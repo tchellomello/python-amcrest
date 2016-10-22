@@ -38,7 +38,6 @@ class AmcrestCamera(object):
         data = resp.content.decode('utf-8')
         return data
 
-    @property
     def get_current_time(self):
         arg = 'global.cgi?action=getCurrentTime'
         return self.command(arg)
