@@ -43,11 +43,6 @@ class AmcrestCamera(object):
         arg = 'global.cgi?action=getCurrentTime'
         return self.command(arg)
 
-    @property
-    def get_video_color_config(self):
-        arg = 'configManager.cgi?action=getConfig&name=VideoColor'
-        return self.command(arg)
-
     def is_motion_detection_enabled(self):
         arg = 'configManager.cgi?action=getConfig&name=MotionDetect'
         ret = self.command(arg)
@@ -57,18 +52,18 @@ class AmcrestCamera(object):
         else:
             return False
 
-    def enable_motion(self):
-        arg = 'configManager.cgi?action=setConfig&MotionDetect\[0\].Enable=true'
+    def enable_motion_detection(self):
+        arg = 'configManager.cgi?action=setConfig&MotionDetect[0].Enable=true'
         ret = self.command(arg)
-        if ret == 'OK':
+        if ret.startswith('OK'):
             return True
         else:
             return False
 
-    def disable_motion(self):
-        arg = 'configManager.cgi?action=setConfig&MotionDetect\[0\].Enable=false'
+    def disable_motion_detection(self):
+        arg = 'configManager.cgi?action=setConfig&MotionDetect[0].Enable=false'
         ret = self.command(arg)
-        if ret == 'OK':
+        if ret.startswith('OK'):
             return True
         else:
             return False
