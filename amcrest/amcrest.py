@@ -56,3 +56,19 @@ class AmcrestCamera(object):
             return True
         else:
             return False
+
+    def enable_motion(self):
+        arg = 'configManager.cgi?action=setConfig&MotionDetect\[0\].Enable=true'
+        ret = self.command(arg)
+        if ret == 'OK':
+            return True
+        else:
+            return False
+
+    def disable_motion(self):
+        arg = 'configManager.cgi?action=setConfig&MotionDetect\[0\].Enable=false'
+        ret = self.command(arg)
+        if ret == 'OK':
+            return True
+        else:
+            return False
