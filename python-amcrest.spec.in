@@ -1,0 +1,132 @@
+%global         package_version @PACKAGE_VERSION@
+
+%if 0%{?fedora} || 0%{?rhel} >= 8
+%global with_python3 1
+%else
+%global with_python2 1
+%endif
+
+%{!?__python2: %global __python2 /usr/bin/python2}
+%{!?python2_sitelib2: %global python2_sitelib %(%{__python2} -c "from distutils.sysconfig import get_python_lib; print (get_python_lib())")}
+
+# Skips check since rhel default repos lack flake8
+%if ! 0%{?rhel}
+%{!?with_check:%global with_check 1}
+%else
+%{!?with_check:%global with_check 0}
+%endif
+
+# Default to skipping autoreconf.  Distros can change just this one line
+# (or provide a command-line override) if they backport any patches that
+# touch configure.ac or Makefile.am.
+%{!?enable_autotools:%global enable_autotools 0}
+
+%global modname amcrest
+
+%global commit 60535795dadbd09c2e67635978121ffa63ca4a50
+%global shortcommit %(c=%{commit}; echo ${c:0:7})
+
+Name:           @PACKAGE_NAME@
+Version:        @PACKAGE_RPM_VERSION@
+Release:        @PACKAGE_RPM_RELEASE@%{?release_suffix}%{?dist}
+Summary:        A python module and tool to manage Amcrest camera
+License:        GPLv2
+Group:          System Environment/Libraries
+URL:            https://github.com/tchellomello/python-amcrest
+
+# Keep the below Source0, will be useful for Fedora review process
+# Source0:        https://github.com/tchellomello/python-amcrest/archive/%{commit}/python-amcrest-%{package_version}-%{shortcommit}.tar.gz
+Source0:        https://github.com/tchellomello/python-amcrest/archive/%{commit}/python-amcrest-%{package_version}.tar.gz
+
+BuildArch:      noarch
+
+BuildRequires: python2-devel
+BuildRequires: python-setuptools
+
+%if 0%{?with_check}
+BuildRequires: python-tools
+BuildRequires: python-flake8
+%endif
+
+# Autotools BuildRequires
+%if 0%{?enable_autotools}
+BuildRequires: autoconf
+BuildRequires: automake
+BuildRequires: gettext-devel
+BuildRequires: libtool
+%endif
+
+%if 0%{?with_python3} && 0%{?with_check}
+BuildRequires: python3-devel
+BuildRequires: python3-setuptools
+BuildRequires: python3-flake8
+BuildRequires: python-tools
+%endif
+
+Requires: python-requests
+
+%{!?_licensedir:%global license %%doc}
+
+%description
+python amcrest is a python 2 library to manage Amcrest camera
+This package also contains the command line tool amcrest-cli tool
+
+%if 0%{?with_python3}
+%package -n python3-amcrest
+Summary: A python 3 module and tool to manage Amcrest camera
+Requires: python3-requests
+
+%description -n python3-amcrest
+python amcrest is a python 3 library to manage Amcrest camera
+This package also contains the command line tool amcrest-cli tool
+%endif
+
+%prep
+%setup -q -n %{name}-%{package_version}
+
+%build
+%if 0%{?enable_autotools}
+autoreconf -if
+%endif
+
+%if 0%{?with_python3}
+%configure
+%endif
+
+%if 0%{?with_python2}
+%configure --without-python3
+%endif
+
+make %{?_smp_mflags}
+
+%install
+make %{?_smp_mflags} install DESTDIR="%{buildroot}"
+
+%check
+%if 0%{?with_check}
+make check-local
+%endif
+
+%if 0%{?with_python2}
+%files
+%{_bindir}/amcrest-cli
+%{_mandir}/man1/amcrest-cli.1.gz
+%doc AUTHORS
+%license COPYING
+%dir %{python2_sitelib}/%{modname}
+%{python2_sitelib}/%{modname}/*
+%endif
+
+%if 0%{?with_python3}
+%files -n python3-amcrest
+%{_bindir}/amcrest-cli
+%{_mandir}/man1/amcrest-cli.1.gz
+%doc AUTHORS
+%license COPYING
+%dir %{python3_sitelib}/%{modname}
+%{python3_sitelib}/%{modname}/*
+%endif
+
+%changelog
+* Thu May 07 2015 Douglas Schilling Landgraf <dougsland@gmail.com> 1.0-0
+- Initial take

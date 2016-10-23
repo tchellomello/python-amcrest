@@ -1,3 +1,19 @@
+# autotools
+aclocal.m4
+autom4te.cache/
+config.status
+configure
+install-sh
+missing
+py-compile
+*.tar.gz
+Makefile
+Makefile.in
+tmp.repos
+
+# spec 
+python-amcrest.spec
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

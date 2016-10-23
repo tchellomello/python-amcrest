@@ -61,10 +61,10 @@ def main():
         args.password
     )
     if args.get_current_time:
-        print(camera.get_current_time())
+        print((camera.get_current_time()))
 
     elif args.motion_detection_status:
-        print(camera.is_motion_detection_enabled())
+        print((camera.is_motion_detection_enabled()))
 
     elif args.enable_motion_detection:
         if camera.is_motion_detection_enabled():
@@ -74,7 +74,7 @@ def main():
         camera.enable_motion_detection()
 
     elif args.disable_motion_detection:
-        print(camera.disable_motion_detection())
+        print((camera.disable_motion_detection()))
 
     else:
         print('Error: You must specify a valid operation. See usage:')

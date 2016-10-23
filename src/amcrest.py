@@ -14,7 +14,7 @@
 try:
     import json
 except:
-    import simplejson as json
+    import simplejson as json  # noqa
 
 import requests
 from requests.auth import HTTPBasicAuth
