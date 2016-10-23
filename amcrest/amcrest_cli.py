@@ -3,7 +3,6 @@
 # vim:sw=4:ts=4:et
 
 import argparse
-import sys
 
 from amcrest import AmcrestCamera
 
