@@ -7,9 +7,11 @@ import sys
 
 from amcrest import AmcrestCamera
 
-def main():
 
-    parser = argparse.ArgumentParser(description='Command line interface for Amcrest cameras.')
+def main():
+    parser = argparse.ArgumentParser(
+        description='Command line interface for Amcrest cameras.'
+    )
     parser.add_argument('-H', '--hostname',
                         dest='hostname',
                         required=True,
@@ -43,21 +45,40 @@ def main():
                         help='Disable motion detection.')
     args = parser.parse_args()
 
-
     if args.get_current_time:
-        camera = AmcrestCamera(args.hostname, args.port, args.username, args.password)
+        camera = AmcrestCamera(
+            args.hostname,
+            args.port,
+            args.username,
+            args.password
+        )
         print(camera.get_current_time())
 
     elif args.motion_detection_status:
-        camera = AmcrestCamera(args.hostname, args.port, args.username, args.password)
+        camera = AmcrestCamera(
+            args.hostname,
+            args.port,
+            args.username,
+            args.password
+        )
         print(camera.is_motion_detection_enabled())
 
     elif args.enable_motion_detection:
-        camera = AmcrestCamera(args.hostname, args.port, args.username, args.password)
+        camera = AmcrestCamera(
+            args.hostname,
+            args.port,
+            args.username,
+            args.password
+        )
         print(camera.enable_motion_detection())
 
     elif args.disable_motion_detection:
-        camera = AmcrestCamera(args.hostname, args.port, args.username, args.password)
+        camera = AmcrestCamera(
+            args.hostname,
+            args.port,
+            args.username,
+            args.password
+        )
         print(camera.detection_motion_detection())
 
     else:
