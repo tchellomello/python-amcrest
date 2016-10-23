@@ -34,7 +34,6 @@ class AmcrestCamera(object):
         except:
             raise
 
-        #data = json.dumps(resp.content.decode('utf-8'))
         data = resp.content.decode('utf-8')
         return data
 
