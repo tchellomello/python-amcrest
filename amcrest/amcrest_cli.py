@@ -57,7 +57,11 @@ def main():
         print(camera.is_motion_detection_enabled())
 
     elif args.enable_motion_detection:
-        print(camera.enable_motion_detection())
+        if camera.is_motion_detection_enabled:
+            print("Nothing to do, motion detected, already enabled!")
+            return
+
+        camera.enable_motion_detection()
 
     elif args.disable_motion_detection:
         print(camera.detection_motion_detection())
