@@ -64,7 +64,7 @@ def main():
         camera.enable_motion_detection()
 
     elif args.disable_motion_detection:
-        print(camera.detection_motion_detection())
+        print(camera.disable_motion_detection())
 
     else:
         print('Error: You must specify a valid operation. See usage:')
