@@ -44,40 +44,22 @@ def main():
                         help='Disable motion detection.')
     args = parser.parse_args()
 
+    camera = AmcrestCamera(
+        args.hostname,
+        args.port,
+        args.username,
+        args.password
+    )
     if args.get_current_time:
-        camera = AmcrestCamera(
-            args.hostname,
-            args.port,
-            args.username,
-            args.password
-        )
         print(camera.get_current_time())
 
     elif args.motion_detection_status:
-        camera = AmcrestCamera(
-            args.hostname,
-            args.port,
-            args.username,
-            args.password
-        )
         print(camera.is_motion_detection_enabled())
 
     elif args.enable_motion_detection:
-        camera = AmcrestCamera(
-            args.hostname,
-            args.port,
-            args.username,
-            args.password
-        )
         print(camera.enable_motion_detection())
 
     elif args.disable_motion_detection:
-        camera = AmcrestCamera(
-            args.hostname,
-            args.port,
-            args.username,
-            args.password
-        )
         print(camera.detection_motion_detection())
 
     else:
