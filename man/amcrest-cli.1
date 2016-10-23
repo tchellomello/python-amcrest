@@ -1,0 +1,30 @@
+.TH man 1 "23 Oct, 2016" "1.0" "amcrest-cli man page"
+.SH NAME
+amcrest-cli \- A tool to manage Amcrest camera
+.SH SYNOPSIS
+amcrest-cli -H HOSTNAME -u USERNAME -p PASSWORD [options]
+.SH DESCRIPTION
+\fBamcrest-cli\fP is a command line tool to manage Amcrest camera
+.SH OPTIONS
+.TP
+.B -h, --help
+Displays a list of options.
+.TP
+.B --get-current-time
+Get current time from camera.
+.TP
+.B --motion-detection-status
+Returns if the motion detection is enabled or disabled
+.TP
+.B --enable-motion-detection
+Enable motion detection
+.TP
+.B --disable-motion-detection
+Disable motion detection
+.TP
+.RE
+.SH BUGS
+Report bugs to <https://github.com/tchellomello/python-amcrest/issues>
+.SH COPYRIGHT
+Copyright 2016
+License GPLv2: GNU GPL Version 2 <http://gnu.org/licenses/gpl.html>.
