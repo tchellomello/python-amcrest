@@ -9,11 +9,12 @@ except:
 import requests
 from requests.auth import HTTPBasicAuth
 
+
 class AmcrestCamera(object):
     """Amcrest camera object implementation."""
 
-    def __init__(self, host, port, user, password, verbose=True,
-            protocol='http'):
+    def __init__(self, host, port, user,
+                 password, verbose=True, protocol='http'):
         self._host = host
         self._port = port
         self._user = user
@@ -22,10 +23,9 @@ class AmcrestCamera(object):
         self._protocol = protocol
         self._token = HTTPBasicAuth(self._user, self._password)
 
-
     def base_url(self, param=""):
-        return '%s://%s:%s/cgi-bin/%s' %(self._protocol, self._host,
-                                                str(self._port), param)
+        return '%s://%s:%s/cgi-bin/%s' % (self._protocol, self._host,
+                                          str(self._port), param)
 
     def command(self, cmd):
         try:
