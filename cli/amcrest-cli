@@ -19,7 +19,8 @@ from amcrest import AmcrestCamera
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Command line interface for Amcrest cameras.'
+        description='Command line interface for Amcrest cameras.',
+        formatter_class=argparse.RawTextHelpFormatter
     )
     parser.add_argument('-H', '--hostname',
                         dest='hostname',
