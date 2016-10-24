@@ -41,6 +41,7 @@ class AmcrestCamera(object):
         try:
             url = self.base_url(cmd)
             resp = requests.get(url, auth=self._token)
+            resp.raise_for_status()
         except:
             raise
 
