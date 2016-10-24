@@ -67,7 +67,7 @@ class AmcrestCamera(object):
             'configManager.cgi?action=setConfig&MotionDetect[0].Enable=true'
         )
 
-        if ret.startswith('OK'):
+        if "ok" in ret.lower():
             return True
 
         return False
@@ -77,7 +77,7 @@ class AmcrestCamera(object):
             'configManager.cgi?action=setConfig&MotionDetect[0].Enable=false'
         )
 
-        if ret.startswith('OK'):
+        if "ok" in ret.lower():
             return True
 
         return False
