@@ -48,12 +48,12 @@ class AmcrestCamera(object):
         return data
 
     def get_current_time(self):
-        arg = 'global.cgi?action=getCurrentTime'
-        return self.command(arg)
+        return self.command('global.cgi?action=getCurrentTime')
 
     def is_motion_detection_enabled(self):
-        arg = 'configManager.cgi?action=getConfig&name=MotionDetect'
-        ret = self.command(arg)
+        ret = self.command(
+            'configManager.cgi?action=getConfig&name=MotionDetect'
+        )
 
         status = ret.splitlines()[0].split('=')[-1]
         if status == 'true':
@@ -62,8 +62,9 @@ class AmcrestCamera(object):
         return False
 
     def enable_motion_detection(self):
-        arg = 'configManager.cgi?action=setConfig&MotionDetect[0].Enable=true'
-        ret = self.command(arg)
+        ret = self.command(
+            'configManager.cgi?action=setConfig&MotionDetect[0].Enable=true'
+        )
 
         if ret.startswith('OK'):
             return True
@@ -71,8 +72,9 @@ class AmcrestCamera(object):
         return False
 
     def disable_motion_detection(self):
-        arg = 'configManager.cgi?action=setConfig&MotionDetect[0].Enable=false'
-        ret = self.command(arg)
+        ret = self.command(
+            'configManager.cgi?action=setConfig&MotionDetect[0].Enable=false'
+        )
 
         if ret.startswith('OK'):
             return True
