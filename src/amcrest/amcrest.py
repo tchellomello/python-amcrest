@@ -104,7 +104,6 @@ class AmcrestCamera(object):
                 If path_file is provided, save the snapshot
                 in the path
 
-
         Return:
             raw from http request
         """
