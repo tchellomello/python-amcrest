@@ -1,4 +1,5 @@
-from setuptools import setup
+#!/usr/bin/env python
+from setuptools import setup, find_packages
 
 setup(name='amcrest',
       version='1.0.0',
@@ -8,6 +9,9 @@ setup(name='amcrest',
       url='http://github.com/tchellomello/python-amcrest',
       license='GPLv2',
       install_requires=['requests'],
-      packages=['src'],
+      package_dir={'': 'src'},
+      packages=find_packages(),
+      include_package_data=True,
+      scripts=['cli/amcrest-cli'],
       keywords="amcrest camera python",
       zip_safe=True)
