@@ -5,8 +5,13 @@ This is a working in process project.
 
 Installation
 ============
+
+
+PIP + GIT
+---------
+
 ```bash
-$ pip install https://github.com/tchellomello/python-amcrest
+$ pip install git+https://github.com/tchellomello/python-amcrest
 ```
 
 Usage
