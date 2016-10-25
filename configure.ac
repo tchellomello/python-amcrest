@@ -91,7 +91,7 @@ AC_CHECK_PROGS([PYFLAKES], [flake8])
 
 AC_CONFIG_FILES([
 		Makefile
-		src/Makefile
+		src/amcrest/Makefile
 		man/Makefile
 		cli/Makefile
 		setup.py
