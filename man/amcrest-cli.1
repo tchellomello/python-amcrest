@@ -13,6 +13,15 @@ Displays a list of options.
 .B --get-current-time
 Get current time from camera.
 .TP
+.B --get-snapshot
+Get snapshot, use one of the following options:
+.br
+0 - regular snapshot
+.br
+1 - motion detection snapshot
+.br
+2 - alarm snapshot
+.TP
 .B --motion-detection-status
 Returns if the motion detection is enabled or disabled
 .TP
@@ -22,7 +31,12 @@ Enable motion detection
 .B --disable-motion-detection
 Disable motion detection
 .TP
-.RE
+.B --output
+output file name, useful for options like --get-snapshot
+.SH EXAMPLES
+.TP
+.B Grab snapshot and save in /tmp/self.jpeg
+$ amcrest-cli -H 192.168.1.10 -u admin -p password --get-snapshot --output /tmp/self.jpeg
 .SH BUGS
 Report bugs to <https://github.com/tchellomello/python-amcrest/issues>
 .SH COPYRIGHT
