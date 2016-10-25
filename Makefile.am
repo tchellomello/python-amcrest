@@ -26,6 +26,8 @@ SUBDIRS = \
 EXTRA_DIST = \
 	python-amcrest.spec \
 	python-amcrest.spec.in \
+	setup.py \
+	setup.py.in \
 	$(NULL)
 
 DISTCLEANFILES = \
