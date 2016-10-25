@@ -17,6 +17,7 @@ except:
     import simplejson as json  # noqa
 
 import requests
+import shutil
 from requests.auth import HTTPBasicAuth
 
 
@@ -40,22 +41,25 @@ class AmcrestCamera(object):
     def command(self, cmd):
         try:
             url = self.base_url(cmd)
-            resp = requests.get(url, auth=self._token)
+            resp = requests.get(url, auth=self._token, stream=True)
             resp.raise_for_status()
         except:
             raise
 
-        data = resp.content.decode('utf-8')
-        return data
+        return resp
 
     def get_current_time(self):
-        return self.command('global.cgi?action=getCurrentTime')
+        ret = self.command(
+            'global.cgi?action=getCurrentTime'
+        )
+        return ret.content.decode('utf-8')
 
     def is_motion_detection_enabled(self):
         ret = self.command(
             'configManager.cgi?action=getConfig&name=MotionDetect'
         )
 
+        ret = ret.content.decode('utf-8')
         status = ret.splitlines()[0].split('=')[-1]
         if status == 'true':
             return True
@@ -67,6 +71,7 @@ class AmcrestCamera(object):
             'configManager.cgi?action=setConfig&MotionDetect[0].Enable=true'
         )
 
+        ret = ret.content.decode('utf-8')
         if "ok" in ret.lower():
             return True
 
@@ -77,7 +82,39 @@ class AmcrestCamera(object):
             'configManager.cgi?action=setConfig&MotionDetect[0].Enable=false'
         )
 
+        ret = ret.content.decode('utf-8')
         if "ok" in ret.lower():
             return True
 
         return False
+
+    def get_snapshot(self, channel=0, path_file=None):
+        """
+        Args:
+
+            channel:
+                Values according with Amcrest API:
+                0 - regular snapshot
+                1 - motion detection snapshot
+                2 - alarm snapshot
+
+                If no channel param is used, default is 0
+
+            path_file:
+                If path_file is provided, save the snapshot
+                in the path
+
+
+        Return:
+            raw from http request
+        """
+
+        ret = self.command(
+            "snapshot.cgi?=channel={0}".format(channel)
+        )
+
+        if path_file is not None:
+           with open(path_file, 'wb') as out_file:
+                shutil.copyfileobj(ret.raw, out_file)
+
+        return ret.raw
