@@ -19,7 +19,7 @@ SHELL := /bin/bash
 
 SUBDIRS = \
         cli \
-        src \
+        src/amcrest \
 	man \
 	$(NULL)	
 
@@ -28,6 +28,7 @@ EXTRA_DIST = \
 	python-amcrest.spec.in \
 	setup.py \
 	setup.py.in \
+	cli/amcrest-cli-autocomplete.sh \
 	$(NULL)
 
 DISTCLEANFILES = \

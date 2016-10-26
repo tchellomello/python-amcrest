@@ -12,6 +12,7 @@
 #
 # vim:sw=4:ts=4:et
 
+import argcomplete
 import argparse
 
 from amcrest import AmcrestCamera
@@ -65,6 +66,8 @@ def main():
     parser.add_argument('--output',
                         dest='output',
                         help='output file name')
+
+    argcomplete.autocomplete(parser)
     args = parser.parse_args()
 
     camera = AmcrestCamera(
