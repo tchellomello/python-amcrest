@@ -28,7 +28,6 @@ EXTRA_DIST = \
 	python-amcrest.spec.in \
 	setup.py \
 	setup.py.in \
-	cli/amcrest-cli-autocomplete.sh \
 	$(NULL)
 
 DISTCLEANFILES = \

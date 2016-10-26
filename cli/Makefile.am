@@ -9,6 +9,9 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+etcdir = $(sysconfdir)/profile.d
+dist_etc_DATA = amcrest-cli-autocomplete.sh
+
 dist_bin_SCRIPTS = \
 	amcrest-cli \
 	$(NULL)
