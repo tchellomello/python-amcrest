@@ -12,6 +12,11 @@ PIP + GIT
 
 ```bash
 $ pip install git+https://github.com/tchellomello/python-amcrest
+$ eval "$(register-python-argcomplete amcrest-cli)"
+
+To enable amcrest-cli autocomplete in the system:
+$ sudo vi /etc/profile.d/amcrest-cli-autocomplete.sh
+  eval "$(register-python-argcomplete amcrest-cli)"
 ```
 
 Usage

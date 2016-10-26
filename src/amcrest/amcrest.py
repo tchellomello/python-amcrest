@@ -113,7 +113,7 @@ class AmcrestCamera(object):
         )
 
         if path_file is not None:
-           with open(path_file, 'wb') as out_file:
+            with open(path_file, 'wb') as out_file:
                 shutil.copyfileobj(ret.raw, out_file)
 
         return ret.raw
