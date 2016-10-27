@@ -10,10 +10,10 @@ amcrest-cli -H HOSTNAME -u USERNAME -p PASSWORD [options]
 .B -h, --help
 Displays a list of options.
 .TP
-.B --get-current-time
+.B --current-time
 Get current time from camera.
 .TP
-.B --get-snapshot
+.B --snapshot
 Get snapshot, use one of the following options:
 .br
 0 - regular snapshot
@@ -22,21 +22,51 @@ Get snapshot, use one of the following options:
 .br
 2 - alarm snapshot
 .TP
+.B --output
+output file name, useful for options like --get-snapshot
+.TP
 .B --motion-detection-status
 Returns if the motion detection is enabled or disabled
 .TP
-.B --enable-motion-detection
-Enable motion detection
+.B ---motion-detection
+Enable or Disable motion detection, use true or false
 .TP
-.B --disable-motion-detection
-Disable motion detection
+.B ---general-config
+Get general config
 .TP
-.B --output
-output file name, useful for options like --get-snapshot
+.B ---network-config
+Get network config
+.TP
+.B ---network-interfaces
+Get network interfaces
 .SH EXAMPLES
 .TP
+.B Get general config
+$ amcrest-cli -H 192.168.1.10 -u admin -p password --general-config
+.TP
 .B Grab snapshot and save in /tmp/self.jpeg
-$ amcrest-cli -H 192.168.1.10 -u admin -p password --get-snapshot --output /tmp/self.jpeg
+$ amcrest-cli -H 192.168.1.10 -u admin -p password --snapshot --output /tmp/self.jpeg
+.TP
+.B Check if motion detection is enable or disable
+$ amcrest-cli -H 192.168.1.10 -u admin -p password --motion-detection
+.TP
+.B Enable motion detection
+$ amcrest-cli -H 192.168.1.10 -u admin -p password --motion-detection true
+.TP
+.B Disable motion detection
+$ amcrest-cli -H 192.168.1.10 -u admin -p password --motion-detection false
+.TP
+.B Get network config
+$ amcrest-cli -H 192.168.1.10 -u admin -p password --network-config
+.TP
+.B Get network interfaces
+$ amcrest-cli -H 192.168.1.10 -u admin -p password --network-interfaces
+.TP
+.B Get current time
+$ amcrest-cli -H 192.168.1.10 -u admin -p password --current-time
+.TP
+.B Set current time
+$ amcrest-cli -H 192.168.1.10 -u admin -p password --current-time "2016-10-28 13-48-00"
 .SH BUGS
 Report bugs to <https://github.com/tchellomello/python-amcrest/issues>
 .SH COPYRIGHT
