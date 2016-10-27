@@ -66,6 +66,7 @@ THEDIR=`pwd`
 
   automake --add-missing
   autoconf
+  autoreconf -i
   ./configure "$@"
 )
 

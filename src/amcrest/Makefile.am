@@ -21,4 +21,9 @@ pycrestdir = $(amcrestpythonlibdir)
 pycrest_PYTHON = \
 	__init__.py \
 	amcrest.py \
+	http.py \
+	system.py \
+	network.py \
+	motion_detection.py \
+	snapshot.py \
 	$(NULL)

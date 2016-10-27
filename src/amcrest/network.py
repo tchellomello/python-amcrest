@@ -11,20 +11,21 @@
 #
 # vim:sw=4:ts=4:et
 
-from .http import Http
 
-
-class AmcrestCamera(Http):
-    """Amcrest camera object implementation."""
-
-    def __init__(self, host, port, user,
-                 password, verbose=True, protocol='http'):
-
-        self.camera = Http(
-            host=host,
-            port=port,
-            user=user,
-            password=password,
-            verbose=verbose,
-            protocol=protocol
+class Network:
+    def __get_config(self, config_name):
+        ret = self.command(
+            'configManager.cgi?action=getConfig&name={0}'.format(config_name)
         )
+        return ret.content.decode('utf-8')
+
+    @property
+    def network_config(self):
+        return self.__get_config('Network')
+
+    @property
+    def network_interfaces(self):
+        ret = self.command(
+            'netApp.cgi?action=getInterfaces'
+        )
+        return ret.content.decode('utf-8')
