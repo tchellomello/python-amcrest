@@ -112,7 +112,7 @@ def main():
     if args.scan_devices:
         ret = camera.scan_devices(args.scan_devices, args.timeout)
         if ret:
-            print("Looks like amcrest device: {0}".format(ret))
+            print(("Looks like amcrest device: {0}".format(ret)))
         else:
             print("No devices found, try again later!")
         return
