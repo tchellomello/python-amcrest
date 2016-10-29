@@ -26,19 +26,16 @@ def main():
 
     parser.add_argument('-H', '--hostname',
                         dest='hostname',
-                        required=True,
                         help='hostname or ip address for Amcrest camera')
 
     parser.add_argument('-u',
                         '--username',
                         dest='username',
-                        required=True,
                         help='username for Amcrest camera')
 
     parser.add_argument('-p',
                         '--password',
                         dest='password',
-                        required=True,
                         help='password for Amcrest camera')
 
     parser.add_argument('-P',
@@ -49,7 +46,7 @@ def main():
 
     parser.add_argument('--general-config',
                         action='store_true',
-                        help='Get general configuration')
+                        help='general configuration')
 
     parser.add_argument('--snapshot',
                         dest='snapshot_option',
@@ -65,29 +62,42 @@ def main():
                         action='store_true',
                         help='Get network interfaces')
 
+    parser.add_argument('--scan-devices',
+                        dest='scan_devices',
+                        help='scan Amcrest cameras in the subnet provided\n'
+                             'i.e: 192.168.1.0/24')
+
+    parser.add_argument('--timeout',
+                        dest='timeout',
+                        type=int,
+                        const=None,
+                        help='set timeout for operations like\n'
+                             ' scan-devices')
+
     parser.add_argument('--current-time',
                         nargs='?',
                         const=-1,
-                        help='Get camera current time')
+                        help='camera current time')
 
     parser.add_argument('--motion-detection',
                         nargs='?',
                         const=-1,
-                        help='Enable/disable motion detection (True or False)')
+                        help='enable/disable motion detection (True or False)')
 
     parser.add_argument('--network-config',
                         nargs='?',
                         const=-1,
-                        help='Get network configuration')
+                        help='network configuration')
 
     parser.add_argument('--snapshot-config',
                         nargs='?',
                         const=-1,
-                        help='Get snapshot configuration')
+                        help='get snapshot configuration')
 
     parser.add_argument('--output',
                         dest='output',
-                        help='output file name')
+                        help='set output file name for operations\n'
+                             ' like snapshot')
 
     argcomplete.autocomplete(parser)
     args = parser.parse_args()
@@ -99,38 +109,44 @@ def main():
         args.password
     )
     camera = amcrest.camera
-
-    if args.general_config:
-        print((camera.general_config))
-
-    elif args.network_config:
-        print((camera.network_config))
-
-    elif args.network_interfaces:
-        print((camera.network_interfaces))
-
-    elif args.current_time == -1:
-        print((camera.current_time))
-
-    elif args.motion_detection == -1:
-        print((camera.motion_detection))
-
-    elif args.motion_detection:
-        camera.motion_detection = args.motion_detection
-
-    elif args.current_time is not None:
-        camera.current_time = args.current_time
-
-    elif args.snapshot_config:
-        print((camera.snapshot_config))
-
-    elif args.snapshot_option:
-
-        if args.output:
-            camera.snapshot(args.snapshot_option, args.output)
+    if args.scan_devices:
+        ret = camera.scan_devices(args.scan_devices, args.timeout)
+        if ret:
+            print("Looks like amcrest device: {0}".format(ret))
         else:
-            print("This option requires --output")
+            print("No devices found, try again later!")
+        return
 
+    if args.username and args.hostname and args.password:
+        if args.general_config:
+            print((camera.general_config))
+
+        elif args.network_config:
+            print((camera.network_config))
+
+        elif args.network_interfaces:
+            print((camera.network_interfaces))
+
+        elif args.current_time == -1:
+            print((camera.current_time))
+
+        elif args.motion_detection == -1:
+            print((camera.motion_detection))
+
+        elif args.motion_detection:
+            camera.motion_detection = args.motion_detection
+
+        elif args.current_time is not None:
+            camera.current_time = args.current_time
+
+        elif args.snapshot_config:
+            print((camera.snapshot_config))
+
+        elif args.snapshot_option:
+            if args.output:
+                camera.snapshot(args.snapshot_option, args.output)
+            else:
+                print("This option requires --output")
     else:
         print('Error: You must specify a valid operation. See usage:')
         parser.print_usage()

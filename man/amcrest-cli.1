@@ -28,17 +28,23 @@ output file name, useful for options like --get-snapshot
 .B --motion-detection-status
 Returns if the motion detection is enabled or disabled
 .TP
-.B ---motion-detection
+.B --motion-detection
 Enable or Disable motion detection, use true or false
 .TP
-.B ---general-config
+.B --general-config
 Get general config
 .TP
-.B ---network-config
+.B --network-config
 Get network config
 .TP
-.B ---network-interfaces
+.B --network-interfaces
 Get network interfaces
+.TP
+.B --scan-devices
+.br
+Scan amcrest cameras in the subnet provided. Masks support: /16, /24, /25, /27, /28, /29, /30, /31
+.br
+If mask not provide, will be used /24.
 .SH EXAMPLES
 .TP
 .B Get general config
@@ -67,6 +73,9 @@ $ amcrest-cli -H 192.168.1.10 -u admin -p password --current-time
 .TP
 .B Set current time
 $ amcrest-cli -H 192.168.1.10 -u admin -p password --current-time "2016-10-28 13-48-00"
+.TP
+.B Scan Amcrest devices
+$ amcrest-cli -H 192.168.1.10 --scan-devices 192.168.0.1/24
 .SH BUGS
 Report bugs to <https://github.com/tchellomello/python-amcrest/issues>
 .SH COPYRIGHT
