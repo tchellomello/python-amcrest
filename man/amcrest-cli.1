@@ -37,6 +37,9 @@ Get general config
 .B --network-config
 Get network config
 .TP
+.B --get-version-http-api
+Get version of HTTP API
+.TP
 .B --network-interfaces
 Get network interfaces
 .TP
@@ -76,6 +79,9 @@ $ amcrest-cli -H 192.168.1.10 -u admin -p password --current-time "2016-10-28 13
 .TP
 .B Scan Amcrest devices
 $ amcrest-cli -H 192.168.1.10 --scan-devices 192.168.0.1/24
+.TP
+.B Get version of HTTP API
+$ amcrest-cli -H 192.168.1.10 -u admin -p password --get-version-http-api
 .SH BUGS
 Report bugs to <https://github.com/tchellomello/python-amcrest/issues>
 .SH COPYRIGHT

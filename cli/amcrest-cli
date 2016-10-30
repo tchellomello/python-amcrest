@@ -62,6 +62,10 @@ def main():
                         action='store_true',
                         help='Get network interfaces')
 
+    parser.add_argument('--get-version-http-api',
+                        action='store_true',
+                        help='Get version of HTTP API')
+
     parser.add_argument('--scan-devices',
                         dest='scan_devices',
                         help='scan Amcrest cameras in the subnet provided\n'
@@ -120,6 +124,9 @@ def main():
     if args.username and args.hostname and args.password:
         if args.general_config:
             print((camera.general_config))
+
+        elif args.get_version_http_api:
+            print((camera.get_version_http_api))
 
         elif args.network_config:
             print((camera.network_config))

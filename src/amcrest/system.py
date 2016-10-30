@@ -51,3 +51,10 @@ class System:
     @property
     def general_config(self):
         return self.__get_config('General')
+
+    @property
+    def get_version_http_api(self):
+        ret = self.command(
+            'IntervideoManager.cgi?action=getVersion&Name=CGI'
+        )
+        return ret.content.decode('utf-8')
