@@ -60,6 +60,10 @@ def main():
                         action='store_true',
                         help='serial number')
 
+    parser.add_argument('--system-information',
+                        action='store_true',
+                        help='the system information')
+
     parser.add_argument('--device-type',
                         action='store_true',
                         help='device type')
@@ -144,6 +148,9 @@ def main():
     if args.username and args.hostname and args.password:
         if args.general_config:
             print((camera.general_config))
+
+        elif args.system_information:
+            print((camera.system_information))
 
         elif args.machine_name:
             print((camera.machine_name))
