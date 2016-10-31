@@ -86,3 +86,10 @@ class System:
             'magicBox.cgi?action=getSerialNo'
         )
         return ret.content.decode('utf-8')
+
+    @property
+    def machine_name(self):
+        ret = self.command(
+            'magicBox.cgi?action=getMachineName'
+        )
+        return ret.content.decode('utf-8')
