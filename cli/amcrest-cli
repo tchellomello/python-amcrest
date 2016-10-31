@@ -52,6 +52,10 @@ def main():
                         action='store_true',
                         help='software information')
 
+    parser.add_argument('--device-class',
+                        action='store_true',
+                        help='device class')
+
     parser.add_argument('--machine-name',
                         action='store_true',
                         help='machine name')
@@ -156,6 +160,9 @@ def main():
     if args.username and args.hostname and args.password:
         if args.general_config:
             print((camera.general_config))
+
+        elif args.device_class:
+            print((camera.device_class))
 
         elif args.onvif_information:
             print((camera.onvif_information))

@@ -114,3 +114,14 @@ class System:
             'IntervideoManager.cgi?action=getVersion&Name=Onvif'
         )
         return ret.content.decode('utf-8')
+
+    @property
+    def device_class(self):
+        """
+        During the development, ths device IP2M-841B didn't
+        responde for this call, adding it anyway.
+        """
+        ret = self.command(
+            'magicBox.cgi?action=getDeviceClass'
+        )
+        return ret.content.decode('utf-8')
