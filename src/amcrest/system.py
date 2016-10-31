@@ -107,3 +107,10 @@ class System:
             'magicBox.cgi?action=getVendor'
         )
         return ret.content.decode('utf-8')
+
+    @property
+    def onvif_information(self):
+        ret = self.command(
+            'IntervideoManager.cgi?action=getVersion&Name=Onvif'
+        )
+        return ret.content.decode('utf-8')

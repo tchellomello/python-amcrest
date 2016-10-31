@@ -60,6 +60,10 @@ def main():
                         action='store_true',
                         help='serial number')
 
+    parser.add_argument('--onvif-information',
+                        action='store_true',
+                        help='onvif information')
+
     parser.add_argument('--vendor-information',
                         action='store_true',
                         help='vendor information')
@@ -152,6 +156,9 @@ def main():
     if args.username and args.hostname and args.password:
         if args.general_config:
             print((camera.general_config))
+
+        elif args.onvif_information:
+            print((camera.onvif_information))
 
         elif args.vendor_information:
             print((camera.vendor_information))
