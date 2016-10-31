@@ -56,6 +56,10 @@ def main():
                         action='store_true',
                         help='device type')
 
+    parser.add_argument('--hardware-version',
+                        action='store_true',
+                        help='hardware version')
+
     parser.add_argument('--snapshot',
                         dest='snapshot_option',
                         default='0',
@@ -135,6 +139,9 @@ def main():
 
         elif args.device_type:
             print((camera.device_type))
+
+        elif args.hardware_version:
+            print((camera.hardware_version))
 
         elif args.version_http_api:
             print((camera.version_http_api))

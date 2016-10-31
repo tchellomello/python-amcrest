@@ -67,6 +67,13 @@ class System:
         return ret.content.decode('utf-8')
 
     @property
+    def hardware_version(self):
+        ret = self.command(
+            'magicBox.cgi?action=getHardwareVersion'
+        )
+        return ret.content.decode('utf-8')
+
+    @property
     def device_type(self):
         ret = self.command(
             'magicBox.cgi?action=getDeviceType'
