@@ -46,6 +46,9 @@ Get network interfaces
 .B --software-information
 Get software information
 .TP
+.B --device-type
+Get device type
+.TP
 .B --scan-devices
 .br
 Scan amcrest cameras in the subnet provided. Masks support: /16, /24, /25, /27, /28, /29, /30, /31
@@ -85,6 +88,9 @@ $ amcrest-cli -H 192.168.1.10 --scan-devices 192.168.0.1/24
 .TP
 .B Get version of HTTP API
 $ amcrest-cli -H 192.168.1.10 -u admin -p password --version-http-api
+.TP
+.B Get device type
+$ amcrest-cli -H 192.168.1.10 -u admin -p password --device-type
 .TP
 .B Get software information
 $ amcrest-cli -H 192.168.1.10 -u admin -p password --software-information
