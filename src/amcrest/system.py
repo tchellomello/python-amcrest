@@ -58,3 +58,10 @@ class System:
             'IntervideoManager.cgi?action=getVersion&Name=CGI'
         )
         return ret.content.decode('utf-8')
+
+    @property
+    def software_information(self):
+        ret = self.command(
+            'magicBox.cgi?action=getSoftwareVersion'
+        )
+        return ret.content.decode('utf-8')

@@ -48,6 +48,10 @@ def main():
                         action='store_true',
                         help='general configuration')
 
+    parser.add_argument('--software-information',
+                        action='store_true',
+                        help='software information')
+
     parser.add_argument('--snapshot',
                         dest='snapshot_option',
                         default='0',
@@ -127,6 +131,9 @@ def main():
 
         elif args.get_version_http_api:
             print((camera.get_version_http_api))
+
+        elif args.software_information:
+            print((camera.software_information))
 
         elif args.network_config:
             print((camera.network_config))

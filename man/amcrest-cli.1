@@ -43,6 +43,9 @@ Get version of HTTP API
 .B --network-interfaces
 Get network interfaces
 .TP
+.B --software-information
+Get software information
+.TP
 .B --scan-devices
 .br
 Scan amcrest cameras in the subnet provided. Masks support: /16, /24, /25, /27, /28, /29, /30, /31
@@ -82,6 +85,9 @@ $ amcrest-cli -H 192.168.1.10 --scan-devices 192.168.0.1/24
 .TP
 .B Get version of HTTP API
 $ amcrest-cli -H 192.168.1.10 -u admin -p password --get-version-http-api
+.TP
+.B Get software information
+$ amcrest-cli -H 192.168.1.10 -u admin -p password --software-information
 .SH BUGS
 Report bugs to <https://github.com/tchellomello/python-amcrest/issues>
 .SH COPYRIGHT
