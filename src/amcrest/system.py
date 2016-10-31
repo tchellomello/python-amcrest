@@ -79,3 +79,10 @@ class System:
             'magicBox.cgi?action=getDeviceType'
         )
         return ret.content.decode('utf-8')
+
+    @property
+    def serial_number(self):
+        ret = self.command(
+            'magicBox.cgi?action=getSerialNo'
+        )
+        return ret.content.decode('utf-8')

@@ -52,6 +52,10 @@ def main():
                         action='store_true',
                         help='software information')
 
+    parser.add_argument('--serial-number',
+                        action='store_true',
+                        help='serial number')
+
     parser.add_argument('--device-type',
                         action='store_true',
                         help='device type')
@@ -139,6 +143,9 @@ def main():
 
         elif args.device_type:
             print((camera.device_type))
+
+        elif args.serial_number:
+            print((camera.serial_number))
 
         elif args.hardware_version:
             print((camera.hardware_version))
