@@ -60,6 +60,10 @@ def main():
                         action='store_true',
                         help='serial number')
 
+    parser.add_argument('--vendor-information',
+                        action='store_true',
+                        help='vendor information')
+
     parser.add_argument('--system-information',
                         action='store_true',
                         help='the system information')
@@ -148,6 +152,9 @@ def main():
     if args.username and args.hostname and args.password:
         if args.general_config:
             print((camera.general_config))
+
+        elif args.vendor_information:
+            print((camera.vendor_information))
 
         elif args.system_information:
             print((camera.system_information))

@@ -100,3 +100,10 @@ class System:
             'magicBox.cgi?action=getSystemInfo'
         )
         return ret.content.decode('utf-8')
+
+    @property
+    def vendor_information(self):
+        ret = self.command(
+            'magicBox.cgi?action=getVendor'
+        )
+        return ret.content.decode('utf-8')
