@@ -23,7 +23,7 @@ Get snapshot, use one of the following options:
 2 - alarm snapshot
 .TP
 .B --output
-output file name, useful for options like --get-snapshot
+output file name, useful for options like --snapshot
 .TP
 .B --motion-detection-status
 Returns if the motion detection is enabled or disabled
@@ -37,7 +37,7 @@ Get general config
 .B --network-config
 Get network config
 .TP
-.B --get-version-http-api
+.B --version-http-api
 Get version of HTTP API
 .TP
 .B --network-interfaces
@@ -84,7 +84,7 @@ $ amcrest-cli -H 192.168.1.10 -u admin -p password --current-time "2016-10-28 13
 $ amcrest-cli -H 192.168.1.10 --scan-devices 192.168.0.1/24
 .TP
 .B Get version of HTTP API
-$ amcrest-cli -H 192.168.1.10 -u admin -p password --get-version-http-api
+$ amcrest-cli -H 192.168.1.10 -u admin -p password --version-http-api
 .TP
 .B Get software information
 $ amcrest-cli -H 192.168.1.10 -u admin -p password --software-information

@@ -53,7 +53,7 @@ class System:
         return self.__get_config('General')
 
     @property
-    def get_version_http_api(self):
+    def version_http_api(self):
         ret = self.command(
             'IntervideoManager.cgi?action=getVersion&Name=CGI'
         )

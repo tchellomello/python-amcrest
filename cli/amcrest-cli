@@ -66,7 +66,7 @@ def main():
                         action='store_true',
                         help='Get network interfaces')
 
-    parser.add_argument('--get-version-http-api',
+    parser.add_argument('--version-http-api',
                         action='store_true',
                         help='Get version of HTTP API')
 
@@ -129,8 +129,8 @@ def main():
         if args.general_config:
             print((camera.general_config))
 
-        elif args.get_version_http_api:
-            print((camera.get_version_http_api))
+        elif args.version_http_api:
+            print((camera.version_http_api))
 
         elif args.software_information:
             print((camera.software_information))
