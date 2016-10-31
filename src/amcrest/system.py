@@ -116,6 +116,19 @@ class System:
         return ret.content.decode('utf-8')
 
     @property
+    def config_backup(self, filename=None):
+        ret = self.command(
+            'Config.backup?action=All'
+        )
+
+        if filename is not None:
+            with open(filename, "w+") as f:
+                f.write(ret.content.decode('utf-8'))
+            return
+
+        return ret.content.decode('utf-8')
+
+    @property
     def device_class(self):
         """
         During the development, device IP2M-841B didn't

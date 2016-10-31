@@ -80,6 +80,10 @@ def main():
                         action='store_true',
                         help='device type')
 
+    parser.add_argument('--config-backup',
+                        action='store_true',
+                        help='config backup')
+
     parser.add_argument('--hardware-version',
                         action='store_true',
                         help='hardware version')
@@ -211,6 +215,12 @@ def main():
 
         elif args.snapshot_config:
             print((camera.snapshot_config))
+
+        elif args.config_backup:
+            if args.output:
+                camera.config_backup(args.output)
+            else:
+                print("This option requires --output")
 
         elif args.snapshot_option:
             if args.output:
