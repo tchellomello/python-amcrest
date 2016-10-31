@@ -44,6 +44,30 @@ def main():
                         default=80,
                         help='port to Amcrest camera. Default: 80')
 
+    parser.add_argument('--info-user',
+                        dest='info_user',
+                        help='info about username')
+
+    parser.add_argument('--info-all-users',
+                        action='store_true',
+                        help='info about all users')
+
+    parser.add_argument('--info-all-active-users',
+                        action='store_true',
+                        help='info about all active users')
+
+    parser.add_argument('--info-group',
+                        dest='info_group',
+                        help='info about group')
+
+    parser.add_argument('--info-all-groups',
+                        action='store_true',
+                        help='info about all groups')
+
+    parser.add_argument('--delete-user',
+                        dest='delete_user',
+                        help='delete username')
+
     parser.add_argument('--general-config',
                         action='store_true',
                         help='general configuration')
@@ -164,6 +188,24 @@ def main():
     if args.username and args.hostname and args.password:
         if args.general_config:
             print((camera.general_config))
+
+        if args.info_group:
+            print((camera.info_user(args.info_group)))
+
+        if args.info_all_groups:
+            print((camera.info_all_groups))
+
+        if args.delete_user:
+            print((camera.delete_user(args.delete_user)))
+
+        if args.info_all_users:
+            print((camera.info_all_users))
+
+        if args.info_all_active_users:
+            print((camera.info_all_active_users))
+
+        if args.info_user:
+            print((camera.info_user(args.info_user)))
 
         elif args.device_class:
             print((camera.device_class))

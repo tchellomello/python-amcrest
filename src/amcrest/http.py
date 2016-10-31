@@ -16,9 +16,10 @@ from .system import System
 from .network import Network
 from .motion_detection import MotionDetection
 from .snapshot import Snapshot
+from .user_management import UserManagement
 
 
-class Http(System, Network, MotionDetection, Snapshot):
+class Http(System, Network, MotionDetection, Snapshot, UserManagement):
     def __init__(self, host, port, user,
                  password, verbose=True, protocol='http'):
         self._host = host

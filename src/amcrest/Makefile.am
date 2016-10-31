@@ -26,4 +26,5 @@ pycrest_PYTHON = \
 	network.py \
 	motion_detection.py \
 	snapshot.py \
+	user_management.py \
 	$(NULL)
