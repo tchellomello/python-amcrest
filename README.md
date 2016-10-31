@@ -26,19 +26,17 @@ Module
 ------
 
 ```python
-from amcrest import AmcrestCamera
+>>> from amcrest import AmcrestCamera
 
-amcrest = AmcrestCamera('192.168.0.1', 80, 'admin', 'password')
-camera = amcrest.camera
+>>> amcrest = AmcrestCamera('192.168.0.1', 80, 'admin', 'password')
+>>> camera = amcrest.camera
 
-camera.is_motion_detection_enabled()
-True
+>>> camera.software_information
+'version=2.420.AC00.15.R\r\nBuildDate=2016-09-08'
 
-camera.enable_motion_detection()
-True
+>>> camera.snapshot(0, "/home/user/Desktop/snapshot00.jpeg")
+<requests.packages.urllib3.response.HTTPResponse object at 0x7f84945083c8>
 
-camera.disable_motion_detection()
-True
 ```
 
 Command Line
