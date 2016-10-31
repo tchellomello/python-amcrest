@@ -28,15 +28,16 @@ Module
 ```python
 from amcrest import AmcrestCamera
 
-c = AmcrestCamera('192.168.0.1', 80, 'admin', 'password')
+amcrest = AmcrestCamera('192.168.0.1', 80, 'admin', 'password')
+camera = amcrest.camera
 
-c.is_motion_detection_enabled()
+camera.is_motion_detection_enabled()
 True
 
-c.enable_motion_detection()
+camera.enable_motion_detection()
 True
 
-c.disable_motion_detection()
+camera.disable_motion_detection()
 True
 ```
 
