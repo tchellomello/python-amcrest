@@ -126,6 +126,14 @@ def main():
                         action='store_true',
                         help='Get network interfaces')
 
+    parser.add_argument('--video-blind-detect-config',
+                        action='store_true',
+                        help='Get video blind detect config')
+
+    parser.add_argument('--video-loss-detect-config',
+                        action='store_true',
+                        help='Get video loss detect config')
+
     parser.add_argument('--version-http-api',
                         action='store_true',
                         help='Get version of HTTP API')
@@ -167,6 +175,67 @@ def main():
                         help='set output file name for operations\n'
                              ' like snapshot')
 
+    parser.add_argument('--event-handler-config',
+                        dest='event_handler_config',
+                        help='get event handler configname')
+
+    parser.add_argument('--alarm-config',
+                        action='store_true',
+                        help='get alarm config')
+
+    parser.add_argument('--alarm-out-config',
+                        action='store_true',
+                        help='get alarm out config')
+
+    parser.add_argument('--alarm-states-output-channels',
+                        action='store_true',
+                        help='alarm states output channels')
+
+    parser.add_argument('--alarm-states-input-channels',
+                        action='store_true',
+                        help='alarm states input channels')
+
+    parser.add_argument('--alarm-input-channels',
+                        action='store_true',
+                        help='alarm input channels')
+
+    parser.add_argument('--alarm-output-channels',
+                        action='store_true',
+                        help='alarm output channels')
+
+    parser.add_argument('--event-login-failure',
+                        action='store_true',
+                        help='event login failure')
+
+    parser.add_argument('--event-storage-not-exist',
+                        action='store_true',
+                        help='event storage not exist')
+
+    parser.add_argument('--event-management',
+                        action='store_true',
+                        help='event management')
+
+    parser.add_argument('--event-storage-access-failure',
+                        action='store_true',
+                        help='event storage access failure')
+
+    parser.add_argument('--event-storage-low-space',
+                        action='store_true',
+                        help='event storage low space')
+
+    parser.add_argument('--event-net-abort',
+                        action='store_true',
+                        help='event net abort')
+
+    parser.add_argument('--event-ip-conflict',
+                        action='store_true',
+                        help='event ip conflict')
+
+    parser.add_argument('--event-channels-happened',
+                        dest='event_channels_happened',
+                        help='params: VideoMotion, VideoLoss,\n'
+                             ' VideoBlind, Alarmlocal')
+
     argcomplete.autocomplete(parser)
     args = parser.parse_args()
 
@@ -186,8 +255,60 @@ def main():
         return
 
     if args.username and args.hostname and args.password:
+        if args.event_storage_not_exist:
+            print((camera.event_storage_not_exist))
+
+        if args.event_login_failure:
+            print((camera.event_login_failure))
+
+        if args.event_net_abort:
+            print((camera.event_net_abort))
+
+        if args.event_ip_conflict:
+            print((camera.event_ip_conflict))
+
+        if args.event_management:
+            print((camera.event_management))
+
+        if args.event_storage_low_space:
+            print((camera.event_storage_low_space))
+
+        if args.event_storage_access_failure:
+            print((camera.event_storage_access_failure))
+
         if args.general_config:
             print((camera.general_config))
+
+        if args.video_blind_detect_config:
+            print((camera.video_blind_detect_config))
+
+        if args.video_loss_detect_config:
+            print((camera.video_loss_detect_config))
+
+        if args.alarm_config:
+            print((camera.alarm_config))
+
+        if args.alarm_out_config:
+            print((camera.alarm_out))
+
+        if args.alarm_output_channels:
+            print((camera.alarm_output_channels))
+
+        if args.alarm_input_channels:
+            print((camera.alarm_input_channels))
+
+        if args.alarm_states_output_channels:
+            print((camera.alarm_states_output_channels))
+
+        if args.alarm_states_input_channels:
+            print((camera.alarm_states_input_channels))
+
+        if args.event_channels_happened:
+            print((camera.event_channels_happened(
+                args.event_channels_happened)))
+
+        if args.event_handler_config:
+            print((camera.event_handler_config(args.event_handler_config)))
 
         if args.info_group:
             print((camera.info_user(args.info_group)))
