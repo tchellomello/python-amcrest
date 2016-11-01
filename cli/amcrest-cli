@@ -321,6 +321,14 @@ def main():
                         const=-1,
                         help='view/set video standard (PAL or NTSC)')
 
+    parser.add_argument('--log-clear-all',
+                        action='store_true',
+                        help='clear all logs')
+
+    # FIXME:
+    # parser.add_argument('--log-show',
+    #                     help='show logs <start time> <end time>')
+
     argcomplete.autocomplete(parser)
     args = parser.parse_args()
 
@@ -340,6 +348,9 @@ def main():
         return
 
     if args.username and args.hostname and args.password:
+
+        if args.log_clear_all:
+            print((camera.log_clear_all))
 
         if args.video_standard == -1:
             print((camera.video_standard))

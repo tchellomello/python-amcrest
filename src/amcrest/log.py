@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2015 Red Hat, Inc.
-#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 2 of the License.
@@ -10,26 +8,22 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
+#
+# vim:sw=4:ts=4:et
 
 
-MAINTAINERCLEANFILES = \
-        $(srcdir)/Makefile.in \
-        $(NULL)
+class Log:
 
-pycrestdir = $(amcrestpythonlibdir)
+    @property
+    def log_clear_all(self):
+        ret = self.command(
+            'log.cgi?action=clear'
+        )
+        return ret.content.decode('utf-8')
 
-pycrest_PYTHON = \
-	__init__.py \
-	amcrest.py \
-	http.py \
-	system.py \
-	network.py \
-	motion_detection.py \
-	snapshot.py \
-	user_management.py \
-	event.py \
-	audio.py \
-	record.py \
-	video.py \
-	log.py \
-	$(NULL)
+    def log_show(self, start_time, end_time):
+        ret = self.command(
+            'Log.backup?action=All&condition.StartTime='
+            '{0}&condition.EndTime={1}'.format(start_time, end_time)
+        )
+        return ret.content.decode('utf-8')
