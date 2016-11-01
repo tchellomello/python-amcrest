@@ -244,6 +244,18 @@ def main():
                         help='params: VideoMotion, VideoLoss,\n'
                              ' VideoBlind, Alarmlocal')
 
+    parser.add_argument('--record-capability',
+                        action='store_true',
+                        help='show record capability')
+
+    parser.add_argument('--record-config',
+                        action='store_true',
+                        help='show record config')
+
+    parser.add_argument('--media-global-config',
+                        action='store_true',
+                        help='media global config')
+
     argcomplete.autocomplete(parser)
     args = parser.parse_args()
 
@@ -263,6 +275,18 @@ def main():
         return
 
     if args.username and args.hostname and args.password:
+
+        if args.record_capability:
+            print((camera.record_capability))
+            return
+
+        if args.record_config:
+            print((camera.record_config))
+            return
+
+        if args.media_global_config:
+            print((camera.media_global_config))
+            return
 
         if args.audio_input_channels_numbers:
             print((camera.audio_input_channels_numbers))

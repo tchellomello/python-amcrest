@@ -19,10 +19,12 @@ from .motion_detection import MotionDetection
 from .snapshot import Snapshot
 from .user_management import UserManagement
 from .event import Event
+from .record import Record
 
 
 class Http(System, Network, MotionDetection, Snapshot,
-           UserManagement, Event, Audio):
+           UserManagement, Event, Audio, Record):
+
     def __init__(self, host, port, user,
                  password, verbose=True, protocol='http'):
         self._host = host

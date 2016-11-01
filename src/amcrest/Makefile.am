@@ -29,4 +29,5 @@ pycrest_PYTHON = \
 	user_management.py \
 	event.py \
         audio.py \
+        record.py \
 	$(NULL)
