@@ -17,9 +17,11 @@ from .network import Network
 from .motion_detection import MotionDetection
 from .snapshot import Snapshot
 from .user_management import UserManagement
+from .event import Event
 
 
-class Http(System, Network, MotionDetection, Snapshot, UserManagement):
+class Http(System, Network, MotionDetection, Snapshot,
+           UserManagement, Event):
     def __init__(self, host, port, user,
                  password, verbose=True, protocol='http'):
         self._host = host
