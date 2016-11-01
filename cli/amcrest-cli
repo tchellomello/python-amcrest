@@ -325,6 +325,14 @@ def main():
                         action='store_true',
                         help='clear all logs')
 
+    parser.add_argument('--ptz-config',
+                        action='store_true',
+                        help='show ptz config')
+
+    parser.add_argument('--ptz-config-movement',
+                        action='store_true',
+                        help='show ptz config movement')
+
     # FIXME:
     # parser.add_argument('--log-show',
     #                     help='show logs <start time> <end time>')
@@ -348,6 +356,12 @@ def main():
         return
 
     if args.username and args.hostname and args.password:
+
+        if args.ptz_config:
+            print((camera.ptz_config))
+
+        if args.ptz_config_movement:
+            print((camera.ptz_config_movement))
 
         if args.log_clear_all:
             print((camera.log_clear_all))

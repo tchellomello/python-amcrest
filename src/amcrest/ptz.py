@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2015 Red Hat, Inc.
-#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 2 of the License.
@@ -10,27 +8,22 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
+#
+# vim:sw=4:ts=4:et
 
 
-MAINTAINERCLEANFILES = \
-        $(srcdir)/Makefile.in \
-        $(NULL)
+class Ptz:
 
-pycrestdir = $(amcrestpythonlibdir)
+    @property
+    def ptz_config(self):
+        ret = self.command(
+            'configManager.cgi?action=getConfig&name=Ptz'
+        )
+        return ret.content.decode('utf-8')
 
-pycrest_PYTHON = \
-	__init__.py \
-	amcrest.py \
-	http.py \
-	system.py \
-	network.py \
-	motion_detection.py \
-	snapshot.py \
-	user_management.py \
-	event.py \
-	audio.py \
-	record.py \
-	video.py \
-	log.py \
-	ptz.py \
-	$(NULL)
+    @property
+    def ptz_config_movement(self):
+        ret = self.command(
+            'configManager.cgi?action=getConfig&name=PtzAutoMovement'
+        )
+        return ret.content.decode('utf-8')
