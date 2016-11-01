@@ -112,6 +112,14 @@ def main():
                         action='store_true',
                         help='hardware version')
 
+    parser.add_argument('--audio-input-channels-numbers',
+                        action='store_true',
+                        help='audio input channels numbers')
+
+    parser.add_argument('--audio-output-channels-numbers',
+                        action='store_true',
+                        help='audio output channels numbers')
+
     parser.add_argument('--snapshot',
                         dest='snapshot_option',
                         default='0',
@@ -255,6 +263,13 @@ def main():
         return
 
     if args.username and args.hostname and args.password:
+
+        if args.audio_input_channels_numbers:
+            print((camera.audio_input_channels_numbers))
+
+        if args.audio_output_channels_numbers:
+            print((camera.audio_output_channels_numbers))
+
         if args.event_storage_not_exist:
             print((camera.event_storage_not_exist))
 

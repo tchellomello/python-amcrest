@@ -12,6 +12,7 @@
 # vim:sw=4:ts=4:et
 import requests
 
+from .audio import Audio
 from .system import System
 from .network import Network
 from .motion_detection import MotionDetection
@@ -21,7 +22,7 @@ from .event import Event
 
 
 class Http(System, Network, MotionDetection, Snapshot,
-           UserManagement, Event):
+           UserManagement, Event, Audio):
     def __init__(self, host, port, user,
                  password, verbose=True, protocol='http'):
         self._host = host
