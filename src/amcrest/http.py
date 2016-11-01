@@ -43,10 +43,20 @@ class Http(System, Network, MotionDetection, Snapshot,
         return '%s://%s:%s/cgi-bin/%s' % (self._protocol, self._host,
                                           str(self._port), param)
 
-    def command(self, cmd):
+    def command(self, cmd, timeout_cmd=3):
+        """
+        Args:
+            cmd - command to execute via http
+            timeout_cmd - timeout, default 3sec
+        """
         try:
             url = self.__base_url(cmd)
-            resp = requests.get(url, auth=self._token, stream=True)
+            resp = requests.get(
+                url,
+                auth=self._token,
+                stream=True,
+                timeout=timeout_cmd,
+            )
             resp.raise_for_status()
         except:
             raise
