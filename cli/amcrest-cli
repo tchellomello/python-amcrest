@@ -256,6 +256,71 @@ def main():
                         action='store_true',
                         help='media global config')
 
+    parser.add_argument('--video-max-extra-stream',
+                        action='store_true',
+                        help='max extra stream')
+
+    parser.add_argument('--video-color-config',
+                        action='store_true',
+                        help='color config')
+
+    parser.add_argument('--encode-capability',
+                        action='store_true',
+                        help='encode capability')
+
+    parser.add_argument('--encode-config-capability',
+                        action='store_true',
+                        help='encode config capability')
+
+    parser.add_argument('--encode-media',
+                        action='store_true',
+                        help='encode media')
+
+    parser.add_argument('--encode-region-interested',
+                        action='store_true',
+                        help='encode region interested')
+
+    parser.add_argument('--video-channel-title',
+                        action='store_true',
+                        help='channel title')
+
+    parser.add_argument('--video-input-channels-device-supported',
+                        action='store_true',
+                        help='input channels device supported')
+
+    parser.add_argument('--video-output-channels-device-supported',
+                        action='store_true',
+                        help='output channels device supported')
+
+    parser.add_argument('--video-max-remote-input-channels',
+                        action='store_true',
+                        help='max remote input channels')
+
+    parser.add_argument('--video-in-options',
+                        action='store_true',
+                        help='video in options')
+
+    parser.add_argument('--video-widget-config',
+                        action='store_true',
+                        help='widget config')
+
+    parser.add_argument('--video-out-options',
+                        action='store_true',
+                        help='video out options')
+
+    parser.add_argument('--video-input-capability',
+                        action='store_true',
+                        help='video input capability')
+
+    parser.add_argument('--video-coordinates-current-window',
+                        dest='coordinates_current_window',
+                        help='coordinates current window')
+
+    parser.add_argument('--video-standard',
+                        nargs='?',
+                        const=-1,
+                        help='view/set video standard (PAL or NTSC)')
+
     argcomplete.autocomplete(parser)
     args = parser.parse_args()
 
@@ -276,95 +341,163 @@ def main():
 
     if args.username and args.hostname and args.password:
 
-        if args.record_capability:
+        if args.video_standard == -1:
+            print((camera.video_standard))
+            return
+        elif args.video_standard:
+            camera.video_standard = args.video_standard
+            return
+
+        elif args.coordinates_current_window:
+            print((camera.coordinates_current_window(
+                args.coordinates_current_window)))
+            return
+
+        elif args.video_widget_config:
+            print((camera.video_widget_config))
+            return
+
+        elif args.video_input_capability:
+            print((camera.video_input_capability))
+            return
+
+        elif args.video_in_options:
+            print((camera.video_in_options))
+            return
+
+        elif args.video_out_options:
+            print((camera.video_out_options))
+            return
+
+        elif args.video_max_remote_input_channels:
+            print((camera.video_max_remote_input_channels))
+            return
+
+        elif args.video_output_channels_device_supported:
+            print((camera.video_output_channels_device_supported))
+            return
+
+        elif args.video_input_channels_device_supported:
+            print((camera.video_input_channels_device_supported))
+            return
+
+        elif args.video_channel_title:
+            print((camera.video_channel_title))
+            return
+
+        elif args.encode_region_interested:
+            print((camera.encode_region_interested))
+            return
+
+        elif args.encode_media:
+            print((camera.encode_media))
+            return
+
+        elif args.encode_config_capability:
+            print((camera.encode_config_capability))
+            return
+
+        elif args.encode_capability:
+            print((camera.encode_capability))
+            return
+
+        elif args.video_max_extra_stream:
+            print((camera.video_max_extra_stream))
+            return
+
+        elif args.video_color_config:
+            print((camera.video_color_config))
+            return
+
+        elif args.record_capability:
             print((camera.record_capability))
             return
 
-        if args.record_config:
+        elif args.record_config:
             print((camera.record_config))
             return
 
-        if args.media_global_config:
+        elif args.media_global_config:
             print((camera.media_global_config))
             return
 
-        if args.audio_input_channels_numbers:
+        elif args.audio_input_channels_numbers:
             print((camera.audio_input_channels_numbers))
 
-        if args.audio_output_channels_numbers:
+        elif args.audio_output_channels_numbers:
             print((camera.audio_output_channels_numbers))
 
-        if args.event_storage_not_exist:
+        elif args.event_storage_not_exist:
             print((camera.event_storage_not_exist))
 
-        if args.event_login_failure:
+        elif args.event_login_failure:
             print((camera.event_login_failure))
 
-        if args.event_net_abort:
+        elif args.event_net_abort:
             print((camera.event_net_abort))
 
-        if args.event_ip_conflict:
+        elif args.event_ip_conflict:
             print((camera.event_ip_conflict))
 
-        if args.event_management:
+        elif args.event_management:
             print((camera.event_management))
 
-        if args.event_storage_low_space:
+        elif args.event_storage_low_space:
             print((camera.event_storage_low_space))
 
-        if args.event_storage_access_failure:
+        elif args.event_storage_access_failure:
             print((camera.event_storage_access_failure))
 
-        if args.general_config:
+        elif args.general_config:
             print((camera.general_config))
 
-        if args.video_blind_detect_config:
+        elif args.video_blind_detect_config:
             print((camera.video_blind_detect_config))
 
-        if args.video_loss_detect_config:
+        elif args.video_loss_detect_config:
             print((camera.video_loss_detect_config))
 
-        if args.alarm_config:
+        elif args.alarm_config:
             print((camera.alarm_config))
 
-        if args.alarm_out_config:
+        elif args.alarm_out_config:
             print((camera.alarm_out))
 
-        if args.alarm_output_channels:
+        elif args.alarm_output_channels:
             print((camera.alarm_output_channels))
 
-        if args.alarm_input_channels:
+        elif args.alarm_input_channels:
             print((camera.alarm_input_channels))
 
-        if args.alarm_states_output_channels:
+        elif args.alarm_states_output_channels:
             print((camera.alarm_states_output_channels))
 
-        if args.alarm_states_input_channels:
+        elif args.alarm_states_input_channels:
             print((camera.alarm_states_input_channels))
 
-        if args.event_channels_happened:
+        elif args.event_channels_happened:
             print((camera.event_channels_happened(
                 args.event_channels_happened)))
 
-        if args.event_handler_config:
+        elif args.event_handler_config:
             print((camera.event_handler_config(args.event_handler_config)))
 
-        if args.info_group:
+        elif args.info_group:
             print((camera.info_user(args.info_group)))
 
-        if args.info_all_groups:
+        elif args.info_all_groups:
             print((camera.info_all_groups))
 
-        if args.delete_user:
+        elif args.delete_user:
             print((camera.delete_user(args.delete_user)))
 
-        if args.info_all_users:
+        elif args.info_all_users:
             print((camera.info_all_users))
 
-        if args.info_all_active_users:
+        elif args.info_all_active_users:
             print((camera.info_all_active_users))
 
-        if args.info_user:
+        elif args.info_user:
             print((camera.info_user(args.info_user)))
 
         elif args.device_class:

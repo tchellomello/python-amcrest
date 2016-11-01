@@ -28,6 +28,7 @@ pycrest_PYTHON = \
 	snapshot.py \
 	user_management.py \
 	event.py \
-        audio.py \
-        record.py \
+	audio.py \
+	record.py \
+	video.py \
 	$(NULL)

@@ -20,10 +20,11 @@ from .snapshot import Snapshot
 from .user_management import UserManagement
 from .event import Event
 from .record import Record
+from .video import Video
 
 
 class Http(System, Network, MotionDetection, Snapshot,
-           UserManagement, Event, Audio, Record):
+           UserManagement, Event, Audio, Record, Video):
 
     def __init__(self, host, port, user,
                  password, verbose=True, protocol='http'):
