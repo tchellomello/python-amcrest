@@ -333,6 +333,10 @@ def main():
                         action='store_true',
                         help='show ptz config movement')
 
+    parser.add_argument('--telnet-config',
+                        nargs='?',
+                        const=-1,
+                        help='enable/disable motion detection (True or False)')
     # FIXME:
     # parser.add_argument('--log-show',
     #                     help='show logs <start time> <end time>')
@@ -357,18 +361,30 @@ def main():
 
     if args.username and args.hostname and args.password:
 
-        if args.ptz_config:
+        if args.telnet_config == -1:
+            print((camera.telnet_config))
+            return
+
+        elif args.telnet_config:
+            camera.telnet_config = args.telnet_config
+            return
+
+        elif args.ptz_config:
             print((camera.ptz_config))
+            return
 
-        if args.ptz_config_movement:
+        elif args.ptz_config_movement:
             print((camera.ptz_config_movement))
+            return
 
-        if args.log_clear_all:
+        elif args.log_clear_all:
             print((camera.log_clear_all))
+            return
 
-        if args.video_standard == -1:
+        elif args.video_standard == -1:
             print((camera.video_standard))
             return
+
         elif args.video_standard:
             camera.video_standard = args.video_standard
             return

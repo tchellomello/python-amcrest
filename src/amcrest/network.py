@@ -105,6 +105,26 @@ class Network:
         return self.amcrest_ips
 
     @property
+    def telnet_config(self):
+        ret = self.command(
+            'configManager.cgi?action=getConfig&name=Telnet'
+        )
+        return ret.content.decode('utf-8')
+
+    @telnet_config.setter
+    def telnet_config(self, status):
+        """
+        status:
+            false - Telnet is disabled
+            true  - Telnet is enabled
+        """
+        ret = self.command(
+            'configManager.cgi?action=setConfig&Telnet.Enable={0}'.format(
+                status)
+        )
+        return ret.content.decode('utf-8')
+
+    @property
     def network_config(self):
         ret = self.command(
             'configManager.cgi?action=getConfig&name=Network'

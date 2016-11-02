@@ -37,6 +37,9 @@ Get general config
 .B --network-config
 Get network config
 .TP
+.B --telnet-config
+Show or set telnet service, use true or false
+.TP
 .B --version-http-api
 Get version of HTTP API
 .TP
@@ -244,6 +247,12 @@ $ amcrest-cli -H 192.168.1.10 -u admin -p password --version-http-api
 .TP
 .B Get device type
 $ amcrest-cli -H 192.168.1.10 -u admin -p password --device-type
+.TP
+.B Show telnet service settings
+$ amcrest-cli -H 192.168.1.10 -u admin -p password --telnet-config
+.TP
+.B Disable telnet service
+$ amcrest-cli -H 192.168.1.10 -u admin -p password --telnet-config false
 .TP
 .B Get software information
 $ amcrest-cli -H 192.168.1.10 -u admin -p password --software-information
