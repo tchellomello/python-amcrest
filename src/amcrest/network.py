@@ -104,6 +104,12 @@ class Network:
 
         return self.amcrest_ips
 
+    def scan_wlan_devices(self, ssid):
+        ret = self.command(
+            'wlan.cgi?action=scanWlanDevices&SSID={0}'.format(ssid)
+        )
+        return ret.content.decode('utf-8')
+
     @property
     def telnet_config(self):
         ret = self.command(

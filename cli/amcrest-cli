@@ -337,6 +337,10 @@ def main():
                         nargs='?',
                         const=-1,
                         help='enable/disable motion detection (True or False)')
+
+    parser.add_argument('--scan-wlan-devices',
+                        dest='scan_wlan_devices',
+                        help='scan wlan devices')
     # FIXME:
     # parser.add_argument('--log-show',
     #                     help='show logs <start time> <end time>')
@@ -365,6 +369,9 @@ def main():
             print((camera.telnet_config))
             return
 
+        elif args.scan_wlan_devices:
+            print((camera.scan_wlan_devices(args.scan_wlan_devices)))
+            return
         elif args.telnet_config:
             camera.telnet_config = args.telnet_config
             return
