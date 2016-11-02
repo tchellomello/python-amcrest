@@ -104,15 +104,12 @@ class Network:
 
         return self.amcrest_ips
 
-    def __get_config(self, config_name):
-        ret = self.command(
-            'configManager.cgi?action=getConfig&name={0}'.format(config_name)
-        )
-        return ret.content.decode('utf-8')
-
     @property
     def network_config(self):
-        return self.__get_config('Network')
+        ret = self.command(
+            'configManager.cgi?action=getConfig&name=Network'
+        )
+        return ret.content.decode('utf-8')
 
     @property
     def network_interfaces(self):
