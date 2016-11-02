@@ -104,9 +104,10 @@ class Network:
 
         return self.amcrest_ips
 
-    def scan_wlan_devices(self, ssid):
+    @property
+    def wlan_config(self):
         ret = self.command(
-            'wlan.cgi?action=scanWlanDevices&SSID={0}'.format(ssid)
+            'configManager.cgi?action=getConfig&name=WLan'
         )
         return ret.content.decode('utf-8')
 

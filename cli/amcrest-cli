@@ -333,6 +333,10 @@ def main():
                         action='store_true',
                         help='show ptz config movement')
 
+    parser.add_argument('--wlan-config',
+                        action='store_true',
+                        help='show/set wlan-config')
+
     parser.add_argument('--telnet-config',
                         nargs='?',
                         const=-1,
@@ -369,9 +373,14 @@ def main():
             print((camera.telnet_config))
             return
 
+        elif args.wlan_config:
+            print((camera.wlan_config))
+            return
+
         elif args.scan_wlan_devices:
             print((camera.scan_wlan_devices(args.scan_wlan_devices)))
             return
+
         elif args.telnet_config:
             camera.telnet_config = args.telnet_config
             return
