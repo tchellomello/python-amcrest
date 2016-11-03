@@ -31,12 +31,17 @@ Module
 >>> amcrest = AmcrestCamera('192.168.0.1', 80, 'admin', 'password')
 >>> camera = amcrest.camera
 
+Check software information
 >>> camera.software_information
 'version=2.420.AC00.15.R\r\nBuildDate=2016-09-08'
 
+Capture snapshot
 >>> camera.snapshot(0, "/home/user/Desktop/snapshot00.jpeg")
 <requests.packages.urllib3.response.HTTPResponse object at 0x7f84945083c8>
 
+Capture audio
+>>> camera.audio_stream_capture(httptype="singlepart", channel=1, path_file="/home/user/Desktop/audio.aac")
+CTRL-C to stop the continuous audio flow or use a timer
 ```
 
 Command Line
