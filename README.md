@@ -22,8 +22,8 @@ $ sudo vi /etc/profile.d/amcrest-cli-autocomplete.sh
 Usage
 =====
 
-Module
-------
+Module Examples
+---------------
 
 ```python
 >>> from amcrest import AmcrestCamera
