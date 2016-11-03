@@ -408,6 +408,10 @@ def main():
             return
 
         elif args.audio_stream_capture:
+            if not args.save:
+                print("This option requires --save")
+                return
+
             if len(args.audio_stream_capture) <= 2:
                 print("Requires arguments: httptype, channel, timer_capture!")
                 sys.exit(-1)
@@ -663,7 +667,7 @@ def main():
             if args.save:
                 camera.config_backup(args.save)
             else:
-                print("This option requires --output")
+                print("This option requires --save")
 
         elif args.snapshot_option:
             if args.save:
