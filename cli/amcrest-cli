@@ -14,11 +14,36 @@
 
 import argcomplete
 import argparse
+import os
+import signal
+import sys
+import threading
 
 from amcrest import AmcrestCamera
 
 
+def graceful_exit(_signo, _stack_frame):
+    """
+    When the process get SIGTERM, we might see "Terminated" message in console.
+    As this cli is user friendly, let's just terminate silently.
+    """
+    sys.exit(0)
+
+
+def __sigtermproc(process_pid):
+    """
+    For continuous flows, i.e: audio packets, there is no
+    option in the http api to pass the maximum time for
+    capturing the audio sequence. In that case, let's send
+    a SIGTERM to amcrest-cli when the max time of capture
+    is done and task finished.
+    """
+    os.kill(process_pid, signal.SIGTERM)
+
+
 def main():
+
+    signal.signal(signal.SIGTERM, graceful_exit)
     parser = argparse.ArgumentParser(
         description='Command line interface for Amcrest cameras.',
         formatter_class=argparse.RawTextHelpFormatter
@@ -178,10 +203,12 @@ def main():
                         const=-1,
                         help='get snapshot configuration')
 
-    parser.add_argument('--output',
-                        dest='output',
-                        help='set output file name for operations\n'
-                             ' like snapshot')
+    parser.add_argument('--save',
+                        dest='save',
+                        help='save output as file for operations like:\n'
+                             '--snapshot\n'
+                             '--audio-stream-capture\n'
+                             '--config-backup')
 
     parser.add_argument('--event-handler-config',
                         dest='event_handler_config',
@@ -345,6 +372,12 @@ def main():
     parser.add_argument('--scan-wlan-devices',
                         dest='scan_wlan_devices',
                         help='scan wlan devices')
+
+    parser.add_argument('--audio-stream-capture',
+                        dest='audio_stream',
+                        metavar='httptype channel timercapture',
+                        nargs='+',
+                        help='capture audio stream')
     # FIXME:
     # parser.add_argument('--log-show',
     #                     help='show logs <start time> <end time>')
@@ -359,6 +392,7 @@ def main():
         args.password
     )
     camera = amcrest.camera
+
     if args.scan_devices:
         ret = camera.scan_devices(args.scan_devices, args.timeout)
         if ret:
@@ -372,6 +406,23 @@ def main():
         if args.telnet_config == -1:
             print((camera.telnet_config))
             return
+
+        elif args.audio_stream_capture:
+            if len(args.audio_stream_capture) <= 2:
+                print("Requires arguments: httptype, channel, timer_capture!")
+                sys.exit(-1)
+
+            httptype = args.audio_stream_capture[0]
+            channel = args.audio_stream_capture[1]
+            timer_capture = float(args.audio_stream_capture[2])
+
+            t = threading.Timer(timer_capture, __sigtermproc, [os.getpid()])
+            t.start()
+
+            if args.save:
+                camera.audio_stream_capture(httptype, channel, args.save)
+            else:
+                camera.audio_stream_capture(httptype, channel)
 
         elif args.wlan_config:
             print((camera.wlan_config))
@@ -609,16 +660,16 @@ def main():
             print((camera.snapshot_config))
 
         elif args.config_backup:
-            if args.output:
-                camera.config_backup(args.output)
+            if args.save:
+                camera.config_backup(args.save)
             else:
                 print("This option requires --output")
 
         elif args.snapshot_option:
-            if args.output:
-                camera.snapshot(args.snapshot_option, args.output)
+            if args.save:
+                camera.snapshot(args.snapshot_option, args.save)
             else:
-                print("This option requires --output")
+                print("This option requires --save")
     else:
         print('Error: You must specify a valid operation. See usage:')
         parser.print_usage()

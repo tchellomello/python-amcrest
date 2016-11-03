@@ -10,6 +10,7 @@
 # GNU General Public License for more details.
 #
 # vim:sw=4:ts=4:et
+import shutil
 
 
 class Audio:
@@ -27,3 +28,30 @@ class Audio:
             'devAudioOutput.cgi?action=getCollect'
         )
         return ret.content.decode('utf-8')
+
+    def audio_stream_capture(self, httptype=None,
+                             channel=None, path_file=None):
+        """
+        Params:
+
+            path_file - path to output file
+            channel: - integer
+            httptype - type string (singlepart or multipart)
+
+                singlepart: HTTP content is a continuos flow of audio packets
+                multipart: HTTP content type is multipart/x-mixed-replace, and
+                           each audio packet ends with a boundary string
+
+        """
+        if httptype is None and channel is None:
+            raise RuntimeError("Requires htttype and channel")
+
+        ret = self.command(
+            'audio.cgi?action=getAudio&httptype={0}&channel={1}'.format(
+                httptype, channel))
+
+        if path_file is not None:
+            with open(path_file, 'wb') as out_file:
+                shutil.copyfileobj(ret.raw, out_file)
+
+        return ret.raw

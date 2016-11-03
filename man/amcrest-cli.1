@@ -22,8 +22,15 @@ Get snapshot, use one of the following options:
 .br
 2 - alarm snapshot
 .TP
-.B --output
-output file name, useful for options like --snapshot, --config-backup
+.B --save
+.br
+save output as file for operations like:
+.br
+--snapshot
+.br
+--audio-stream-capture
+.br
+--config-backup
 .TP
 .B --motion-detection-status
 Returns if the motion detection is enabled or disabled
@@ -222,7 +229,7 @@ view/set video standard <PAL or NTSC>
 $ amcrest-cli -H 192.168.1.10 -u admin -p password --general-config
 .TP
 .B Grab snapshot and save in /tmp/self.jpeg
-$ amcrest-cli -H 192.168.1.10 -u admin -p password --snapshot --output /tmp/self.jpeg
+$ amcrest-cli -H 192.168.1.10 -u admin -p password --snapshot --save /tmp/self.jpeg
 .TP
 .B Check if motion detection is enable or disable
 $ amcrest-cli -H 192.168.1.10 -u admin -p password --motion-detection
@@ -262,6 +269,9 @@ $ amcrest-cli -H 192.168.1.10 -u admin -p password --telnet-config false
 .TP
 .B Get software information
 $ amcrest-cli -H 192.168.1.10 -u admin -p password --software-information
+.TP
+.B Capture audio stream with httptype as singlepart, channel as 1 and 2 sec as timer
+$ amcrest-cli -H 192.168.1.10 -u admin -p password --audio-stream-capture singlepart 1 2 --save /home/user/myaudio.aac
 .SH BUGS
 Report bugs to <https://github.com/tchellomello/python-amcrest/issues>
 .SH COPYRIGHT
