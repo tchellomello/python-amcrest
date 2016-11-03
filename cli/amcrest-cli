@@ -374,7 +374,7 @@ def main():
                         help='scan wlan devices')
 
     parser.add_argument('--audio-stream-capture',
-                        dest='audio_stream',
+                        dest='audio_stream_capture',
                         metavar='httptype channel timercapture',
                         nargs='+',
                         help='capture audio stream')
