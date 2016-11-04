@@ -72,7 +72,8 @@ class UserManagement:
         cmd = "userManager.cgi?action=addUser&user.Name={0}" \
               "&user.Password={1}&user.Group={2}&user.Sharable={3}" \
               "&user.Reserved={4}".format(
-                username, password, group, sharable, reserved)
+                username, password, group.lower(), sharable.lower(),
+                reserved.lower())
 
         if memo:
             cmd += "&user.Memo=%s" % memo
@@ -91,4 +92,32 @@ class UserManagement:
             'userManager.cgi?action=modifyPassword&name={0}&pwd={1}'
             '&pwdOld={2}'.format(username, newpwd, oldpwd)
         )
+        return ret.content.decode('utf-8')
+
+    def modify_user(self, username, attribute, value):
+        """
+        Params:
+            username - username for user
+            attribute - the attribute name that will change:
+                        group, sharable, reserved, memo
+
+            value - the new value for attribute
+        """
+
+        cmd = "userManager.cgi?action=modifyUser&name={0}".format(
+            username)
+
+        if attribute.lower() == "group":
+            cmd += "&user.Group=%s" % value.lower()
+
+        elif attribute.lower() == "sharable":
+            cmd += "&user.Sharable=%s" % value.lower()
+
+        elif attribute.lower() == "reserved":
+            cmd += "&user.Reserved=%s" % value.lower()
+
+        elif attribute == "memo":
+            cmd += "&user.Memo=%s" % value.lower()
+
+        ret = self.command(cmd)
         return ret.content.decode('utf-8')
