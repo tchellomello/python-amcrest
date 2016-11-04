@@ -138,3 +138,21 @@ class System:
             'magicBox.cgi?action=getDeviceClass'
         )
         return ret.content.decode('utf-8')
+
+    def shutdown(self):
+        """
+        From the testings, shutdown acts like "reboot now"
+        """
+        ret = self.command(
+            'magicBox.cgi?action=shutdown'
+        )
+        return ret.content.decode('utf-8')
+
+    def reboot(self, delay=None):
+        cmd = 'magicBox.cgi?action=reboot'
+
+        if delay is not None:
+            cmd += "&delay={0}".format(delay)
+
+        ret = self.command(cmd)
+        return ret.content.decode('utf-8')
