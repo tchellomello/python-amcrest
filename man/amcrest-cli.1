@@ -110,6 +110,21 @@ Get information about group
 .B --info-all-groups
 Get information about all groups
 .TP
+.B --add-user <username> <password> <group> <sharable> [<memo>]
+username - username for user
+.br
+password - password for user
+.br
+group - string the range is "admin" and "user". In different group,
+        the user has different authorities.
+.br
+sharable - bool, true means allow multi-point login
+.br
+reserved - bool, true means this user can't be deleted
+.br
+memo - memo to user
+.br
+.TP
 .B --delete-user <username>
 Delete user
 .TP

@@ -93,6 +93,13 @@ def main():
                         dest='delete_user',
                         help='delete username')
 
+    parser.add_argument('--add-user',
+                        dest='add_user',
+                        metavar='username password group [sharable]'
+                                ' [reserved] [memo]',
+                        nargs='+',
+                        help='Add new user')
+
     parser.add_argument('--general-config',
                         action='store_true',
                         help='general configuration')
@@ -599,6 +606,34 @@ def main():
 
         elif args.info_all_groups:
             print((camera.info_all_groups))
+
+        elif args.add_user:
+            if len(args.add_user) <= 2:
+                print("This option requires at least: "
+                      "username, password and group")
+                return
+
+            user = args.add_user[0]
+            pwd = args.add_user[1]
+            grp = args.add_user[2]
+
+            if len(args.add_user) >= 4:
+                sharable = args.add_user[3]
+            else:
+                sharable = False
+
+            if len(args.add_user) >= 5:
+                reserved = args.add_user[4]
+            else:
+                reserved = False
+
+            if len(args.add_user) >= 6:
+                memo = args.add_user[5]
+            else:
+                memo = False
+
+            print((camera.add_user(user, pwd, grp,
+                                   sharable, reserved, memo)))
 
         elif args.delete_user:
             print((camera.delete_user(args.delete_user)))

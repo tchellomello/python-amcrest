@@ -52,3 +52,30 @@ class UserManagement:
             'userManager.cgi?action=deleteUser&name={0}'.format(username)
         )
         return ret.content.decode('utf-8')
+
+    def add_user(self, username, password, group, sharable=True,
+                 reserved=False, memo=None):
+        """
+        Params:
+            username - username for user
+            password - password for user
+            group - string the range is "admin" and "user". In different group,
+                    the user has different authorities.
+
+            sharable - bool, true means allow multi-point login
+
+            reserved - bool, true means this user can't be deleted
+
+            memo - memo to user
+        """
+
+        cmd = "userManager.cgi?action=addUser&user.Name={0}" \
+              "&user.Password={1}&user.Group={2}&user.Sharable={3}" \
+              "&user.Reserved={4}".format(
+                username, password, group, sharable, reserved)
+
+        if memo:
+            cmd += "&user.Memo=%s" % memo
+
+        ret = self.command(cmd)
+        return ret.content.decode('utf-8')
