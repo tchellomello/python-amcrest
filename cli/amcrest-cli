@@ -100,6 +100,12 @@ def main():
                         nargs='+',
                         help='Add new user')
 
+    parser.add_argument('--modify-password',
+                        dest='modify_password',
+                        nargs='+',
+                        metavar='username newpwd oldpwd',
+                        help='modify user password')
+
     parser.add_argument('--general-config',
                         action='store_true',
                         help='general configuration')
@@ -634,6 +640,20 @@ def main():
 
             print((camera.add_user(user, pwd, grp,
                                    sharable, reserved, memo)))
+            return
+
+        elif args.modify_password:
+            if len(args.modify_password) <= 2:
+                print("This option requires at least: "
+                      "username, new password and old password")
+                return
+
+            user = args.modify_password[0]
+            newpwd = args.modify_password[1]
+            oldpwd = args.modify_password[2]
+
+            print((camera.modify_password(user, newpwd, oldpwd)))
+            return
 
         elif args.delete_user:
             print((camera.delete_user(args.delete_user)))

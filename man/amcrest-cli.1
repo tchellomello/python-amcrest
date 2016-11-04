@@ -110,7 +110,7 @@ Get information about group
 .B --info-all-groups
 Get information about all groups
 .TP
-.B --add-user <username> <password> <group> <sharable> [<memo>]
+.B --add-user <username> <password> <group> [sharable] [reserved] [memo]
 username - username for user
 .br
 password - password for user
@@ -124,6 +124,9 @@ reserved - bool, true means this user can't be deleted
 .br
 memo - memo to user
 .br
+.TP
+.B --modify-password <username> <new password> <old password>
+Modify user password
 .TP
 .B --delete-user <username>
 Delete user

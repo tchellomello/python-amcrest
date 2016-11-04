@@ -79,3 +79,16 @@ class UserManagement:
 
         ret = self.command(cmd)
         return ret.content.decode('utf-8')
+
+    def modify_password(self, username, newpwd, oldpwd):
+        """
+        Params:
+            username - user name
+            newpwd - new password
+            oldpwd - old password
+        """
+        ret = self.command(
+            'userManager.cgi?action=modifyPassword&name={0}&pwd={1}'
+            '&pwdOld={2}'.format(username, newpwd, oldpwd)
+        )
+        return ret.content.decode('utf-8')
