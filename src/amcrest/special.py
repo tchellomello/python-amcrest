@@ -1,0 +1,66 @@
+# -*- coding: utf-8 -*-
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# vim:sw=4:ts=4:et
+import shutil
+
+
+class Special:
+
+    """
+    11/05/2016
+
+    Looks like the mjpeg support was removed from the mainstream in one of
+    the firmware updates, so subtype=0 is not working.
+
+    I have tested with the below firmware and still not working
+    in the mainstream:
+        Amcrest_IPC-AWXX_Eng_N_V2.420.AC00.15.R.20160908.bin
+
+    Based on above, the cmd we send to camera should use: subtype=1 until
+    mainstream is back.
+
+    Simple translation:
+        subtype=0 for mainstream
+        subtype=1 for substream
+
+    Tested on device: IP2M-841B
+
+    Users complaining here too:
+    https://amcrest.com/forum/technical-discussion-f3/lost-mjpeg-encode-for-main-stream-after-firmware-u-t1516.html
+
+    """
+    def mjpg_stream(self, channelno=None, typeno=None, path_file=None):
+        """
+        Params:
+            channelno: integer, the video channel index which starts from 1,
+                       default 1 if not specified.
+
+            typeno: the stream type, default 0 if not specified. It can be
+                    the following value:
+
+                    0-Main Stream
+                    1-Extra Stream 1 (Sub Stream)
+                    2-Extra Stream 2 (Sub Stream)
+        """
+        if channelno is None and typeno is None:
+            cmd = "mjpg/video.cgi?channel=0&subtype=1"
+        else:
+            cmd = "mjpg/video.cgi?channel={0}&subtype={1}".format(
+                channelno, typeno)
+
+        ret = self.command(cmd)
+
+        if path_file is not None:
+            with open(path_file, 'wb') as out_file:
+                shutil.copyfileobj(ret.raw, out_file)
+
+        return ret.raw
