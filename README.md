@@ -1,7 +1,10 @@
 # python-amcrest
-This repository is a wapper for Amcrest SDK HTTP API.
+This repository is python module for Amcrest SDK HTTP API.
 
 This is a working in process project.
+
+All tests execute with Amcrest IP2M-841B
+If you have different model, fell free to contribute.
 
 Installation
 ============
