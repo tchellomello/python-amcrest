@@ -23,11 +23,12 @@ from .record import Record
 from .video import Video
 from .log import Log
 from .ptz import Ptz
+from .special import Special
 
 
 class Http(System, Network, MotionDetection, Snapshot,
            UserManagement, Event, Audio, Record, Video,
-           Log, Ptz):
+           Log, Ptz, Special):
 
     def __init__(self, host, port, user,
                  password, verbose=True, protocol='http'):

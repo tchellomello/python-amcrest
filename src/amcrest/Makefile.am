@@ -33,4 +33,5 @@ pycrest_PYTHON = \
 	video.py \
 	log.py \
 	ptz.py \
+	special.py \
 	$(NULL)

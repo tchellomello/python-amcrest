@@ -405,6 +405,11 @@ def main():
                         dest='scan_wlan_devices',
                         help='scan wlan devices')
 
+    parser.add_argument('--mjpg-stream',
+                        metavar='timercapture [channelno] [typeno]',
+                        nargs='+',
+                        help='capture mjpg stream')
+
     parser.add_argument('--audio-stream-capture',
                         dest='audio_stream_capture',
                         metavar='httptype channel timercapture',
@@ -437,6 +442,27 @@ def main():
 
         if args.telnet_config == -1:
             print((camera.telnet_config))
+            return
+
+        elif args.mjpg_stream:
+            if not args.save:
+                print("This option requires --save")
+                return
+
+            timer_capture = float(args.mjpg_stream[0])
+
+            channelno = None
+            typeno = None
+            if len(args.mjpg_stream) > 1:
+                channelno = args.mjpg_stream[1]
+            if len(args.mjpg_stream) > 2:
+                typeno = args.mjpg_stream[2]
+
+            t = threading.Timer(timer_capture, __sigtermproc, [os.getpid()])
+            t.start()
+
+            print((camera.mjpg_stream(
+                channelno, typeno, path_file=args.save)))
             return
 
         elif args.reboot:

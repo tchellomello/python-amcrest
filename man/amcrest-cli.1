@@ -142,6 +142,9 @@ Shutdown the camera (it's like reboot now)
 .B --reboot [delay]
 Reboot the camera
 .TP
+.B --mjpg-stream [ChannelNo] [TypeNo]
+Capture mjpg stream
+.TP
 .B --video-blind-detect-config
 Get video blind detect config
 .TP
@@ -301,6 +304,9 @@ $ amcrest-cli -H 192.168.1.10 -u admin -p password --software-information
 .TP
 .B Capture audio stream with httptype as singlepart, channel as 1 and 10 sec as timer
 $ amcrest-cli -H 192.168.1.10 -u admin -p password --audio-stream-capture singlepart 1 10 --save /home/user/myaudio.aac
+.TP
+.B Capture mjpeg with 20 sec as timer
+$ amcrest-cli -H 192.168.1.10 -u admin -p --mjpg-stream 20 --save /home/user/myfile.mjpg
 .SH BUGS
 Report bugs to <https://github.com/tchellomello/python-amcrest/issues>
 .SH COPYRIGHT
