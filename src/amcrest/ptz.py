@@ -27,3 +27,26 @@ class Ptz:
             'configManager.cgi?action=getConfig&name=PtzAutoMovement'
         )
         return ret.content.decode('utf-8')
+
+    def ptz_zoom_in(self, action=None, channel=0):
+        """
+        The magic of zoom in 1x, 2x etc. is the timer between the cmd
+        'start' and cmd 'stop'. My suggestion for start/top cmd is 0.5 sec
+        """
+
+        ret = self.command(
+            'ptz.cgi?action={0}&channel={1}&code=ZoomTele&arg1=0'
+            '&arg2=0&arg3=0'.format(action, channel)
+        )
+        return ret.content.decode('utf-8')
+
+    def ptz_zoom_out(self, action=None, channel=0):
+        """
+        The magic of zoom out 1x, 2x etc. is the timer between the cmd
+        'start' and cmd 'stop'. My suggestion for start/top cmd is 0.5 sec
+        """
+        ret = self.command(
+            'ptz.cgi?action={0}&channel={1}&code=ZoomWide&arg1=0'
+            '&arg2=0&arg3=0'.format(action, channel)
+        )
+        return ret.content.decode('utf-8')
