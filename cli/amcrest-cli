@@ -388,9 +388,9 @@ def main():
                         action='store_true',
                         help='show ptz config')
 
-    parser.add_argument('--ptz-config-movement',
+    parser.add_argument('--ptz-auto-movement',
                         action='store_true',
-                        help='show ptz config movement')
+                        help='show ptz auto movement')
 
     parser.add_argument('--wlan-config',
                         action='store_true',
@@ -510,8 +510,8 @@ def main():
             print((camera.ptz_config))
             return
 
-        elif args.ptz_config_movement:
-            print((camera.ptz_config_movement))
+        elif args.ptz_auto_movement:
+            print((camera.ptz_auto_movement))
             return
 
         elif args.log_clear_all:

@@ -22,7 +22,7 @@ class Ptz:
         return ret.content.decode('utf-8')
 
     @property
-    def ptz_config_movement(self):
+    def ptz_auto_movement(self):
         ret = self.command(
             'configManager.cgi?action=getConfig&name=PtzAutoMovement'
         )
