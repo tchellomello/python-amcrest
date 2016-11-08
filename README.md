@@ -48,6 +48,13 @@ CTRL-C to stop the continuous audio flow or use a timer
 
 Move camera down
 >>> camera.ptz_control_command(action="start", code="Down", arg1=0, arg2=0, arg3=0)))
+
+Record realtime stream into a file
+>>> camera.realtime_stream(path_file="/home/user/Desktop/myvideo")
+CTRL-C to stop the continuous video flow or use a timer
+$ mplayer /home/user/Desktop/myvideo
+
+
 ```
 
 Command Line

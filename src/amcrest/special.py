@@ -15,6 +15,25 @@ import shutil
 
 class Special:
 
+    def realtime_stream(self, channel=1, typeno=0, path_file=None):
+        """
+        If the stream is redirect to a file, use mplayer tool to
+        visualize the video record
+
+        camera.realtime_stream(path_file="/home/user/Desktop/myvideo)
+        $ mplayer /home/user/Desktop/myvideo
+        """
+        ret = self.command(
+            'realmonitor.cgi?action=getStream&channel={0}&subtype={1}'.format(
+                channel, typeno)
+        )
+
+        if path_file is not None:
+            with open(path_file, 'wb') as out_file:
+                shutil.copyfileobj(ret.raw, out_file)
+
+        return ret.raw
+
     """
     11/05/2016
 
