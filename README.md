@@ -45,6 +45,9 @@ Capture snapshot
 Capture audio
 >>> camera.audio_stream_capture(httptype="singlepart", channel=1, path_file="/home/user/Desktop/audio.aac")
 CTRL-C to stop the continuous audio flow or use a timer
+
+Move camera down
+>>> camera.ptz_control_command(action="start", code="Down", arg1=0, arg2=0, arg3=0)))
 ```
 
 Command Line

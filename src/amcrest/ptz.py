@@ -28,6 +28,38 @@ class Ptz:
         )
         return ret.content.decode('utf-8')
 
+    def ptz_presets_list(self, channel=0):
+        ret = self.command(
+            'ptz.cgi?action=getPresets&channel={0}'.format(channel)
+        )
+        return ret.content.decode('utf-8')
+
+    def ptz_status(self, channel=0):
+        ret = self.command(
+            'ptz.cgi?action=getStatus&channel={0}'.format(channel)
+        )
+        return ret.content.decode('utf-8')
+
+    def ptz_tour_routines_list(self, channel=0):
+        ret = self.command(
+            'configManager.cgi?action=getTours&channel={0}'.format(channel)
+        )
+        return ret.content.decode('utf-8')
+
+    def ptz_control_command(self, channel=0, action=None, code=None,
+                            arg1=None, arg2=None, arg3=None):
+
+        if action is None and code is None and arg1 is None and \
+                arg2 is None and arg3 is None:
+            raise RuntimeError("code, arg1, arg2, arg3 is required!")
+
+        ret = self.command(
+            'ptz.cgi?action={0}&channel={1}&code={2}&arg1={3}'
+            '&arg2={4}&arg3={5}'.format(action, channel, code,
+                                        arg1, arg2, arg3)
+        )
+        return ret.content.decode('utf-8')
+
     def zoom_in(self, action=None, channel=0):
         """
         Params:
@@ -216,7 +248,7 @@ class Ptz:
         return ret.content.decode('utf-8')
 
     def move_right_up(self, action=None, channel=0,
-                     vertical_speed=1, horizontal_speed=1):
+                      vertical_speed=1, horizontal_speed=1):
         """
         Params:
             action           - start or stop
@@ -232,7 +264,7 @@ class Ptz:
         return ret.content.decode('utf-8')
 
     def move_right_down(self, action=None, channel=0,
-                       vertical_speed=1, horizontal_speed=1):
+                        vertical_speed=1, horizontal_speed=1):
         """
         Params:
             action           - start or stop
@@ -244,5 +276,31 @@ class Ptz:
         ret = self.command(
             'ptz.cgi?action={0}&channel={1}&code=RightDown&arg1=0'
             '&arg2={2}&arg3=0'.format(action, channel, vertical_speed)
+        )
+        return ret.content.decode('utf-8')
+
+    def move_directly(self,
+                      channel=1, startpoint_x=None, startpoint_y=None,
+                      endpoint_x=None, endpoint_y=None):
+        """
+
+        Three-dimensional orientation. Move to the rectangle with screen
+        coordinate [startX, startY], [endX, endY]
+
+        Params:
+            action           - start or stop
+            channel          - channel index, start with 1
+            startX, startY, endX and endY - range is 0-8192
+        """
+
+        if startpoint_x is None or startpoint_y is None or \
+           endpoint_x is None or endpoint_y is None:
+            raise RuntimeError("Required args, start_point_x, start_point_y"
+                               "end_point_x and end_point_y not speficied")
+
+        ret = self.command(
+            'ptzBase.cgi?action=moveDirectly&channel={0}&startPoint[0]={1}'
+            '&startPoint[1]={2}&endPoint[0]={3}&endPoint[1]={4}'.format(
+             channel, startpoint_x, startpoint_y, endpoint_x, endpoint_y)
         )
         return ret.content.decode('utf-8')
