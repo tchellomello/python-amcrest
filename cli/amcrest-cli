@@ -14,10 +14,10 @@
 
 try:
     #import for Python 2.x
-    from ConfigParser import ConfigParser
+    from ConfigParser import ConfigParser, NoOptionError, NoSectionError
 except:
     #import for Python 3.x
-    from configparser import ConfigParser
+    from configparser import ConfigParser, NoOptionError, NoSectionError
 
 import argcomplete
 import argparse
@@ -449,10 +449,14 @@ def main():
         else:
             section = config.sections()[0]
 
-        args.hostname = config.get(section, 'hostname')
-        args.port = config.getint(section, 'port')
-        args.username = config.get(section, 'username')
-        args.password = config.get(section, 'password')
+        try:
+            args.hostname = config.get(section, 'hostname')
+            args.port = config.getint(section, 'port')
+            args.username = config.get(section, 'username')
+            args.password = config.get(section, 'password')
+        except (NoSectionError, NoOptionError) as e:
+            print("ERROR! %s found at %s" % (e, AMCREST_CONF))
+            return
 
     amcrest = AmcrestCamera(
         args.hostname,
