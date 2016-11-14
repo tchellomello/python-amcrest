@@ -28,6 +28,7 @@ import threading
 
 from amcrest import AmcrestCamera
 
+AMCREST_CONF=os.path.join(os.getenv("HOME"), '.config/amcrest.conf')
 
 def graceful_exit(_signo, _stack_frame):
     """
@@ -59,10 +60,6 @@ def main():
     # FIXME: Add metavar in the options for better understanding in the
     # --help output
 
-    parser.add_argument('--credentials',
-                        dest='credentials',
-                        help='filename with Amcrest camera credentials')
-
     parser.add_argument('-H', '--hostname',
                         dest='hostname',
                         help='hostname or ip address for Amcrest camera')
@@ -82,6 +79,10 @@ def main():
                         dest='port',
                         default=80,
                         help='port to Amcrest camera. Default: 80')
+
+    parser.add_argument('--camera',
+                        dest='camera',
+                        help='specify which section to read from ~/.config/amcrest.conf')
 
     parser.add_argument('--info-user',
                         dest='info_user',
@@ -433,13 +434,21 @@ def main():
     argcomplete.autocomplete(parser)
     args = parser.parse_args()
 
-    if args.credentials:
+    if os.path.isfile(AMCREST_CONF) and not args.scan_devices:
         config = ConfigParser()
-        config['DEFAULT'] = { 'username':  'admin',
-                              'password':  'admin',
-                              'port': 80 }
-        config.read(args.credentials)
-        section = config.sections()[0]
+        config.read(AMCREST_CONF)
+
+        # if more cameras found, requires --camera option
+        if len(config.sections()) > 1 and not args.camera:
+            print("More than 1 camera found at %s. "
+                  "Append the --camera option." % AMCREST_CONF)
+            return
+
+        if args.camera:
+            section = args.camera
+        else:
+            section = config.sections()[0]
+
         args.hostname = config.get(section, 'hostname')
         args.port = config.getint(section, 'port')
         args.username = config.get(section, 'username')
