@@ -12,6 +12,13 @@
 #
 # vim:sw=4:ts=4:et
 
+try:
+    #import for Python 2.x
+    from ConfigParser import ConfigParser
+except:
+    #import for Python 3.x
+    from configparser import ConfigParser
+
 import argcomplete
 import argparse
 import os
@@ -51,6 +58,10 @@ def main():
 
     # FIXME: Add metavar in the options for better understanding in the
     # --help output
+
+    parser.add_argument('--credentials',
+                        dest='credentials',
+                        help='filename with Amcrest camera credentials')
 
     parser.add_argument('-H', '--hostname',
                         dest='hostname',
@@ -421,6 +432,18 @@ def main():
 
     argcomplete.autocomplete(parser)
     args = parser.parse_args()
+
+    if args.credentials:
+        config = ConfigParser()
+        config['DEFAULT'] = { 'username':  'admin',
+                              'password':  'admin',
+                              'port': 80 }
+        config.read(args.credentials)
+        section = config.sections()[0]
+        args.hostname = config.get(section, 'hostname')
+        args.port = config.getint(section, 'port')
+        args.username = config.get(section, 'username')
+        args.password = config.get(section, 'password')
 
     amcrest = AmcrestCamera(
         args.hostname,
