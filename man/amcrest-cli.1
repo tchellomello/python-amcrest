@@ -2,13 +2,28 @@
 .SH NAME
 amcrest-cli \- A tool to manage Amcrest camera
 .SH SYNOPSIS
-amcrest-cli -H HOSTNAME -u USERNAME -p PASSWORD [options]
+amcrest-cli [-H HOSTNAME -u USERNAME -p PASSWORD] [--credentials <filename>] [options]
 .SH DESCRIPTION
 \fBamcrest-cli\fP is a command line tool to manage Amcrest camera
 .SH OPTIONS
 .TP
 .B -h, --help
 Displays a list of options.
+.TP
+.B --credentials
+Read credentials from a file to connect to the camera.
+.PP
+.RS
+[mycamera1]
+.br
+hostname: mycamera1.example.com
+.br
+username: admin      #if omitted, defaults to admin
+.br
+password: 1234567    #if omitted, defaults to admin
+.br
+port: 80             #if omitted, defaults to 80
+.RE
 .TP
 .B --current-time
 Get current time from camera.

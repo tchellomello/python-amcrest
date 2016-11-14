@@ -65,3 +65,16 @@ $ man amcrest-cli
 or
 
 $ amcrest-cli --help
+
+
+Reading credentials from a file:
+$ cat ~/camera1.cfg
+[camera1]
+hostname: camera1.example.com
+username: admin
+password: 123456
+port: 80
+
+$ amcrest-cli --credentials ~/camera1.cfg  --version-http-api
+version=1.40
+```
