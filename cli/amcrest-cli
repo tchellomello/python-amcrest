@@ -404,6 +404,16 @@ def main():
                         action='store_true',
                         help='show ptz auto movement')
 
+    parser.add_argument('--ptz-presets-list',
+                        action='store_true',
+                        help='show ptz preset list')
+
+    parser.add_argument('--ptz-goto-preset',
+                        dest='ptz_goto_preset',
+                        metavar='channel preset_point_number',
+                        nargs='+',
+                        help='move camera to preset configuration')
+
     parser.add_argument('--wlan-config',
                         action='store_true',
                         help='show/set wlan-config')
@@ -549,6 +559,20 @@ def main():
         elif args.ptz_auto_movement:
             print((camera.ptz_auto_movement))
             return
+
+        elif args.ptz_presets_list:
+            print((camera.ptz_presets_list()))
+            return
+
+        elif args.ptz_goto_preset:
+            if len(args.ptz_goto_preset) < 2:
+                print("Requires arguments: channel preset_point_number")
+                return
+
+            action = 'start'
+            channel = args.ptz_goto_preset[0]
+            preset_point_number = args.ptz_goto_preset[1]
+            camera.go_to_preset(action, channel, preset_point_number)
 
         elif args.log_clear_all:
             print((camera.log_clear_all))

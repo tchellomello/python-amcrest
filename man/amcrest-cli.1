@@ -262,6 +262,12 @@ encode media
 .B --encode-region-interested
 encode region interested
 .TP
+.B --ptz-presets-list
+show  all PTZ preset regions
+.TP
+.B --ptz-goto-preset
+move camera to a PTZ preset region
+.TP
 .B --video-channel-title
 channel title
 .TP
@@ -340,6 +346,11 @@ $ amcrest-cli -H 192.168.1.10 -u admin -p password --audio-stream-capture single
 .TP
 .B Capture mjpeg with 20 sec as timer
 $ amcrest-cli -H 192.168.1.10 -u admin -p password --mjpg-stream 20 --save /home/user/myfile.mjpg
+.TP
+.B Move camera to a preset region on channel 0 preset 1
+$ amcrest-cli -H 192.168.1.10 -u admin -p password --ptz-goto-preset 0 1
+.br
+$ amcrest-cli --camera mycamera1 --ptz-goto-preset 0 1
 .SH BUGS
 Report bugs to <https://github.com/tchellomello/python-amcrest/issues>
 .SH "SEE ALSO"
