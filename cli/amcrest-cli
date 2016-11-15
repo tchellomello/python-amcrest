@@ -14,10 +14,10 @@
 
 try:
     #import for Python 2.x
-    from ConfigParser import ConfigParser
+    from ConfigParser import ConfigParser, NoOptionError, NoSectionError
 except:
     #import for Python 3.x
-    from configparser import ConfigParser
+    from configparser import ConfigParser, NoOptionError, NoSectionError
 
 import argcomplete
 import argparse
@@ -28,6 +28,7 @@ import threading
 
 from amcrest import AmcrestCamera
 
+AMCREST_CONF=os.path.join(os.getenv("HOME"), '.config/amcrest.conf')
 
 def graceful_exit(_signo, _stack_frame):
     """
@@ -59,10 +60,6 @@ def main():
     # FIXME: Add metavar in the options for better understanding in the
     # --help output
 
-    parser.add_argument('--credentials',
-                        dest='credentials',
-                        help='filename with Amcrest camera credentials')
-
     parser.add_argument('-H', '--hostname',
                         dest='hostname',
                         help='hostname or ip address for Amcrest camera')
@@ -82,6 +79,10 @@ def main():
                         dest='port',
                         default=80,
                         help='port to Amcrest camera. Default: 80')
+
+    parser.add_argument('--camera',
+                        dest='camera',
+                        help='specify which section to read from ~/.config/amcrest.conf')
 
     parser.add_argument('--info-user',
                         dest='info_user',
@@ -403,6 +404,16 @@ def main():
                         action='store_true',
                         help='show ptz auto movement')
 
+    parser.add_argument('--ptz-presets-list',
+                        action='store_true',
+                        help='show ptz preset list')
+
+    parser.add_argument('--ptz-goto-preset',
+                        dest='ptz_goto_preset',
+                        metavar='channel preset_point_number',
+                        nargs='+',
+                        help='move camera to preset configuration')
+
     parser.add_argument('--wlan-config',
                         action='store_true',
                         help='show/set wlan-config')
@@ -433,17 +444,29 @@ def main():
     argcomplete.autocomplete(parser)
     args = parser.parse_args()
 
-    if args.credentials:
+    if os.path.isfile(AMCREST_CONF) and not args.scan_devices:
         config = ConfigParser()
-        config['DEFAULT'] = { 'username':  'admin',
-                              'password':  'admin',
-                              'port': 80 }
-        config.read(args.credentials)
-        section = config.sections()[0]
-        args.hostname = config.get(section, 'hostname')
-        args.port = config.getint(section, 'port')
-        args.username = config.get(section, 'username')
-        args.password = config.get(section, 'password')
+        config.read(AMCREST_CONF)
+
+        # if more cameras found, requires --camera option
+        if len(config.sections()) > 1 and not args.camera:
+            print("More than 1 camera found at %s. "
+                  "Append the --camera option." % AMCREST_CONF)
+            return
+
+        if args.camera:
+            section = args.camera
+        else:
+            section = config.sections()[0]
+
+        try:
+            args.hostname = config.get(section, 'hostname')
+            args.port = config.getint(section, 'port')
+            args.username = config.get(section, 'username')
+            args.password = config.get(section, 'password')
+        except (NoSectionError, NoOptionError) as e:
+            print("ERROR! %s found at %s" % (e, AMCREST_CONF))
+            return
 
     amcrest = AmcrestCamera(
         args.hostname,
@@ -536,6 +559,20 @@ def main():
         elif args.ptz_auto_movement:
             print((camera.ptz_auto_movement))
             return
+
+        elif args.ptz_presets_list:
+            print((camera.ptz_presets_list()))
+            return
+
+        elif args.ptz_goto_preset:
+            if len(args.ptz_goto_preset) < 2:
+                print("Requires arguments: channel preset_point_number")
+                return
+
+            action = 'start'
+            channel = args.ptz_goto_preset[0]
+            preset_point_number = args.ptz_goto_preset[1]
+            camera.go_to_preset(action, channel, preset_point_number)
 
         elif args.log_clear_all:
             print((camera.log_clear_all))

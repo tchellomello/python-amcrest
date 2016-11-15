@@ -2,28 +2,46 @@
 .SH NAME
 amcrest-cli \- A tool to manage Amcrest camera
 .SH SYNOPSIS
-amcrest-cli [-H HOSTNAME -u USERNAME -p PASSWORD] [--credentials <filename>] [options]
+amcrest-cli [-H HOSTNAME -u USERNAME -p PASSWORD] [--camera <camera>] [options]
 .SH DESCRIPTION
-\fBamcrest-cli\fP is a command line tool to manage Amcrest camera
-.SH OPTIONS
-.TP
-.B -h, --help
-Displays a list of options.
-.TP
-.B --credentials
-Read credentials from a file to connect to the camera.
+\fBamcrest-cli\fP is a command line tool to manage Amcrest camera.
+.P
+By default it reads the default ~/.config/amcrest.conf configuration file.
+If the file does not exist, it requires the use of -H HOSTNAME -u USERNAME -p PASSWORD options.
+.P
+The current format for ~/.config/amcrest.conf is:
 .PP
 .RS
 [mycamera1]
 .br
 hostname: mycamera1.example.com
 .br
-username: admin      #if omitted, defaults to admin
+username: admin
 .br
-password: 1234567    #if omitted, defaults to admin
+password: 1234567
 .br
-port: 80             #if omitted, defaults to 80
+port: 80
+.P
+[mycamera2]
+.br
+hostname: mycamera2.example.com
+.br
+username: admin
+.br
+password: 7654321
+.br
+port: 80
 .RE
+.P
+Note that when having more than one camera defined, it will be required to use the option \fB--camera\fP.
+.PP
+.RS
+$ amcrest-cli --camera mycamera2 --save ~/Desktop/mycamera2_snapshot.jpg
+.RE
+.SH OPTIONS
+.TP
+.B -h, --help
+Displays a list of options.
 .TP
 .B --current-time
 Get current time from camera.
@@ -244,6 +262,12 @@ encode media
 .B --encode-region-interested
 encode region interested
 .TP
+.B --ptz-presets-list
+show  all PTZ preset regions
+.TP
+.B --ptz-goto-preset
+move camera to a PTZ preset region
+.TP
 .B --video-channel-title
 channel title
 .TP
@@ -322,8 +346,15 @@ $ amcrest-cli -H 192.168.1.10 -u admin -p password --audio-stream-capture single
 .TP
 .B Capture mjpeg with 20 sec as timer
 $ amcrest-cli -H 192.168.1.10 -u admin -p password --mjpg-stream 20 --save /home/user/myfile.mjpg
+.TP
+.B Move camera to a preset region on channel 0 preset 1
+$ amcrest-cli -H 192.168.1.10 -u admin -p password --ptz-goto-preset 0 1
+.br
+$ amcrest-cli --camera mycamera1 --ptz-goto-preset 0 1
 .SH BUGS
 Report bugs to <https://github.com/tchellomello/python-amcrest/issues>
+.SH "SEE ALSO"
+.BR amcrest-cli (1)
 .SH COPYRIGHT
 Copyright 2016
 License GPLv2: GNU GPL Version 2 <http://gnu.org/licenses/gpl.html>.
