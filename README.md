@@ -3,7 +3,10 @@ This repository is python module for Amcrest SDK HTTP API.
 
 This is a working in process project.
 
-All tests executed with Amcrest IP2M-841B
+Tests executed with the following Amcrest models:
+    IPM-721S
+    IP2M-841B
+
 If you have different model, fell free to contribute.
 
 Installation
@@ -20,6 +23,15 @@ $ eval "$(register-python-argcomplete amcrest-cli)"
 To enable amcrest-cli autocomplete in the system:
 $ sudo vi /etc/profile.d/amcrest-cli-autocomplete.sh
   eval "$(register-python-argcomplete amcrest-cli)"
+```
+
+RPM
+---------
+```bash
+$ git clone git@github.com:tchellomello/python-amcrest.git
+$ ./autogen.sh
+$ make rpm
+$ dnf/yum install amcrest-cli-NVR.rpm pythonX-amcrest-NVR.rpm
 ```
 
 Usage
