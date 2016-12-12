@@ -25,12 +25,12 @@ class MotionDetection:
 
     def is_motion_detector_on(self):
         ret = self.motion_detection
-        status = [s for s in ret if 'Enable='in s].split('=')[-1]
+        status = [s for s in ret if 'Enable='in s][0].split('=')[-1]
         return self.str2bool(status)
 
     def is_record_on_motion_detection(self):
         ret = self.motion_detection
-        status = [s for s in ret if 'RecordEnable='in s].split('=')[-1]
+        status = [s for s in ret if 'RecordEnable='in s][0].split('=')[-1]
         return self.str2bool(status)
 
     @motion_detection.setter
