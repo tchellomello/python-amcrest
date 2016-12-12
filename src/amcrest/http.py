@@ -12,6 +12,8 @@
 # vim:sw=4:ts=4:et
 import requests
 
+from distutils.util import strtobool
+
 from .audio import Audio
 from .system import System
 from .network import Network
@@ -62,5 +64,13 @@ class Http(System, Network, MotionDetection, Snapshot,
             resp.raise_for_status()
         except:
             raise
-
         return resp
+
+    def str2bool(self, value):
+        """
+        Args:
+            value - text to be converted to boolean
+             True values: y, yes, true, t, on, 1
+             False values: n, no, false, off, 0
+        """
+        return bool(strtobool(value))

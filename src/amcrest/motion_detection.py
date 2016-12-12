@@ -23,6 +23,12 @@ class MotionDetection:
     def motion_detection(self):
         return self.__get_config("MotionDetect")
 
+    @property
+    def motion_detection_boolean(self):
+        ret = self.__get_config("MotionDetect")
+        status = ret.split()[0].split('=')[-1]
+        return self.str2bool(status)
+
     @motion_detection.setter
     def motion_detection(self, opt):
         if opt.lower() == "true" or opt.lower() == "false":
