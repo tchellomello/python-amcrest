@@ -23,10 +23,14 @@ class MotionDetection:
     def motion_detection(self):
         return self.__get_config("MotionDetect")
 
-    @property
-    def motion_detection_boolean(self):
-        ret = self.__get_config("MotionDetect")
-        status = ret.split()[0].split('=')[-1]
+    def is_motion_detector_on(self):
+        ret = self.motion_detection
+        status = [s for s in ret if 'Enable='in s].split('=')[-1]
+        return self.str2bool(status)
+
+    def is_record_on_motion_detection(self):
+        ret = self.motion_detection
+        status = [s for s in ret if 'RecordEnable='in s].split('=')[-1]
         return self.str2bool(status)
 
     @motion_detection.setter
