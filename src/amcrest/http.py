@@ -75,3 +75,14 @@ class Http(System, Network, MotionDetection, Snapshot,
              False values: n, no, false, off, 0
         """
         return bool(strtobool(value))
+
+
+    def to_unit(self, value, unit='GB'):
+        """Convert bytes to give unit."""
+        BYTE_SIZES = ['B', 'KB', 'MB', 'GB', 'TB']
+
+        if not isinstance(value, (int, float)):
+            value = float(value)
+
+        if unit in BYTE_SIZES:
+            return value / 1024**BYTE_SIZES.index(unit)
