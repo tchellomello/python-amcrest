@@ -29,7 +29,7 @@ class Storage:
         return ret.content.decode('utf-8')
 
     @property
-    def storage_sdcard_used_bytes(self, dev='/dev/mmc0', unit='GB'):
+    def storage_used_bytes(self, dev='/dev/mmc0', unit='GB'):
         ret = self.storage_device_info
         #TODO
         #Use regex to enhance the filter
@@ -37,7 +37,7 @@ class Storage:
         return self.to_unit(status.split('=')[-1])
 
     @property
-    def storage_sdcard_total_bytes(self, dev='/dev/mmc0', unit='GB'):
+    def storage_total_bytes(self, dev='/dev/mmc0', unit='GB'):
         ret = self.storage_device_info
         #TODO
         #Use regex to enhance the filter
