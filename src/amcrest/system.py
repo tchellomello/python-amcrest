@@ -120,7 +120,7 @@ class System:
             'Config.backup?action=All'
         )
 
-        if filename is not None:
+        if filename:
             with open(filename, "w+") as f:
                 f.write(ret.content.decode('utf-8'))
             return
@@ -150,7 +150,7 @@ class System:
     def reboot(self, delay=None):
         cmd = 'magicBox.cgi?action=reboot'
 
-        if delay is not None:
+        if delay:
             cmd += "&delay={0}".format(delay)
 
         ret = self.command(cmd)

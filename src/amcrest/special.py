@@ -28,7 +28,7 @@ class Special:
                 channel, typeno)
         )
 
-        if path_file is not None:
+        if path_file:
             with open(path_file, 'wb') as out_file:
                 shutil.copyfileobj(ret.raw, out_file)
 
@@ -78,7 +78,7 @@ class Special:
 
         ret = self.command(cmd)
 
-        if path_file is not None:
+        if path_file:
             with open(path_file, 'wb') as out_file:
                 shutil.copyfileobj(ret.raw, out_file)
 

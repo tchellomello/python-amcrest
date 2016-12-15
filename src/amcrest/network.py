@@ -25,7 +25,7 @@ class Network:
         # If devices not found, try increasing timeout
         socket.setdefaulttimeout(0.2)
 
-        if timeout is not None:
+        if timeout:
             socket.setdefaulttimeout(timeout)
 
         with closing(socket.socket()) as sk:
