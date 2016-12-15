@@ -115,7 +115,6 @@ class System:
         )
         return ret.content.decode('utf-8')
 
-    @property
     def config_backup(self, filename=None):
         ret = self.command(
             'Config.backup?action=All'
