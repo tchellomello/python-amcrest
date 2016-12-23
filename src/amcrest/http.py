@@ -76,7 +76,6 @@ class Http(System, Network, MotionDetection, Snapshot,
         """
         return bool(strtobool(value))
 
-
     def to_unit(self, value, unit='GB'):
         """Convert bytes to give unit."""
         BYTE_SIZES = ['B', 'KB', 'MB', 'GB', 'TB']

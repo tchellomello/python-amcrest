@@ -31,15 +31,15 @@ class Storage:
     @property
     def storage_used_bytes(self, dev='/dev/mmc0', unit='GB'):
         ret = self.storage_device_info
-        #TODO
-        #Use regex to enhance the filter
+        # TODO
+        # Use regex to enhance the filter
         status = [s for s in ret.split() if '.UsedBytes=' in s][0]
         return self.to_unit(status.split('=')[-1])
 
     @property
     def storage_total_bytes(self, dev='/dev/mmc0', unit='GB'):
         ret = self.storage_device_info
-        #TODO
-        #Use regex to enhance the filter
+        # TODO
+        # Use regex to enhance the filter
         status = [s for s in ret.split() if '.TotalBytes=' in s][0]
         return self.to_unit(status.split('=')[-1])
