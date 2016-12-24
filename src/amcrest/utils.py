@@ -39,7 +39,7 @@ class Utils:
             return (float('{:.{prec}f}'.format(result, prec=PRECISION)), unit)
 
 
-    def percent(self, percent, whole):
+    def percent(self, part, whole):
         """Convert data to percent"""
-        result = (percent * whole) / 100.0
+        result = 100 * float(part)/float(whole)
         return float('{:.{prec}f}'.format(result, prec=PRECISION))
