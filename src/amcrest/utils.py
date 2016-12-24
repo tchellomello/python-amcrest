@@ -33,8 +33,11 @@ class Utils:
             value = float(value)
 
         if unit in BYTE_SIZES:
-            return value / 1024**BYTE_SIZES.index(unit)
+            result = value / 1024**BYTE_SIZES.index(unit)
+            return float('{:.{prec}f}'.format(result, prec=precision))
 
-    def percent(self, percent, whole):
+
+    def percent(self, percent, whole, precision=2):
         """Convert data to percent"""
-        return (percent * whole) / 100.0
+        result = (percent * whole) / 100.0
+        return float('{:.{prec}f}'.format(result, prec=precision))
