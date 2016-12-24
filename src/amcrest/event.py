@@ -138,6 +138,14 @@ class Event:
         return ret.content.decode('utf-8')
 
     @property
+    def is_motion_detected(self):
+        event = self.event_channels_happened('VideoMotion')
+        if 'channels' not in event:
+            return False
+        else:
+            return True
+
+    @property
     def event_management(self):
         ret = self.command(
             'eventManager.cgi?action=getCaps'
