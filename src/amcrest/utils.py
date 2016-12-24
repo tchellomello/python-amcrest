@@ -36,7 +36,7 @@ class Utils:
 
         if unit in BYTE_SIZES:
             result = value / 1024**BYTE_SIZES.index(unit)
-            return float('{:.{prec}f}'.format(result, prec=PRECISION))
+            return (float('{:.{prec}f}'.format(result, prec=PRECISION)), unit)
 
 
     def percent(self, percent, whole):
