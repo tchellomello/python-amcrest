@@ -27,11 +27,12 @@ from .log import Log
 from .ptz import Ptz
 from .special import Special
 from .storage import Storage
+from .utils import Utils
 
 
 class Http(System, Network, MotionDetection, Snapshot,
            UserManagement, Event, Audio, Record, Video,
-           Log, Ptz, Special, Storage):
+           Log, Ptz, Special, Storage, Utils):
 
     def __init__(self, host, port, user,
                  password, verbose=True, protocol='http'):
@@ -66,22 +67,3 @@ class Http(System, Network, MotionDetection, Snapshot,
         except:
             raise
         return resp
-
-    def str2bool(self, value):
-        """
-        Args:
-            value - text to be converted to boolean
-             True values: y, yes, true, t, on, 1
-             False values: n, no, false, off, 0
-        """
-        return bool(strtobool(value))
-
-    def to_unit(self, value, unit='GB'):
-        """Convert bytes to give unit."""
-        BYTE_SIZES = ['B', 'KB', 'MB', 'GB', 'TB']
-
-        if not isinstance(value, (int, float)):
-            value = float(value)
-
-        if unit in BYTE_SIZES:
-            return value / 1024**BYTE_SIZES.index(unit)
