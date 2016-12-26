@@ -86,7 +86,7 @@ class System:
         ret = self.command(
             'magicBox.cgi?action=getSerialNo'
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode('utf-8').split('=')[-1]
 
     @property
     def machine_name(self):
