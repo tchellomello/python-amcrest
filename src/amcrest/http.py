@@ -15,24 +15,25 @@ import requests
 from distutils.util import strtobool
 
 from .audio import Audio
-from .system import System
-from .network import Network
-from .motion_detection import MotionDetection
-from .snapshot import Snapshot
-from .user_management import UserManagement
 from .event import Event
-from .record import Record
-from .video import Video
 from .log import Log
+from .motion_detection import MotionDetection
+from .nas import Nas
+from .network import Network
 from .ptz import Ptz
+from .record import Record
+from .snapshot import Snapshot
 from .special import Special
 from .storage import Storage
+from .system import System
+from .user_management import UserManagement
 from .utils import Utils
+from .video import Video
 
 
 class Http(System, Network, MotionDetection, Snapshot,
            UserManagement, Event, Audio, Record, Video,
-           Log, Ptz, Special, Storage, Utils):
+           Log, Ptz, Special, Storage, Utils, Nas):
 
     def __init__(self, host, port, user,
                  password, verbose=True, protocol='http'):
