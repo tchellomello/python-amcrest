@@ -34,6 +34,11 @@ class Ptz:
         )
         return ret.content.decode('utf-8')
 
+    @property
+    def ptz_presets_count(self, channel=0):
+        ret = self.ptz_presets_list()
+        return ret.count("Name=")
+
     def ptz_status(self, channel=0):
         ret = self.command(
             'ptz.cgi?action=getStatus&channel={0}'.format(channel)

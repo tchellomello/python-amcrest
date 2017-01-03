@@ -34,3 +34,21 @@ class Record:
             'configManager.cgi?action=getConfig&name=MediaGlobal'
         )
         return ret.content.decode('utf-8')
+
+    @property
+    def record_mode(self):
+        status_code = { 0 : 'Automatic',
+                        1 : 'Manual',
+                        2 : 'Stop',
+                        None: 'Unknown'}
+
+        ret = self.command(
+            'configManager.cgi?action=getConfig&name=RecordMode'
+        )
+
+        try:
+            status = int([s for s in ret.content.decode('utf-8').split() if 'Mode=' in s][0].split('=')[-1])
+        except:
+            status = None
+
+        return status_code[status]
