@@ -87,3 +87,5 @@ port: 80
 $ amcrest-cli --camera living_room --version-http-api
 version=1.40
 ```
+## Help
+If you need any help, please join our community on the Gitter channels available at https://gitter.im/python-amcrest
