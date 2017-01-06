@@ -13,6 +13,7 @@
 import requests
 
 from distutils.util import strtobool
+from requests.adapters import HTTPAdapter
 
 from .audio import Audio
 from .event import Event
@@ -50,15 +51,26 @@ class Http(System, Network, MotionDetection, Snapshot,
         return '%s://%s:%s/cgi-bin/%s' % (self._protocol, self._host,
                                           str(self._port), param)
 
-    def command(self, cmd, timeout_cmd=3):
+    def command(self, cmd, retries=None, timeout_cmd=None):
         """
         Args:
             cmd - command to execute via http
             timeout_cmd - timeout, default 3sec
+            retries - maximum number of retries each connection should attempt
         """
+        if timeout_cmd is None:
+            timeout_cmd = 3.0
+
+        if retries is None:
+            retries = 3
+
+        s = requests.Session()
+        s.mount('http://', HTTPAdapter(max_retries=retries))
+        s.mount('https://', HTTPAdapter(max_retries=retries))
+
+        url = self.__base_url(cmd)
         try:
-            url = self.__base_url(cmd)
-            resp = requests.get(
+            resp = s.get(
                 url,
                 auth=self._token,
                 stream=True,
