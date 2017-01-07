@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2015 Red Hat, Inc.
-#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 2 of the License.
@@ -10,29 +8,14 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
+#
+# vim:sw=4:ts=4:et
 
+# How long to wait for the server send data before giving up, as a float
+# or a (connect timeout, read timeout) tuple.
+# Default value from requests library is 3
+TIMEOUT_HTTP_PROTOCOL = 3.0
 
-MAINTAINERCLEANFILES = \
-        $(srcdir)/Makefile.in \
-        $(NULL)
-
-pycrestdir = $(amcrestpythonlibdir)
-
-pycrest_PYTHON = \
-	__init__.py \
-	amcrest.py \
-	http.py \
-	config.py \
-	system.py \
-	network.py \
-	motion_detection.py \
-	snapshot.py \
-	user_management.py \
-	event.py \
-	audio.py \
-	record.py \
-	video.py \
-	log.py \
-	ptz.py \
-	special.py \
-	$(NULL)
+# Retries - maximum number of retries each connection should attempt
+# Default value from requests library is 3
+MAX_RETRY_HTTP_CONNECTION = 3
