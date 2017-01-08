@@ -46,6 +46,7 @@ class Http(System, Network, MotionDetection, Snapshot,
         self._verbose = verbose
         self._protocol = protocol
         self._token = requests.auth.HTTPBasicAuth(self._user, self._password)
+        self._base_url = self.__base_url()
 
     # Base methods
     def __clean_url(self, url):
