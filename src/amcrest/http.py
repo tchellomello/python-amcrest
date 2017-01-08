@@ -49,7 +49,7 @@ class Http(System, Network, MotionDetection, Snapshot,
 
     # Base methods
     def __clean_url(self, url):
-        host = re.sub(r'^http?://', '', url, flags=re.IGNORECASE)
+        host = re.sub(r'^http[s]?://', '', url, flags=re.IGNORECASE)
         host = re.sub(r'/$', '', host)
         return host
 
