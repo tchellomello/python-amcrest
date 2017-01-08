@@ -18,7 +18,8 @@ class AmcrestCamera(Http):
     """Amcrest camera object implementation."""
 
     def __init__(self, host, port, user,
-                 password, verbose=True, protocol='http'):
+                 password, verbose=True, protocol='http',
+                 retries_connection=None, timeout_protocol=None):
 
         self.camera = Http(
             host=host,
@@ -26,5 +27,7 @@ class AmcrestCamera(Http):
             user=user,
             password=password,
             verbose=verbose,
-            protocol=protocol
+            protocol=protocol,
+            retries_connection=retries_connection,
+            timeout_protocol=timeout_protocol
         )

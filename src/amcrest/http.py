@@ -13,7 +13,6 @@
 import requests
 import re
 
-from distutils.util import strtobool
 from requests.adapters import HTTPAdapter
 
 from .audio import Audio
@@ -32,13 +31,16 @@ from .user_management import UserManagement
 from .utils import Utils
 from .video import Video
 
+from .config import TIMEOUT_HTTP_PROTOCOL, MAX_RETRY_HTTP_CONNECTION
+
 
 class Http(System, Network, MotionDetection, Snapshot,
            UserManagement, Event, Audio, Record, Video,
            Log, Ptz, Special, Storage, Utils, Nas):
 
     def __init__(self, host, port, user,
-                 password, verbose=True, protocol='http'):
+                 password, verbose=True, protocol='http',
+                 retries_connection=None, timeout_protocol=None):
         self._host = self.__clean_url(host)
         self._port = port
         self._user = user
@@ -47,6 +49,16 @@ class Http(System, Network, MotionDetection, Snapshot,
         self._protocol = protocol
         self._token = requests.auth.HTTPBasicAuth(self._user, self._password)
         self._base_url = self.__base_url()
+
+        if timeout_protocol is None:
+            self._timeout_protocol = TIMEOUT_HTTP_PROTOCOL
+        else:
+            self._timeout_protocol = timeout_protocol
+
+        if retries_connection is None:
+            self._retries_conn = MAX_RETRY_HTTP_CONNECTION
+        else:
+            self._retries_conn = retries_connection
 
     # Base methods
     def __clean_url(self, url):
@@ -65,23 +77,24 @@ class Http(System, Network, MotionDetection, Snapshot,
             timeout_cmd - timeout, default 3sec
             retries - maximum number of retries each connection should attempt
         """
-        if timeout_cmd is None:
-            timeout_cmd = 3.0
+        if timeout_cmd is not None:
+            self._timeout_protocol = timeout_cmd
 
-        if retries is None:
-            retries = 3
+        if retries is not None:
+            self._retries_conn = retries
 
         s = requests.Session()
-        s.mount('http://', HTTPAdapter(max_retries=retries))
-        s.mount('https://', HTTPAdapter(max_retries=retries))
+        s.mount('http://', HTTPAdapter(max_retries=self._retries_conn))
+        s.mount('https://', HTTPAdapter(max_retries=self._retries_conn))
 
+        print(self._timeout_protocol)
         url = self.__base_url(cmd)
         try:
             resp = s.get(
                 url,
                 auth=self._token,
                 stream=True,
-                timeout=timeout_cmd,
+                timeout=self._timeout_protocol,
             )
             resp.raise_for_status()
         except:

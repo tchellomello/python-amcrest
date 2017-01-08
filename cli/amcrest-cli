@@ -13,10 +13,10 @@
 # vim:sw=4:ts=4:et
 
 try:
-    #import for Python 2.x
+    # import for Python 2.x
     from ConfigParser import ConfigParser, NoOptionError, NoSectionError
 except:
-    #import for Python 3.x
+    # import for Python 3.x
     from configparser import ConfigParser, NoOptionError, NoSectionError
 
 import argcomplete
@@ -28,7 +28,8 @@ import threading
 
 from amcrest import AmcrestCamera
 
-AMCREST_CONF=os.path.join(os.getenv("HOME"), '.config/amcrest.conf')
+AMCREST_CONF = os.path.join(os.getenv("HOME"), '.config/amcrest.conf')
+
 
 def graceful_exit(_signo, _stack_frame):
     """
@@ -82,7 +83,8 @@ def main():
 
     parser.add_argument('--camera',
                         dest='camera',
-                        help='specify which section to read from ~/.config/amcrest.conf')
+                        help='specify which section to read from '
+                             '~/.config/amcrest.conf')
 
     parser.add_argument('--info-user',
                         dest='info_user',
