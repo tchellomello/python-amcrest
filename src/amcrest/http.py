@@ -11,6 +11,7 @@
 #
 # vim:sw=4:ts=4:et
 import requests
+import re
 
 from distutils.util import strtobool
 from requests.adapters import HTTPAdapter
@@ -38,7 +39,7 @@ class Http(System, Network, MotionDetection, Snapshot,
 
     def __init__(self, host, port, user,
                  password, verbose=True, protocol='http'):
-        self._host = host
+        self._host = self.__clean_url(host)
         self._port = port
         self._user = user
         self._password = password
@@ -47,6 +48,11 @@ class Http(System, Network, MotionDetection, Snapshot,
         self._token = requests.auth.HTTPBasicAuth(self._user, self._password)
 
     # Base methods
+    def __clean_url(self, url):
+        host = re.sub(r'^http[s]?://', '', url, flags=re.IGNORECASE)
+        host = re.sub(r'/$', '', host)
+        return host
+
     def __base_url(self, param=""):
         return '%s://%s:%s/cgi-bin/%s' % (self._protocol, self._host,
                                           str(self._port), param)
