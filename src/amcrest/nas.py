@@ -15,7 +15,7 @@
 class Nas:
 
     @property
-    def nas_information(self):
+     def nas_information(self):
         ret = self.command(
             'configManager.cgi?action=getConfig&name=NAS'
         )
