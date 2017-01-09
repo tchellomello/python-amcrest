@@ -15,8 +15,8 @@ from distutils.util import strtobool
 
 PRECISION = 2
 
-class Utils:
 
+class Utils:
 
     def str2bool(self, value):
         """
@@ -37,7 +37,6 @@ class Utils:
         if unit in BYTE_SIZES:
             result = value / 1024**BYTE_SIZES.index(unit)
             return (float('{:.{prec}f}'.format(result, prec=PRECISION)), unit)
-
 
     def percent(self, part, whole):
         """Convert data to percent"""

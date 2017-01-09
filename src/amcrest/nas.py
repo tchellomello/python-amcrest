@@ -20,4 +20,3 @@ class Nas:
             'configManager.cgi?action=getConfig&name=NAS'
         )
         return ret.content.decode('utf-8')
-
