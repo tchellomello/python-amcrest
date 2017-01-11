@@ -87,7 +87,6 @@ class Http(System, Network, MotionDetection, Snapshot,
         s.mount('http://', HTTPAdapter(max_retries=self._retries_conn))
         s.mount('https://', HTTPAdapter(max_retries=self._retries_conn))
 
-        print(self._timeout_protocol)
         url = self.__base_url(cmd)
         try:
             resp = s.get(
