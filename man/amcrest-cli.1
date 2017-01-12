@@ -347,6 +347,11 @@ $ amcrest-cli -H 192.168.1.10 -u admin -p password --audio-stream-capture single
 .B Capture mjpeg with 20 sec as timer
 $ amcrest-cli -H 192.168.1.10 -u admin -p password --mjpg-stream 20 --save /home/user/myfile.mjpg
 .TP
+.B NTP Examples
+$ amcrest-cli -H 192.168.1.10 -u admin -p password --ntp-config NTP.Address=pool.ntp.org
+.br
+$ amcrest-cli -H 192.168.1.10 -u admin -p password --ntp-config NTP.Enable=true
+.TP
 .B Move camera to a preset region on channel 0 preset 1
 $ amcrest-cli -H 192.168.1.10 -u admin -p password --ptz-goto-preset 0 1
 .br
