@@ -144,3 +144,29 @@ class Network:
             'netApp.cgi?action=getInterfaces'
         )
         return ret.content.decode('utf-8')
+
+    @property
+    def ntp_config(self):
+        ret = self.command(
+            'configManager.cgi?action=getConfig&name=NTP'
+        )
+        return ret.content.decode('utf-8')
+
+    @ntp_config.setter
+    def ntp_config(self, ntp_opt):
+        """
+        ntp_opt is the NTP options listed as example below:
+
+        NTP.Address=clock.isc.org
+        NTP.Enable=false
+        NTP.Port=38
+        NTP.TimeZone=9
+        NTP.UpdatePeriod=31
+
+        opt format:
+        <paramName>=<paramValue>[&<paramName>=<paramValue>...]
+        """
+        ret = self.command(
+            'configManager.cgi?action=setConfig&{0}'.format(ntp_opt)
+        )
+        return ret.content.decode('utf-8')

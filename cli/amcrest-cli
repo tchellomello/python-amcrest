@@ -244,6 +244,11 @@ def main():
                         const=-1,
                         help='network configuration')
 
+    parser.add_argument('--ntp-config',
+                        nargs='?',
+                        const=-1,
+                        help='ntp config')
+
     parser.add_argument('--snapshot-config',
                         nargs='?',
                         const=-1,
@@ -827,6 +832,14 @@ def main():
 
         elif args.network_config:
             print((camera.network_config))
+
+        elif args.ntp_config == -1:
+            print((camera.ntp_config))
+            return
+
+        elif args.ntp_config is not None:
+            camera.ntp_config = args.ntp_config
+            return
 
         elif args.network_interfaces:
             print((camera.network_interfaces))
