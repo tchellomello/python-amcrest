@@ -147,5 +147,13 @@ make check-local
 %{_sysconfdir}/profile.d/amcrest-cli-autocomplete.sh
 
 %changelog
+* Fri Jan 13 2017 Marcelo Moreira de Mello <tchello.mello@gmail.com> 1.1-0
+- Implemented tests with Travis
+- Added configuration file ~/.config/amcrest.conf
+- Added NTP support
+- Introduced to customize timeout parameters
+- Supported notification when motion is dected
+- Minor bug fixes and enhancements
+
 * Thu May 07 2015 Douglas Schilling Landgraf <dougsland@gmail.com> 1.0-0
 - Initial take
