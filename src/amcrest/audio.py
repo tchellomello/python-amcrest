@@ -50,7 +50,7 @@ class Audio:
             'audio.cgi?action=getAudio&httptype={0}&channel={1}'.format(
                 httptype, channel))
 
-        if path_file is not None:
+        if path_file:
             with open(path_file, 'wb') as out_file:
                 shutil.copyfileobj(ret.raw, out_file)
 

@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2015 Red Hat, Inc.
-#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 2 of the License.
@@ -10,29 +8,12 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
+#
+# vim:sw=4:ts=4:et
 
+from amcrest import AmcrestCamera
 
-MAINTAINERCLEANFILES = \
-        $(srcdir)/Makefile.in \
-        $(NULL)
+amcrest = AmcrestCamera('192.168.1.10', 80, 'admin', 'super_password')
+camera = amcrest.camera
 
-pycrestdir = $(amcrestpythonlibdir)
-
-pycrest_PYTHON = \
-	__init__.py \
-	amcrest.py \
-	http.py \
-	config.py \
-	system.py \
-	network.py \
-	motion_detection.py \
-	snapshot.py \
-	user_management.py \
-	event.py \
-	audio.py \
-	record.py \
-	video.py \
-	log.py \
-	ptz.py \
-	special.py \
-	$(NULL)
+camera.snapshot(channel=0, path_file="/tmp/snapshot.jpg")

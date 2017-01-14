@@ -64,7 +64,8 @@ class System:
         ret = self.command(
             'magicBox.cgi?action=getSoftwareVersion'
         )
-        return ret.content.decode('utf-8')
+        version, build_date = ret.content.decode('utf-8').split()
+        return (version, build_date)
 
     @property
     def hardware_version(self):
@@ -85,7 +86,7 @@ class System:
         ret = self.command(
             'magicBox.cgi?action=getSerialNo'
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode('utf-8').split('=')[-1]
 
     @property
     def machine_name(self):
@@ -115,13 +116,12 @@ class System:
         )
         return ret.content.decode('utf-8')
 
-    @property
     def config_backup(self, filename=None):
         ret = self.command(
             'Config.backup?action=All'
         )
 
-        if filename is not None:
+        if filename:
             with open(filename, "w+") as f:
                 f.write(ret.content.decode('utf-8'))
             return
@@ -151,7 +151,7 @@ class System:
     def reboot(self, delay=None):
         cmd = 'magicBox.cgi?action=reboot'
 
-        if delay is not None:
+        if delay:
             cmd += "&delay={0}".format(delay)
 
         ret = self.command(cmd)

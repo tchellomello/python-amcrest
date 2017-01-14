@@ -24,7 +24,7 @@ class Snapshot:
     def snapshot_config(self):
         return self.__get_config('Snap')
 
-    def snapshot(self, channel=0, path_file=None):
+    def snapshot(self, channel=0, path_file=None, timeout=None):
         """
         Args:
 
@@ -44,10 +44,11 @@ class Snapshot:
             raw from http request
         """
         ret = self.command(
-            "snapshot.cgi?=channel={0}".format(channel)
+            "snapshot.cgi?=channel={0}".format(channel),
+            timeout_cmd=timeout
         )
 
-        if path_file is not None:
+        if path_file:
             with open(path_file, 'wb') as out_file:
                 shutil.copyfileobj(ret.raw, out_file)
 

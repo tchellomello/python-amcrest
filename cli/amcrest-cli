@@ -13,10 +13,10 @@
 # vim:sw=4:ts=4:et
 
 try:
-    #import for Python 2.x
+    # import for Python 2.x
     from ConfigParser import ConfigParser, NoOptionError, NoSectionError
 except:
-    #import for Python 3.x
+    # import for Python 3.x
     from configparser import ConfigParser, NoOptionError, NoSectionError
 
 import argcomplete
@@ -28,7 +28,8 @@ import threading
 
 from amcrest import AmcrestCamera
 
-AMCREST_CONF=os.path.join(os.getenv("HOME"), '.config/amcrest.conf')
+AMCREST_CONF = os.path.join(os.getenv("HOME"), '.config/amcrest.conf')
+
 
 def graceful_exit(_signo, _stack_frame):
     """
@@ -82,7 +83,8 @@ def main():
 
     parser.add_argument('--camera',
                         dest='camera',
-                        help='specify which section to read from ~/.config/amcrest.conf')
+                        help='specify which section to read from '
+                             '~/.config/amcrest.conf')
 
     parser.add_argument('--info-user',
                         dest='info_user',
@@ -241,6 +243,11 @@ def main():
                         nargs='?',
                         const=-1,
                         help='network configuration')
+
+    parser.add_argument('--ntp-config',
+                        nargs='?',
+                        const=-1,
+                        help='ntp config')
 
     parser.add_argument('--snapshot-config',
                         nargs='?',
@@ -826,6 +833,14 @@ def main():
         elif args.network_config:
             print((camera.network_config))
 
+        elif args.ntp_config == -1:
+            print((camera.ntp_config))
+            return
+
+        elif args.ntp_config is not None:
+            camera.ntp_config = args.ntp_config
+            return
+
         elif args.network_interfaces:
             print((camera.network_interfaces))
 
@@ -858,6 +873,7 @@ def main():
     else:
         print('Error: You must specify a valid operation. See usage:')
         parser.print_usage()
+
 
 if __name__ == '__main__':
     main()
