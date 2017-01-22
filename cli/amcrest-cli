@@ -33,6 +33,7 @@ from amcrest import AmcrestCamera
 AMCREST_CONF = os.path.join(os.getenv("HOME"), '.config/amcrest.conf')
 VERSION = get_distribution('amcrest').version
 
+
 def graceful_exit(_signo, _stack_frame):
     """
     When the process get SIGTERM, we might see "Terminated" message in console.
