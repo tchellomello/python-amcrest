@@ -41,6 +41,7 @@ class Http(System, Network, MotionDetection, Snapshot,
     def __init__(self, host, port, user,
                  password, verbose=True, protocol='http',
                  retries_connection=None, timeout_protocol=None):
+
         self._host = self.__clean_url(host)
         self._port = port
         self._user = user
@@ -69,6 +70,9 @@ class Http(System, Network, MotionDetection, Snapshot,
     def __base_url(self, param=""):
         return '%s://%s:%s/cgi-bin/%s' % (self._protocol, self._host,
                                           str(self._port), param)
+
+    def get_base_url(self):
+        return self._base_url
 
     def command(self, cmd, retries=None, timeout_cmd=None):
         """

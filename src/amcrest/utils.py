@@ -42,6 +42,3 @@ class Utils:
         """Convert data to percent"""
         result = 100 * float(part)/float(whole)
         return float('{:.{prec}f}'.format(result, prec=PRECISION))
-
-    def get_base_url(self):
-        return self._base_url
