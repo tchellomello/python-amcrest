@@ -251,6 +251,16 @@ def main():
                         const=-1,
                         help='network configuration')
 
+    parser.add_argument('--upnp-status',
+                        nargs='?',
+                        const=-1,
+                        help='upnp status')
+
+    parser.add_argument('--upnp-config',
+                        nargs='?',
+                        const=-1,
+                        help='upnp config')
+
     parser.add_argument('--ntp-config',
                         nargs='?',
                         const=-1,
@@ -839,6 +849,18 @@ def main():
 
         elif args.network_config:
             print((camera.network_config))
+
+        elif args.upnp_config == -1:
+            print((camera.upnp_config))
+            return
+
+        elif args.upnp_config is not None:
+            camera.upnp_config = args.upnp_config
+            return
+
+        elif args.upnp_status == -1:
+            print((camera.upnp_status))
+            return
 
         elif args.ntp_config == -1:
             print((camera.ntp_config))

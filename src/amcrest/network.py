@@ -146,6 +146,65 @@ class Network:
         return ret.content.decode('utf-8')
 
     @property
+    def upnp_status(self):
+        ret = self.command(
+            'netApp.cgi?action=getUPnPStatus'
+        )
+        return ret.content.decode('utf-8')
+
+    @property
+    def upnp_config(self):
+        ret = self.command(
+            'configManager.cgi?action=getConfig&name=UPnP'
+        )
+        return ret.content.decode('utf-8')
+
+    @upnp_config.setter
+    def upnp_config(self, upnp_opt):
+        """
+        01/21/2017
+
+        Note 1:
+        -------
+        The current SDK from Amcrest is case sensitive, do not
+        mix UPPERCASE options with lowercase. Otherwise it will
+        ignore your call.
+
+        Example:
+
+        Correct:
+                "UPnP.Enable=true&UPnP.MapTable[0].Protocol=UDP"
+
+        Incorrect:
+            "UPnP.Enable=true&UPnP.Maptable[0].Protocol=UDP"
+                                      ^ here should be T in UPPERCASE
+
+        Note 2:
+        -------
+        In firmware Amcrest_IPC-AWXX_Eng_N_V2.420.AC00.15.R.20160908.bin
+        InnerPort was not able to be changed as API SDK 2.10 suggests.
+
+        upnp_opt is the UPnP options listed as example below:
+        +-------------------------------------------------------------------+
+        | ParamName                      | Value  | Description             |
+        +--------------------------------+----------------------------------+
+        |UPnP.Enable                     | bool   | Enable/Disable UPnP     |
+        |UPnP.MapTable[index].Enable     | bool   | Enable/Disable UPnP map |
+        |UPnP.MapTable[index].InnerPort  | int    | Range [1-65535]         |
+        |UPnP.MapTable[index].OuterPort  | int    | Range [1-65535]         |
+        |UPnP.MapTable[index].Protocol   | string | Range {TCP, UDP}        |
+        |UPnP.MapTable[index].ServiceName| string | User UPnP Service name  |
+        +-------------------------------------------------------------------+
+
+        upnp_opt format:
+        <paramName>=<paramValue>[&<paramName>=<paramValue>...]
+        """
+        ret = self.command(
+            'configManager.cgi?action=setConfig&{0}'.format(upnp_opt)
+        )
+        return ret.content.decode('utf-8')
+
+    @property
     def ntp_config(self):
         ret = self.command(
             'configManager.cgi?action=getConfig&name=NTP'
@@ -163,7 +222,7 @@ class Network:
         NTP.TimeZone=9
         NTP.UpdatePeriod=31
 
-        opt format:
+        ntp_opt format:
         <paramName>=<paramValue>[&<paramName>=<paramValue>...]
         """
         ret = self.command(
