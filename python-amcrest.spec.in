@@ -147,6 +147,10 @@ make check-local
 %{_sysconfdir}/profile.d/amcrest-cli-autocomplete.sh
 
 %changelog
+* Sat Jan 21 2017 Marcelo Moreira de Mello <tchello.mello@gmail.com> 1.1-2
+* Fixed and reorganized tree
+* Rebase
+
 * Sat Jan 21 2017 Marcelo Moreira de Mello <tchello.mello@gmail.com> 1.1-1
 * Exposed method get_base_url()
 
