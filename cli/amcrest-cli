@@ -26,9 +26,12 @@ import signal
 import sys
 import threading
 
+from pkg_resources import get_distribution
+
 from amcrest import AmcrestCamera
 
 AMCREST_CONF = os.path.join(os.getenv("HOME"), '.config/amcrest.conf')
+VERSION = get_distribution('amcrest').version
 
 
 def graceful_exit(_signo, _stack_frame):
@@ -216,6 +219,10 @@ def main():
     parser.add_argument('--version-http-api',
                         action='store_true',
                         help='Get version of HTTP API')
+
+    parser.add_argument('--version',
+                        action='version',
+                        version=VERSION)
 
     parser.add_argument('--scan-devices',
                         dest='scan_devices',
