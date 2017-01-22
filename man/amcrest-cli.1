@@ -347,6 +347,17 @@ $ amcrest-cli -H 192.168.1.10 -u admin -p password --audio-stream-capture single
 .B Capture mjpeg with 20 sec as timer
 $ amcrest-cli -H 192.168.1.10 -u admin -p password --mjpg-stream 20 --save /home/user/myfile.mjpg
 .TP
+.B Show UPnP status
+$ amcrest-cli -H 192.168.1.10 -u admin -p password --upnp-status
+.TP
+.B Show UPnP config
+$ amcrest-cli -H 192.168.1.10 -u admin -p password --upnp-config
+.TP
+.B Setting UPnP config
+$ amcrest-cli -H 192.168.1.10 -u admin -p password --upnp-config UPnP.Enable=true
+.br
+$ amcrest-cli -H 192.168.1.10 -u admin -p password --upnp-config "UPnP.Enable=true&UPnP.MapTable[0].Protocol=UDP"
+.TP
 .B NTP Examples
 $ amcrest-cli -H 192.168.1.10 -u admin -p password --ntp-config NTP.Address=pool.ntp.org
 .br
