@@ -5,8 +5,7 @@ This repository is python module for Amcrest SDK HTTP API.
 | Model                   |     Tested    | Status   | Results/Issues  |
 | ------------------------|:-------------:| :-------:| :--------------:|
 | IPM-721S                | :+1:          |  working |  MJPEG streaming does not work on main channel (Firmware issue) |
-| IP2M-841B/841W          | :+1:          |  working |  MJPEG streaming does not work on main channel (Firmware issue) |
-| IP2M-842W               | :+1:          |  working |                 |
+| IP2M-841B/841W/842W     | :+1:          |  working |  MJPEG streaming does not work on main channel (Firmware issue) |
 | IP3M-956E               | :+1:          |  working |                 |
 
 If you have different model, feel fee to contribute and report your results.
