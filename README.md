@@ -2,15 +2,12 @@
 This repository is python module for Amcrest SDK HTTP API.
 
 ## Supportability Matrix
-| Model                   |     Tested    | Firmware Version | Results/Issues  |
-| ------------------------|:-------------:| ----------------:| ---------------:|
-| IPM-721S                | :+1:          |                  | MJPEG streaming does not work on main channel (Firmware issue) |
-| IPM-751B                | :interrobang: |                  |
-| IP2M-841B/IP2M-841W     | :+1:          | 2.420.AC00.15.R, build : 2016-09-08  |  MJPEG streaming does not work on main channel (Firmware issue) |
-| IP2M-842W               | :interrobang: |                  |                 |
-| IP3M-943B               | :interrobang: |                  |                 |
-| IP3M-956E               | :+1:          |                  |                 |
-| IPM-HX1B                | :interrobang: |                  |                 |
+| Model                   |     Tested    | Status   |Firmware Version | Results/Issues  |
+| ------------------------|:-------------:| :-------:| ----------------:| ---------------:|
+| IPM-721S                | :+1:          |  working |                 | MJPEG streaming does not work on main channel (Firmware issue) |
+| IP2M-841B/IP2M-841W     | :+1:          |  working | 2.420.AC00.15.R, build : 2016-09-08  |  MJPEG streaming does not work on main channel (Firmware issue) |
+| IP2M-842W               | :+1:          |  working |                 |                 |
+| IP3M-956E               | :+1:          |  working |                 |                 |
 
 If you have different model, feel fee to contribute and report your results.
 
