@@ -13,8 +13,6 @@
 import requests
 import re
 
-from pkg_resources import get_distribution
-
 from requests.adapters import HTTPAdapter
 
 from .audio import Audio
@@ -52,7 +50,6 @@ class Http(System, Network, MotionDetection, Snapshot,
         self._protocol = protocol
         self._token = requests.auth.HTTPBasicAuth(self._user, self._password)
         self._base_url = self.__base_url()
-        self.version = get_distribution('amcrest').version
 
         if timeout_protocol is None:
             self._timeout_protocol = TIMEOUT_HTTP_PROTOCOL
