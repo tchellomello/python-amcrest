@@ -88,5 +88,26 @@ port: 80
 $ amcrest-cli --camera living_room --version-http-api
 version=1.40
 ```
+
+- TUI
+```bash
+Configure amcrest.conf and trigger amcrest-tui, make sure the user
+triggering amcrest-tui have access to framebuffer device or use sudo.
+
+$ vim ~/.config/amcrest.conf
+[patio]
+hostname: 192.168.0.20
+username: admin
+password: 123456
+port: 80
+
+[living_room]
+hostname: 192.168.0.21
+username: admin
+password: secret
+port: 80
+
+$ amcrest-tui
+```
 ## Help
 If you need any help, please join our community on the Gitter channels available at https://gitter.im/python-amcrest

@@ -18,8 +18,9 @@ PYTHONSOURCES = \
 SHELL := /bin/bash
 
 SUBDIRS = \
-        cli \
-        src/amcrest \
+	cli \
+	tui \
+	src/amcrest \
 	man \
 	$(NULL)	
 
