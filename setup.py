@@ -12,6 +12,6 @@ setup(name='amcrest',
       package_dir={'': 'src'},
       packages=find_packages('src'),
       include_package_data=True,
-      scripts=['cli/amcrest-cli'],
+      scripts=['cli/amcrest-cli', 'tui/amcrest-tui'],
       keywords="amcrest camera python",
       zip_safe=True)

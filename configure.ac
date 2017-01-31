@@ -94,6 +94,7 @@ AC_CONFIG_FILES([
 		src/amcrest/Makefile
 		man/Makefile
 		cli/Makefile
+		tui/Makefile
 		setup.py
 		python-amcrest.spec])
 AC_OUTPUT
