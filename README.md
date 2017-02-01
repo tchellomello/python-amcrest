@@ -96,7 +96,7 @@ Configure amcrest.conf and trigger amcrest-tui, make sure the user
 triggering amcrest-tui have access to framebuffer device or use sudo.
 
 NOTE:
-Execute it from console logins, like /dev/ttyX (Non X Windows).
+Execute it from console logins, like /dev/ttyX (Non X Window).
 Pseudo-terminals like xterm, ssh, screen and others WONT WORK.
 
 $ vim ~/.config/amcrest.conf
