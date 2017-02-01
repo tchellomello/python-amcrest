@@ -97,7 +97,7 @@ triggering amcrest-tui have access to framebuffer device or use sudo.
 
 NOTE:
 Execute it from console logins, like /dev/ttyX (Non X Windows).
-Pseudo-terminals like xterm, ssh, screen and others *WON'T WORK*.
+Pseudo-terminals like xterm, ssh, screen and others WON'T WORK.
 
 $ vim ~/.config/amcrest.conf
 [patio]
