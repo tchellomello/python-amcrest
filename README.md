@@ -95,6 +95,10 @@ version=1.40
 Configure amcrest.conf and trigger amcrest-tui, make sure the user
 triggering amcrest-tui have access to framebuffer device or use sudo.
 
+NOTE:
+Execute it from console logins, like /dev/ttyX (Non X Windows).
+Pseudo-terminals like xterm, ssh, screen and others *WON'T WORK*.
+
 $ vim ~/.config/amcrest.conf
 [patio]
 hostname: 192.168.0.20
