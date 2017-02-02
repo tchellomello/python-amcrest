@@ -33,29 +33,25 @@ AC_PROG_LN_S
 
 AM_CONDITIONAL(BUILD_PYTHON3, false)
 
-[if test -z "$NO_PYTHON3"]
+AC_PATH_PROG([PYTHON3], [python3], [no])
+[if test "$PYTHON3" == "no"]
 [then]
-    AC_PATH_PROG([PYTHON3], [python3], [no])
-    [if test "$PYTHON3" == "no"]
-    [then]
-        AM_PATH_PYTHON([2])
-        AC_SUBST([amcrestpythonlibdir], ["\$(pythondir)/amcrest"])
-    [else]
-        AM_CONDITIONAL(BUILD_PYTHON3, true)
-        AC_SUBST([PYTHON3_PREFIX], ['${prefix}'])
-        AC_SUBST([PYTHON3_EXEC_PREFIX], ['${exec_prefix}'])
+    AM_PATH_PYTHON([2])
+    AC_SUBST([amcrestpythonlibdir], ["\$(pythondir)/amcrest"])
+[else]
+    AC_SUBST([PYTHON3_PREFIX], ['${prefix}'])
+    AC_SUBST([PYTHON3_EXEC_PREFIX], ['${exec_prefix}'])
 
-        PYTHON3_DIR=`$PYTHON3 -c "import distutils.sysconfig; \
-            print(distutils.sysconfig.get_python_lib(0,0,prefix='$PYTHON3_PREFIX'))"`
-        PYTHON3_EXECDIR=`$PYTHON3 -c "import distutils.sysconfig; \
-            print(distutils.sysconfig.get_python_lib(1,0,prefix='$PYTHON3_EXEC_PREFIX'))"`
+    PYTHON3_DIR=`$PYTHON3 -c "import distutils.sysconfig; \
+        print(distutils.sysconfig.get_python_lib(0,0,prefix='$PYTHON3_PREFIX'))"`
+    PYTHON3_EXECDIR=`$PYTHON3 -c "import distutils.sysconfig; \
+        print(distutils.sysconfig.get_python_lib(1,0,prefix='$PYTHON3_EXEC_PREFIX'))"`
 
-        AC_SUBST(PYTHON3_CFLAGS)
-        AC_SUBST(PYTHON3_LIBS)
-        AC_SUBST(python3dir, $PYTHON3_DIR)
-        AC_SUBST(py3execdir, $PYTHON3_EXECDIR)
-        AC_SUBST([amcrestpythonlibdir], ["\$(python3dir)/amcrest"])
-    [fi]
+    AC_SUBST(PYTHON3_CFLAGS)
+    AC_SUBST(PYTHON3_LIBS)
+    AC_SUBST(python3dir, $PYTHON3_DIR)
+    AC_SUBST(py3execdir, $PYTHON3_EXECDIR)
+    AC_SUBST([amcrestpythonlibdir], ["\$(python3dir)/amcrest"])
 [fi]
 
 # Python tools
