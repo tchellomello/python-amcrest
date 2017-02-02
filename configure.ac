@@ -41,6 +41,7 @@ AM_CONDITIONAL(BUILD_PYTHON3, false)
         AM_PATH_PYTHON([2])
         AC_SUBST([amcrestpythonlibdir], ["\$(pythondir)/amcrest"])
     [else]
+        AM_CONDITIONAL(BUILD_PYTHON3, true)
         AC_SUBST([PYTHON3_PREFIX], ['${prefix}'])
         AC_SUBST([PYTHON3_EXEC_PREFIX], ['${exec_prefix}'])
 
