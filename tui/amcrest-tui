@@ -14,15 +14,15 @@
 import os
 import signal
 import subprocess
-import sys
 import tempfile
 import time
 
-if sys.version_info <= (3, 0):  # noqa
-    print("This program requires Python 3 or higher")
-    sys.exit(1)
-
-from configparser import ConfigParser, NoOptionError, NoSectionError
+try:
+    # import for Python 2.x
+    from ConfigParser import ConfigParser, NoOptionError, NoSectionError
+except:
+    # import for Python 3.x
+    from configparser import ConfigParser, NoOptionError, NoSectionError
 from argparse import ArgumentParser
 from amcrest import AmcrestCamera
 
@@ -53,6 +53,9 @@ class AmcrestTuiViewer():
 
         # Channel for snapshot
         self.channel_snapshot = channel_snapshot
+
+        # Hold fbi pid
+        self.cmd = None
 
         # FIXME: User might be able to provide config file path
         self.config_file_name = config_file_name
@@ -90,20 +93,22 @@ class AmcrestTuiViewer():
                 print(("ERROR! %s found at %s" % (e, self.AMCREST_CONF)))
                 raise
 
+    def _kill_process(self, alarm, stack):
+        # As fbida waits users input to close the program,
+        # we need to set timeout and as soon the time expire send
+        # SIGTERM to program to open a new one and avoid race.
+        os.kill(self.cmd.pid, signal.SIGTERM)
+
     def _view_image(self, image):
-        try:
-            cmd = subprocess.Popen(
-                ['fbi', '-a', '-noverbose', '-d', self.fb_device, image],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                shell=False
-            )
-            cmd.communicate(timeout=self.timer_between_snapshots)
-        except subprocess.TimeoutExpired:
-            # As fbida waits users input to close the program,
-            # we need to set timeout and as soon the time expire send
-            # SIGTERM to program to open a new one and avoid race.
-            os.kill(cmd.pid, signal.SIGTERM)
+        self.cmd = subprocess.Popen(
+            ['fbi', '-a', '-noverbose', '-d', self.fb_device, image],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            shell=False
+        )
+        signal.signal(signal.SIGALRM, self._kill_process)
+        signal.alarm(self.timer_between_snapshots)
+        self.cmd.communicate()
 
     def _snapshot(self, tmpfile):
         # Execute the snapshot for each camera listed

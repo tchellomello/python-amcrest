@@ -83,15 +83,17 @@ python amcrest is a python 3 library to manage Amcrest camera
 This package also contains the command line tool amcrest-cli tool
 %endif
 
-%if 0%{?with_python3}
 %package -n amcrest-tui
 Summary: text user interface to visualize snapshot via framebuffer
+%if 0%{?with_python3}
 Requires: python3-amcrest = %{version}-%{release}
+%else
+Requires: python-amcrest = %{version}-%{release}
+%endif
 Requires: fbida
 
 %description -n amcrest-tui
-python3 tool to visualize snapshots via framebuffer
-%endif
+python tool to visualize snapshots via framebuffer
 
 %package -n amcrest-cli
 Summary: client tool for amcrest camera
