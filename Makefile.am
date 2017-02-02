@@ -13,7 +13,7 @@ AUTOMAKE_OPTIONS = foreign 1.9
 ACLOCAL_AMFLAGS = -I m4
 
 PYTHONSOURCES = \
-	$(shell find . -name \*.py -o -name amcrest-cli)
+	$(shell find . -name \*.py -o -name amcrest-cli -o -name amcrest-tui)
 
 SHELL := /bin/bash
 
