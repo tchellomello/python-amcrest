@@ -53,3 +53,30 @@ class Record:
             status = None
 
         return status_code[status]
+
+    @record_mode.setter
+    def record_mode(self, record_opt, channel=0):
+        """
+        Params:
+
+        channel:
+        video index, start from 0
+
+        record_opt:
+        +----------------------------+-----------------+-------------------+
+        | ParamName                  | ParamValue type | Description       |
+        +----------------------------+-----------------+-------------------+
+        | RecordMode[channel].Mode   | integer         | Range os {0, 1, 2}|
+        |                            |                 | 0: automatically  |
+        |                            |                 | 1: manually       |
+        |                            |                 | 2: stop record    |
+        +----------------------------+-----------------+-------------------+
+
+        record_opt format:
+        <paramName>=<paramValue>[&<paramName>=<paramValue>...]
+        """
+        ret = self.command(
+            'configManager.cgi?action=setConfig&RecordMode'
+            '[{0}].Mode={1}'.format(channel, record_opt)
+        )
+        return ret.content.decode('utf-8')

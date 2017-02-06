@@ -336,9 +336,15 @@ def main():
                         action='store_true',
                         help='show record capability')
 
+    parser.add_argument('--record-mode',
+                        nargs='?',
+                        const=-1,
+                        help='show/set record mode')
+
     parser.add_argument('--record-config',
-                        action='store_true',
-                        help='show record config')
+                        nargs='?',
+                        const=-1,
+                        help='show/set record config')
 
     parser.add_argument('--media-global-config',
                         action='store_true',
@@ -668,8 +674,20 @@ def main():
             print((camera.record_capability))
             return
 
-        elif args.record_config:
+        elif args.record_mode == -1:
+            print((camera.record_mode))
+            return
+
+        elif args.record_mode is not None:
+            camera.record_mode = args.record_mode
+            return
+
+        elif args.record_config == -1:
             print((camera.record_config))
+            return
+
+        elif args.record_config is not None:
+            camera.record_config = args.record_config
             return
 
         elif args.media_global_config:
