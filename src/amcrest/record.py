@@ -28,6 +28,48 @@ class Record:
         )
         return ret.content.decode('utf-8')
 
+    @record_config.setter
+    def record_config(self, rec_opt):
+        """
+        rec_opt is the Record options listed as example below:
+
+        +----------------------+--------+------------------------------------+
+        | ParamName            | Value  |   Description                      |
+        +----------------------+--------+------------------------------------+
+        | Record[ch].PreRecord |Integer | Range is [0-300]                   |
+        |                      |        | Prerecord seconds, 0 no prerecord  |
+        |                      |        | ch (Channel number) starts from 0  |
+        +----------------------|--------|------------------------------------+
+        | Record[ch].          |        | wd (week day)                      |
+        | TimeSection[wd][ts]  | string | range is [0-6] (Sun/Sat)           |
+        |                      |        |                                    |
+        |                      |        | ts (time section) range is [0-23]  |
+        |                      |        | time section table index           |
+        |                      |        |                                    |
+        |                      |        | Format: mas hh:mm:ss-hh:mm:ss      |
+        |                      |        | Mask: [0-65535], hh: [0-24],       |
+        |                      |        | mm: [0-59], ss: [0-59]             |
+        |                      |        | Mask indicate record type by bits: |
+        |                      |        | Bit0: regular record               |
+        |                      |        | Bit1: motion detection record      |
+        |                      |        | Bit2: alarm record                 |
+        |                      |        | Bit3: card record                  |
+        +----------------------+--------+------------------------------------+
+
+        Example:
+        Record[0].TimeSection[0][0]=6 00:00:00-23:59:59
+
+
+        rec_opt format:
+        <paramName>=<paramValue>[&<paramName>=<paramValue>...]
+        """
+
+        print(rec_opt)
+        ret = self.command(
+            'configManager.cgi?action=setConfig&{0}'.format(rec_opt)
+        )
+        return ret.content.decode('utf-8')
+
     @property
     def media_global_config(self):
         ret = self.command(
