@@ -336,6 +336,10 @@ def main():
                         action='store_true',
                         help='show record capability')
 
+    parser.add_argument('--factory-create',
+                        action='store_true',
+                        help='create a media file finder')
+
     parser.add_argument('--record-mode',
                         nargs='?',
                         const=-1,
@@ -668,6 +672,10 @@ def main():
 
         elif args.video_color_config:
             print((camera.video_color_config))
+            return
+
+        elif args.factory_create:
+            print((camera.factory_create))
             return
 
         elif args.record_capability:
