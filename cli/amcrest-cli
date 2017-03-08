@@ -21,6 +21,7 @@ except:
 
 import argcomplete
 import argparse
+import getpass
 import os
 import signal
 import sys
@@ -490,7 +491,10 @@ def main():
             args.hostname = config.get(section, 'hostname')
             args.port = config.getint(section, 'port')
             args.username = config.get(section, 'username')
-            args.password = config.get(section, 'password')
+            try:
+                args.password = config.get(section, 'password')
+            except NoOptionError:
+                args.password = getpass.getpass()
         except (NoSectionError, NoOptionError) as e:
             print("ERROR! %s found at %s" % (e, AMCREST_CONF))
             return
