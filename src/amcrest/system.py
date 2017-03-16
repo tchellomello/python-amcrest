@@ -1,3 +1,4 @@
+"""Amcrest system module."""
 # -*- coding: utf-8 -*-
 #
 # This program is free software; you can redistribute it and/or modify
@@ -13,6 +14,7 @@
 
 
 class System:
+    """Amcrest system class."""
     @property
     def current_time(self):
         ret = self.command(
