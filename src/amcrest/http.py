@@ -15,23 +15,23 @@ import re
 
 from requests.adapters import HTTPAdapter
 
-from .audio import Audio
-from .event import Event
-from .log import Log
-from .motion_detection import MotionDetection
-from .nas import Nas
-from .network import Network
-from .ptz import Ptz
-from .record import Record
-from .snapshot import Snapshot
-from .special import Special
-from .storage import Storage
-from .system import System
-from .user_management import UserManagement
-from .utils import Utils
-from .video import Video
+from amcrest.audio import Audio
+from amcrest.event import Event
+from amcrest.log import Log
+from amcrest.motion_detection import MotionDetection
+from amcrest.nas import Nas
+from amcrest.network import Network
+from amcrest.ptz import Ptz
+from amcrest.record import Record
+from amcrest.snapshot import Snapshot
+from amcrest.special import Special
+from amcrest.storage import Storage
+from amcrest.system import System
+from amcrest.user_management import UserManagement
+from amcrest.utils import Utils
+from amcrest.video import Video
 
-from .config import TIMEOUT_HTTP_PROTOCOL, MAX_RETRY_HTTP_CONNECTION
+from amcrest.config import TIMEOUT_HTTP_PROTOCOL, MAX_RETRY_HTTP_CONNECTION
 
 
 class Http(System, Network, MotionDetection, Snapshot,
