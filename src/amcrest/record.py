@@ -98,7 +98,7 @@ class Record(object):
             status = int([s for s in ret.content.decode(
                 'utf-8').split() if 'Mode=' in s][0].split('=')[-1])
 
-        #pylint: disable=bare-except
+        # pylint: disable=bare-except
         except:
             status = None
 
