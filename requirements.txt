@@ -1,2 +1,3 @@
 argcomplete
 requests
+urllib3
