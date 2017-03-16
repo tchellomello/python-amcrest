@@ -11,7 +11,7 @@
 #
 # vim:sw=4:ts=4:et
 
-from .http import Http
+from amcrest.http import Http
 
 
 class AmcrestCamera(Http):
