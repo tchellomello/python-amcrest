@@ -22,6 +22,8 @@ disable=
   abstract-class-not-used,
   unused-argument,
   global-statement,
+  no-init,
+  no-member,
   redefined-variable-type,
   too-many-arguments,
   too-many-branches,
