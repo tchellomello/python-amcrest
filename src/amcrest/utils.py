@@ -25,23 +25,25 @@ def clean_url(url):
     return host
 
 
-def percent(self, part, whole):
+def percent(part, whole):
     """Convert data to percent"""
     result = 100 * float(part)/float(whole)
     return float('{:.{prec}f}'.format(result, prec=PRECISION))
 
 
-def str2bool(self, value):
+def str2bool(value):
     """
     Args:
         value - text to be converted to boolean
          True values: y, yes, true, t, on, 1
          False values: n, no, false, off, 0
     """
-    return bool(util.strtobool(value))
+    if isinstance(value, (str, unicode)):
+        return bool(util.strtobool(value))
+    return bool(value)
 
 
-def to_unit(self, value, unit='B'):
+def to_unit(value, unit='B'):
     """Convert bytes to give unit."""
     byte_array = ['B', 'KB', 'MB', 'GB', 'TB']
 
