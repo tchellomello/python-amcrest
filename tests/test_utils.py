@@ -12,10 +12,9 @@ class TestUtils(TestCase):
         self.assertEqual('www.foo.bar', clean_url('http://www.foo.bar/'))
         self.assertEqual('www.foo.bar', clean_url('https://www.foo.bar'))
 
-
     def test_precision(self):
         """Test return code from utils.precision."""
-        self.assertEqual(10.0, percent(10,100))
+        self.assertEqual(10.0, percent(10, 100))
         self.assertRaises(ValueError, percent, 'a', 100)
 
     def test_str2bool(self):
@@ -34,4 +33,3 @@ class TestUtils(TestCase):
         self.assertEqual(1024.0, to_unit(1024, unit='B')[0])
         self.assertEqual(8192.0, to_unit(8589934592, unit='MB')[0])
         self.assertEqual(1024.0, to_unit(1099511627776, unit='GB')[0])
-
