@@ -33,3 +33,4 @@ class TestUtils(TestCase):
         self.assertEqual(1024.0, to_unit(1024, unit='B')[0])
         self.assertEqual(8192.0, to_unit(8589934592, unit='MB')[0])
         self.assertEqual(1024.0, to_unit(1099511627776, unit='GB')[0])
+        self.assertNotEqual(117.73, to_unit('123000300', unit='MB')[0])
