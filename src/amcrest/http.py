@@ -10,10 +10,11 @@
 # GNU General Public License for more details.
 #
 # vim:sw=4:ts=4:et
-import re
 import requests
 
 from requests.adapters import HTTPAdapter
+
+from amcrest.utils import clean_url
 
 from amcrest.audio import Audio
 from amcrest.event import Event
@@ -28,21 +29,21 @@ from amcrest.special import Special
 from amcrest.storage import Storage
 from amcrest.system import System
 from amcrest.user_management import UserManagement
-from amcrest.utils import Utils
 from amcrest.video import Video
 
 from amcrest.config import TIMEOUT_HTTP_PROTOCOL, MAX_RETRY_HTTP_CONNECTION
 
 
+# pylint: disable=too-many-ancestors
 class Http(System, Network, MotionDetection, Snapshot,
            UserManagement, Event, Audio, Record, Video,
-           Log, Ptz, Special, Storage, Utils, Nas):
+           Log, Ptz, Special, Storage, Nas):
 
     def __init__(self, host, port, user,
                  password, verbose=True, protocol='http',
                  retries_connection=None, timeout_protocol=None):
 
-        self._host = self.__clean_url(host)
+        self._host = clean_url(host)
         self._port = port
         self._user = user
         self._password = password
@@ -62,11 +63,6 @@ class Http(System, Network, MotionDetection, Snapshot,
             self._retries_conn = retries_connection
 
     # Base methods
-    def __clean_url(self, url):
-        host = re.sub(r'^http[s]?://', '', url, flags=re.IGNORECASE)
-        host = re.sub(r'/$', '', host)
-        return host
-
     def __base_url(self, param=""):
         return '%s://%s:%s/cgi-bin/%s' % (self._protocol, self._host,
                                           str(self._port), param)

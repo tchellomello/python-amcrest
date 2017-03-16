@@ -14,13 +14,13 @@
 from amcrest.http import Http
 
 
-class AmcrestCamera(Http):
+class AmcrestCamera(object):
     """Amcrest camera object implementation."""
 
     def __init__(self, host, port, user,
                  password, verbose=True, protocol='http',
                  retries_connection=None, timeout_protocol=None):
-
+        super(AmcrestCamera, self).__init__()
         self.camera = Http(
             host=host,
             port=port,

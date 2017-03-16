@@ -10,7 +10,7 @@
 # GNU General Public License for more details.
 #
 # vim:sw=4:ts=4:et
-from amcrest.utils import Utils
+from amcrest.utils import str2bool
 
 
 class MotionDetection(object):
@@ -28,13 +28,13 @@ class MotionDetection(object):
         ret = self.motion_detection
         status = [s for s in ret.split() if '.Enable=' in s][0]\
             .split('=')[-1]
-        return Utils.str2bool(status)
+        return str2bool(status)  # pylint: disable=no-value-for-parameter
 
     def is_record_on_motion_detection(self):
         ret = self.motion_detection
         status = [s for s in ret.split() if '.RecordEnable=' in s][0]\
             .split('=')[-1]
-        return Utils.str2bool(status)
+        return str2bool(status)  # pylint: disable=no-value-for-parameter
 
     @motion_detection.setter
     def motion_detection(self, opt):
