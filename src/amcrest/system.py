@@ -26,7 +26,7 @@ class System:
     def current_time(self, date):
         """
         According with API:
-            The time format is "Y-M-D H-m-S". It’s not be effected by Locales.
+            The time format is "Y-M-D H-m-S". It is not be effected by Locales.
             TimeFormat in SetLocalesConfig
 
         Params:
