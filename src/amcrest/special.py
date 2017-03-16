@@ -13,7 +13,7 @@
 import shutil
 
 
-class Special:
+class Special(object):
 
     def realtime_stream(self, channel=1, typeno=0, path_file=None):
         """
@@ -34,6 +34,7 @@ class Special:
 
         return ret.raw
 
+    # pylint: disable=pointless-string-statement
     """
     11/05/2016
 
@@ -55,8 +56,8 @@ class Special:
 
     Users complaining here too:
     https://amcrest.com/forum/technical-discussion-f3/lost-mjpeg-encode-for-main-stream-after-firmware-u-t1516.html
-
     """
+
     def mjpg_stream(self, channelno=None, typeno=None, path_file=None):
         """
         Params:

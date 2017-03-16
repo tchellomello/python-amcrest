@@ -12,7 +12,7 @@
 # vim:sw=4:ts=4:et
 
 
-class Log:
+class Log(object):
 
     @property
     def log_clear_all(self):

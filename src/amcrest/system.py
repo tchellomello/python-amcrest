@@ -13,7 +13,7 @@
 # vim:sw=4:ts=4:et
 
 
-class System:
+class System(object):
     """Amcrest system class."""
     @property
     def current_time(self):
@@ -124,8 +124,8 @@ class System:
         )
 
         if filename:
-            with open(filename, "w+") as f:
-                f.write(ret.content.decode('utf-8'))
+            with open(filename, "w+") as cfg:
+                cfg.write(ret.content.decode('utf-8'))
             return
 
         return ret.content.decode('utf-8')

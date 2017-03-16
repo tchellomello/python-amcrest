@@ -12,7 +12,7 @@
 # vim:sw=4:ts=4:et
 
 
-class UserManagement:
+class UserManagement(object):
 
     def info_user(self, username):
         ret = self.command(
@@ -72,8 +72,8 @@ class UserManagement:
         cmd = "userManager.cgi?action=addUser&user.Name={0}" \
               "&user.Password={1}&user.Group={2}&user.Sharable={3}" \
               "&user.Reserved={4}".format(
-                username, password, group.lower(), sharable.lower(),
-                reserved.lower())
+                  username, password, group.lower(), sharable.lower(),
+                  reserved.lower())
 
         if memo:
             cmd += "&user.Memo=%s" % memo

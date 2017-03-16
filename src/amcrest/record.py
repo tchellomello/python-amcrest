@@ -12,7 +12,7 @@
 # vim:sw=4:ts=4:et
 
 
-class Record:
+class Record(object):
 
     @property
     def record_capability(self):
@@ -71,7 +71,6 @@ class Record:
         <paramName>=<paramValue>[&<paramName>=<paramValue>...]
         """
 
-        print(rec_opt)
         ret = self.command(
             'configManager.cgi?action=setConfig&{0}'.format(rec_opt)
         )
@@ -98,6 +97,8 @@ class Record:
         try:
             status = int([s for s in ret.content.decode(
                 'utf-8').split() if 'Mode=' in s][0].split('=')[-1])
+
+        #pylint: disable=bare-except
         except:
             status = None
 

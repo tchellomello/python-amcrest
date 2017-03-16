@@ -16,7 +16,7 @@ from distutils.util import strtobool
 PRECISION = 2
 
 
-class Utils:
+class Utils(object):
 
     def str2bool(self, value):
         """

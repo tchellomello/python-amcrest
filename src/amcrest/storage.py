@@ -12,7 +12,7 @@
 # vim:sw=4:ts=4:et
 
 
-class Storage:
+class Storage(object):
 
     @property
     def storage_device_info(self):

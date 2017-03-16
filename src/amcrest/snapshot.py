@@ -13,7 +13,7 @@
 import shutil
 
 
-class Snapshot:
+class Snapshot(object):
     def __get_config(self, config_name):
         ret = self.command(
             'configManager.cgi?action=getConfig&name={0}'.format(config_name)

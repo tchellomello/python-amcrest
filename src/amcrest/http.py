@@ -10,8 +10,8 @@
 # GNU General Public License for more details.
 #
 # vim:sw=4:ts=4:et
-import requests
 import re
+import requests
 
 from requests.adapters import HTTPAdapter
 
@@ -87,13 +87,13 @@ class Http(System, Network, MotionDetection, Snapshot,
         if retries is not None:
             self._retries_conn = retries
 
-        s = requests.Session()
-        s.mount('http://', HTTPAdapter(max_retries=self._retries_conn))
-        s.mount('https://', HTTPAdapter(max_retries=self._retries_conn))
+        session = requests.Session()
+        session.mount('http://', HTTPAdapter(max_retries=self._retries_conn))
+        session.mount('https://', HTTPAdapter(max_retries=self._retries_conn))
 
         url = self.__base_url(cmd)
         try:
-            resp = s.get(
+            resp = session.get(
                 url,
                 auth=self._token,
                 stream=True,
