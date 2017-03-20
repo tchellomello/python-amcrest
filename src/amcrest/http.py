@@ -103,3 +103,21 @@ class Http(System, Network, MotionDetection, Snapshot,
         except:
             raise
         return resp
+
+    def command_audio(self, cmd, file_content, http_header,
+                      timeout=None):
+        url = self.__base_url(cmd)
+
+        if timeout is not None:
+            timeout = self._timeout_protocol
+
+        try:
+            requests.post(
+                url,
+                files=file_content,
+                auth=self._token,
+                headers=http_header,
+                timeout=timeout
+            )
+        except requests.exceptions.ReadTimeout:
+            pass

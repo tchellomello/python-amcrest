@@ -223,6 +223,10 @@ def main():
                         help='scan Amcrest cameras in the subnet provided\n'
                              'i.e: 192.168.1.0/24')
 
+    parser.add_argument('--play-wav',
+                        dest='play_wav',
+                        help='play wav files')
+
     parser.add_argument('--timeout',
                         dest='timeout',
                         type=int,
@@ -465,6 +469,12 @@ def main():
                         metavar='httptype channel timercapture',
                         nargs='+',
                         help='capture audio stream')
+
+    parser.add_argument('--audio-send-stream',
+                        dest='audio_send_stream',
+                        metavar='httptype channel filename',
+                        nargs='+',
+                        help='send audio stream')
     # FIXME:
     # parser.add_argument('--log-show',
     #                     help='show logs <start time> <end time>')
@@ -550,6 +560,19 @@ def main():
             print((camera.shutdown()))
             return
 
+        elif args.audio_send_stream:
+            if len(args.audio_send_stream) <= 3:
+                print("Requires arguments: httptype, channel, filename, codec")
+                sys.exit(-1)
+
+            httptype = args.audio_send_stream[0]
+            channel = args.audio_send_stream[1]
+            filename = args.audio_send_stream[2]
+            codec = args.audio_send_stream[3]
+
+            camera.audio_send_stream(httptype, channel, filename, codec)
+            return
+
         elif args.audio_stream_capture:
             if not args.save:
                 print("This option requires --save")
@@ -570,6 +593,9 @@ def main():
                 camera.audio_stream_capture(httptype, channel, args.save)
             else:
                 camera.audio_stream_capture(httptype, channel)
+
+        elif args.play_wav:
+            return(camera.play_wav(path_file=args.play_wav))
 
         elif args.wlan_config:
             print((camera.wlan_config))
