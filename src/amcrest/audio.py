@@ -29,6 +29,64 @@ class Audio:
         )
         return ret.content.decode('utf-8')
 
+    def play_wav(self, httptype=None, channel=None,
+                 path_file=None):
+
+        if httptype is None:
+            httptype = 'singlepart'
+
+        if channel is None:
+            channel = '1'
+
+        if path_file is None:
+            raise RuntimeError('filename is required')
+
+        self.audio_send_stream(httptype, channel, path_file, 'G.711A')
+
+    def audio_send_stream(self, httptype=None,
+                          channel=None, path_file=None, encode=None):
+        """
+        Params:
+
+            path_file - path to audio file
+            channel: - integer
+            httptype - type string (singlepart or multipart)
+
+                singlepart: HTTP content is a continuos flow of audio packets
+                multipart: HTTP content type is multipart/x-mixed-replace, and
+                           each audio packet ends with a boundary string
+
+            Supported audio encode type according with documentation:
+                PCM
+                ADPCM
+                G.711A
+                G.711.Mu
+                G.726
+                G.729
+                MPEG2
+                AMR
+                AAC
+
+        """
+        if httptype is None or channel is None:
+            raise RuntimeError("Requires htttype and channel")
+
+        file_audio = {
+            'file': open(path_file, 'rb'),
+        }
+
+        header = {
+            'content-type': 'Audio/' + encode,
+            'content-length': '9999999'
+        }
+
+        self.command_audio(
+            'audio.cgi?action=postAudio&httptype={0}&channel={1}'.format(
+                httptype, channel),
+            file_content=file_audio,
+            http_header=header
+        )
+
     def audio_stream_capture(self, httptype=None,
                              channel=None, path_file=None):
         """

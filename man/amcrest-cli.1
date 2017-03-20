@@ -247,6 +247,12 @@ show record capability
 .B --record-config
 show record config
 .TP
+.B --play-wav
+play a wav file in the camera microphone
+.TP
+.B --audio-send-stream
+play audio into the camera microphone, user must specify httptype, channel, file and codec  
+.TP
 .B --factory-create
 create a media file finder
 .TP
@@ -376,6 +382,15 @@ $ amcrest-cli -H 192.168.1.10 -u admin -p password --ntp-config NTP.Enable=true
 $ amcrest-cli -H 192.168.1.10 -u admin -p password --ptz-goto-preset 0 1
 .br
 $ amcrest-cli --camera mycamera1 --ptz-goto-preset 0 1
+.TP
+.B Play wav file
+$ amcrest-cli -H 192.168.1.10 -u admin -p password --play-wav /path/file.wav
+.br
+.TP
+.B Play audio stream
+$ amcrest-cli -H 192.168.1.10 -u admin -p password --audio-send-stream singlepart 1 /path/file.wav G.711A
+.br
+
 .SH BUGS
 Report bugs to <https://github.com/tchellomello/python-amcrest/issues>
 .SH "SEE ALSO"
