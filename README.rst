@@ -35,12 +35,14 @@ RPM
 ---
 
 .. code-block:: bash
+
     $ git clone git@github.com:tchellomello/python-amcrest.git
     $ ./autogen.sh
     $ make rpm
     $ dnf/yum install amcrest-cli-NVR.rpm pythonX-amcrest-NVR.rpm
 
 
+-----
 Usage
 -----
 
@@ -121,24 +123,26 @@ Pseudo-terminals like xterm, ssh, screen and others WONT WORK.
     $ amcrest-tui
 
 
+---------------------
 Supportability Matrix
 ---------------------
 
 +-------------------------+---------------+----------+-----------------+
 | Model                   |     Tested    | Status   | Results/Issues  |
 +=========================+===============+==========+=================+
-| IPM-721S                | :+1:          |  working |                 |
+| IPM-721S                | Yes           |  working |                 |
 +-------------------------+---------------+----------+-----------------+
-| IP2M-841B/841W/842W     | :+1:          |  working |                 |
+| IP2M-841B/841W/842W     | Yes           |  working |                 |
 +-------------------------+---------------+----------+-----------------+
-| IP3M-956E               | :+1:          |  working |                 |
+| IP3M-956E               | Yes           |  working |                 |
 +-------------------------+---------------+----------+-----------------+
-| IPM-HX1B                | :+1:          |  working |                 |
+| IPM-HX1B                | Yes           |  working |                 |
 +-------------------------+---------------+----------+-----------------+
 
 If you have different model, feel fee to contribute and report your results.
 
 
+----
 Help
 ----
 If you need any help, please join our community on the Gitter channels available at `Gitter <https://gitter.im/python-amcrest>`_.
