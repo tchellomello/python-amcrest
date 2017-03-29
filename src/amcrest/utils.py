@@ -35,7 +35,7 @@ def pretty(value, delimiter='='):
 
 def percent(part, whole):
     """Convert data to percent"""
-    result = 100 * float(part)/float(whole)
+    result = 100 * float(part) / float(whole)
     return float('{:.{prec}f}'.format(result, prec=PRECISION))
 
 

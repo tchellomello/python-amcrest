@@ -12,20 +12,22 @@
 #
 # vim:sw=4:ts=4:et
 
-try:
-    # import for Python 2.x
-    from ConfigParser import ConfigParser, NoOptionError, NoSectionError
-except:
-    # import for Python 3.x
-    from configparser import ConfigParser, NoOptionError, NoSectionError
+# pylint: disable=invalid-name
 
-import argcomplete
-import argparse
-import getpass
 import os
 import signal
 import sys
 import threading
+import getpass
+import argparse
+import argcomplete
+
+try:
+    # import for Python 2.x
+    from ConfigParser import ConfigParser, NoOptionError, NoSectionError
+except ImportError:
+    # import for Python 3.x
+    from configparser import ConfigParser, NoOptionError, NoSectionError
 
 from amcrest import AmcrestCamera
 
@@ -59,6 +61,7 @@ def main():
         formatter_class=argparse.RawTextHelpFormatter
     )
 
+    # pylint: disable=fixme
     # FIXME: Add metavar in the options for better understanding in the
     # --help output
 
@@ -595,7 +598,7 @@ def main():
                 camera.audio_stream_capture(httptype, channel)
 
         elif args.play_wav:
-            return(camera.play_wav(path_file=args.play_wav))
+            return camera.play_wav(path_file=args.play_wav)
 
         elif args.wlan_config:
             print((camera.wlan_config))

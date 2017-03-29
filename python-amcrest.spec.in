@@ -165,6 +165,10 @@ make check-local
 %{_sysconfdir}/profile.d/amcrest-cli-autocomplete.sh
 
 %changelog
+* Tue Mar 28 2017  Marcelo Moreira de Mello <tchello.mello@gmail.com> 1.1-5
+- Introduced unittests
+- Refactored Python imports
+
 * Tue Jan 31 2017 Marcelo Moreira de Mello <tchello.mello@gmail.com> 1.1-4
 - Reverted patch 20f527eb which broke external 3rd party applications
 
