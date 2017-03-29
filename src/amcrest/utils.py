@@ -46,7 +46,7 @@ def str2bool(value):
          True values: y, yes, true, t, on, 1
          False values: n, no, false, off, 0
     """
-    if isinstance(value, (str, unicode)):
+    if isinstance(value, str):
         return bool(util.strtobool(value))
     return bool(value)
 
