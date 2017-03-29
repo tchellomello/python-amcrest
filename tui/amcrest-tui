@@ -98,7 +98,7 @@ class AmcrestTuiViewer():
                             camera_name, 'password')).camera
                 }
             except (NoSectionError, NoOptionError) as e:
-                print(("ERROR! %s found at %s" % (e, self.AMCREST_CONF)))
+                print("ERROR! %s found at %s" % (e, self.AMCREST_CONF))
                 raise
 
     def _kill_process(self, alarm, stack):
@@ -137,7 +137,7 @@ class AmcrestTuiViewer():
                 self.dev = self.amcrest_config[camera]['device']
 
                 os.system("clear")
-                print(("Loading new image from: {0}".format(camera)))
+                print("Loading new image from: {0}".format(camera))
                 try:
                     self._snapshot(tmpfile.name)
                 except RuntimeError as e:
