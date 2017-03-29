@@ -2,7 +2,7 @@
 from setuptools import setup, find_packages
 
 setup(name='amcrest',
-      version='1.1.5',
+      version='1.1.6',
       description='Python wrapper implementation for Amcrest cameras.',
       author='Douglas Schilling Landgraf, Marcelo Moreira de Mello',
       author_email='dougsland@gmail.com, tchello.mello@gmail.com',
