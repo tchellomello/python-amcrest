@@ -46,8 +46,12 @@ def str2bool(value):
          True values: y, yes, true, t, on, 1
          False values: n, no, false, off, 0
     """
-    if isinstance(value, str):
-        return bool(util.strtobool(value))
+    try:
+        if isinstance(value, (str, unicode)):
+            return bool(util.strtobool(value))
+    except NameError:  # python 3
+        if isinstance(value, str):
+            return bool(util.strtobool(value))
     return bool(value)
 
 

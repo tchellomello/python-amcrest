@@ -27,6 +27,8 @@ class TestUtils(TestCase):
         self.assertFalse(str2bool('N'))
         self.assertFalse(str2bool('no'))
         self.assertFalse(str2bool(0))
+        self.assertTrue(str2bool(u'Y'))
+        self.assertRaises(ValueError, str2bool, 'amcrest')
 
     def test_to_unit(self):
         """Test return code from utils.to_unit."""
