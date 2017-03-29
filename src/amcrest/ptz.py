@@ -12,7 +12,7 @@
 # vim:sw=4:ts=4:et
 
 
-class Ptz:
+class Ptz(object):
 
     @property
     def ptz_config(self):
@@ -306,6 +306,6 @@ class Ptz:
         ret = self.command(
             'ptzBase.cgi?action=moveDirectly&channel={0}&startPoint[0]={1}'
             '&startPoint[1]={2}&endPoint[0]={3}&endPoint[1]={4}'.format(
-             channel, startpoint_x, startpoint_y, endpoint_x, endpoint_y)
+                channel, startpoint_x, startpoint_y, endpoint_x, endpoint_y)
         )
         return ret.content.decode('utf-8')

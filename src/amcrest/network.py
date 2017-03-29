@@ -15,24 +15,26 @@ import socket
 import threading
 
 
-class Network:
+class Network(object):
 
     amcrest_ips = []
     __RTSP_PORT = 554
     __PWGPSI_PORT = 3800
 
-    def __raw_scan(self, ip, timeout=None):
+    def __raw_scan(self, ipaddr, timeout=None):
         # If devices not found, try increasing timeout
         socket.setdefaulttimeout(0.2)
 
         if timeout:
             socket.setdefaulttimeout(timeout)
 
-        with closing(socket.socket()) as sk:
+        with closing(socket.socket()) as sock:
             try:
-                sk.connect((ip, self.__RTSP_PORT))
-                sk.connect((ip, self.__PWGPSI_PORT))
-                self.amcrest_ips.append(ip)
+                sock.connect((ipaddr, self.__RTSP_PORT))
+                sock.connect((ipaddr, self.__PWGPSI_PORT))
+                self.amcrest_ips.append(ipaddr)
+
+            # pylint: disable=bare-except
             except:
                 pass
 
@@ -80,6 +82,8 @@ class Network:
         if mask == 16:
             # For mask 16, we must cut the last two
             # entries with .
+
+            # pylint: disable=unused-variable
             for i in range(0, 1):
                 network = network.rpartition(".")[0]
 
@@ -89,18 +93,18 @@ class Network:
         if mask == 16:
             for seq1 in range(0, max_range[mask]):
                 for seq2 in range(0, max_range[mask]):
-                    ip = "{0}.{1}.{2}".format(network, seq1, seq2)
-                    t = threading.Thread(
-                        target=self.__raw_scan, args=(ip, timeout)
+                    ipaddr = "{0}.{1}.{2}".format(network, seq1, seq2)
+                    thd = threading.Thread(
+                        target=self.__raw_scan, args=(ipaddr, timeout)
                     )
-                    t.start()
+                    thd.start()
         else:
             for seq1 in range(0, max_range[mask]):
-                ip = "{0}.{1}".format(network, seq1)
-                t = threading.Thread(
-                    target=self.__raw_scan, args=(ip, timeout)
+                ipaddr = "{0}.{1}".format(network, seq1)
+                thd = threading.Thread(
+                    target=self.__raw_scan, args=(ipaddr, timeout)
                 )
-                t.start()
+                thd.start()
 
         return self.amcrest_ips
 

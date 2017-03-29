@@ -10,9 +10,10 @@
 # GNU General Public License for more details.
 #
 # vim:sw=4:ts=4:et
+from amcrest.utils import to_unit
 
 
-class Storage:
+class Storage(object):
 
     @property
     def storage_device_info(self):
@@ -34,7 +35,7 @@ class Storage:
         # TODO
         # Use regex to enhance the filter
         status = [s for s in ret.split() if '.UsedBytes=' in s][0]
-        return self.to_unit(status.split('=')[-1], unit)
+        return to_unit(status.split('=')[-1], unit)
 
     @property
     def storage_total(self, dev='/dev/mmc0', unit='GB'):
@@ -42,4 +43,4 @@ class Storage:
         # TODO
         # Use regex to enhance the filter
         status = [s for s in ret.split() if '.TotalBytes=' in s][0]
-        return self.to_unit(status.split('=')[-1], unit)
+        return to_unit(status.split('=')[-1], unit)

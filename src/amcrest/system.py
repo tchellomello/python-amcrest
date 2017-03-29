@@ -1,3 +1,4 @@
+"""Amcrest system module."""
 # -*- coding: utf-8 -*-
 #
 # This program is free software; you can redistribute it and/or modify
@@ -12,7 +13,8 @@
 # vim:sw=4:ts=4:et
 
 
-class System:
+class System(object):
+    """Amcrest system class."""
     @property
     def current_time(self):
         ret = self.command(
@@ -24,7 +26,7 @@ class System:
     def current_time(self, date):
         """
         According with API:
-            The time format is "Y-M-D H-m-S". It’s not be effected by Locales.
+            The time format is "Y-M-D H-m-S". It is not be effected by Locales.
             TimeFormat in SetLocalesConfig
 
         Params:
@@ -122,8 +124,8 @@ class System:
         )
 
         if filename:
-            with open(filename, "w+") as f:
-                f.write(ret.content.decode('utf-8'))
+            with open(filename, "w+") as cfg:
+                cfg.write(ret.content.decode('utf-8'))
             return
 
         return ret.content.decode('utf-8')

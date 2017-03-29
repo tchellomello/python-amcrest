@@ -13,7 +13,7 @@
 import shutil
 
 
-class Audio:
+class Audio(object):
 
     @property
     def audio_input_channels_numbers(self):

@@ -12,7 +12,7 @@
 # vim:sw=4:ts=4:et
 
 
-class Video:
+class Video(object):
 
     @property
     def video_max_extra_stream(self):
@@ -62,6 +62,7 @@ class Video:
         )
         return ret.content.decode('utf-8')
 
+    # pylint: disable=invalid-name
     @property
     def video_input_channels_device_supported(self):
         ret = self.command(
@@ -69,6 +70,7 @@ class Video:
         )
         return ret.content.decode('utf-8')
 
+    # pylint: disable=invalid-name
     @property
     def video_output_channels_device_supported(self):
         ret = self.command(
@@ -76,6 +78,7 @@ class Video:
         )
         return ret.content.decode('utf-8')
 
+    # pylint: disable=invalid-name
     @property
     def video_max_remote_input_channels(self):
         ret = self.command(

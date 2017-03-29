@@ -1,3 +1,4 @@
+"""Amcrest NAS."""
 # -*- coding: utf-8 -*-
 #
 # This program is free software; you can redistribute it and/or modify
@@ -12,10 +13,12 @@
 # vim:sw=4:ts=4:et
 
 
-class Nas:
+class Nas(object):
+    """Amcrest methods to handle NAS."""
 
     @property
     def nas_information(self):
+        """Return NAS information."""
         ret = self.command(
             'configManager.cgi?action=getConfig&name=NAS'
         )

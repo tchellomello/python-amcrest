@@ -11,38 +11,39 @@
 #
 # vim:sw=4:ts=4:et
 import requests
-import re
 
 from requests.adapters import HTTPAdapter
 
-from .audio import Audio
-from .event import Event
-from .log import Log
-from .motion_detection import MotionDetection
-from .nas import Nas
-from .network import Network
-from .ptz import Ptz
-from .record import Record
-from .snapshot import Snapshot
-from .special import Special
-from .storage import Storage
-from .system import System
-from .user_management import UserManagement
-from .utils import Utils
-from .video import Video
+from amcrest.utils import clean_url, pretty
 
-from .config import TIMEOUT_HTTP_PROTOCOL, MAX_RETRY_HTTP_CONNECTION
+from amcrest.audio import Audio
+from amcrest.event import Event
+from amcrest.log import Log
+from amcrest.motion_detection import MotionDetection
+from amcrest.nas import Nas
+from amcrest.network import Network
+from amcrest.ptz import Ptz
+from amcrest.record import Record
+from amcrest.snapshot import Snapshot
+from amcrest.special import Special
+from amcrest.storage import Storage
+from amcrest.system import System
+from amcrest.user_management import UserManagement
+from amcrest.video import Video
+
+from amcrest.config import TIMEOUT_HTTP_PROTOCOL, MAX_RETRY_HTTP_CONNECTION
 
 
+# pylint: disable=too-many-ancestors
 class Http(System, Network, MotionDetection, Snapshot,
            UserManagement, Event, Audio, Record, Video,
-           Log, Ptz, Special, Storage, Utils, Nas):
+           Log, Ptz, Special, Storage, Nas):
 
     def __init__(self, host, port, user,
                  password, verbose=True, protocol='http',
                  retries_connection=None, timeout_protocol=None):
 
-        self._host = self.__clean_url(host)
+        self._host = clean_url(host)
         self._port = port
         self._user = user
         self._password = password
@@ -61,12 +62,22 @@ class Http(System, Network, MotionDetection, Snapshot,
         else:
             self._retries_conn = retries_connection
 
-    # Base methods
-    def __clean_url(self, url):
-        host = re.sub(r'^http[s]?://', '', url, flags=re.IGNORECASE)
-        host = re.sub(r'/$', '', host)
-        return host
+        self._set_name()
 
+    def _set_name(self):
+        """Set device name."""
+        try:
+            self._name = pretty(self.machine_name)
+            self._serial = self.serial_number
+        except AttributeError:
+            self._name = None
+            self._serial = None
+
+    def __repr__(self):
+        """Default object representation."""
+        return "<{0}: {1}>".format(self._name, self._serial)
+
+    # Base methods
     def __base_url(self, param=""):
         return '%s://%s:%s/cgi-bin/%s' % (self._protocol, self._host,
                                           str(self._port), param)
@@ -87,13 +98,13 @@ class Http(System, Network, MotionDetection, Snapshot,
         if retries is not None:
             self._retries_conn = retries
 
-        s = requests.Session()
-        s.mount('http://', HTTPAdapter(max_retries=self._retries_conn))
-        s.mount('https://', HTTPAdapter(max_retries=self._retries_conn))
+        session = requests.Session()
+        session.mount('http://', HTTPAdapter(max_retries=self._retries_conn))
+        session.mount('https://', HTTPAdapter(max_retries=self._retries_conn))
 
         url = self.__base_url(cmd)
         try:
-            resp = s.get(
+            resp = session.get(
                 url,
                 auth=self._token,
                 stream=True,

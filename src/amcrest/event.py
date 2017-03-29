@@ -12,7 +12,7 @@
 # vim:sw=4:ts=4:et
 
 
-class Event:
+class Event(object):
 
     def event_handler_config(self, handlername):
         ret = self.command(
