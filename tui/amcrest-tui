@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+"""Amcrest Text User Interface."""
 # -*- coding: utf-8 -*-
 #
 # This program is free software; you can redistribute it and/or modify
@@ -11,6 +12,8 @@
 # GNU General Public License for more details.
 #
 # vim:sw=4:ts=4:et
+# pylint: disable=invalid-name
+
 import os
 import signal
 import subprocess
@@ -20,14 +23,16 @@ import time
 try:
     # import for Python 2.x
     from ConfigParser import ConfigParser, NoOptionError, NoSectionError
-except:
+except ImportError:
     # import for Python 3.x
     from configparser import ConfigParser, NoOptionError, NoSectionError
+
 from argparse import ArgumentParser
 from amcrest import AmcrestCamera
 
 
 class AmcrestTuiViewer():
+    """Amcrest Text User Interface."""
 
     AMCREST_CONF = "{0}/.config/amcrest.conf".format(os.path.expanduser("~"))
 
@@ -39,8 +44,10 @@ class AmcrestTuiViewer():
                  merge_snapshots,
                  framebuffer_device):
         """
-        config_file_name - optional amcrest config file
-        timer_between_snapshots - timer between each snapshot
+        Define AmcrestTuiViever init method.
+
+        Config_file_name - optional amcrest config file
+        Timer_between_snapshots - timer between each snapshot
         """
         if not os.path.exists(self.AMCREST_CONF):
             raise RuntimeError(
@@ -57,6 +64,7 @@ class AmcrestTuiViewer():
         # Hold fbi pid
         self.cmd = None
 
+        # pylint: disable=fixme
         # FIXME: User might be able to provide config file path
         self.config_file_name = config_file_name
 
@@ -79,10 +87,10 @@ class AmcrestTuiViewer():
             try:
                 self.amcrest_config[camera_name] = {
                     'hostname': self.config.get(camera_name, 'hostname'),
-                    'port':     self.config.get(camera_name, 'port'),
+                    'port': self.config.get(camera_name, 'port'),
                     'username': self.config.get(camera_name, 'username'),
                     'password': self.config.get(camera_name, 'password'),
-                    'device':   AmcrestCamera(
+                    'device': AmcrestCamera(
                         host=self.config.get(camera_name, 'hostname'),
                         port=self.config.get(camera_name, 'port'),
                         user=self.config.get(camera_name, 'username'),
@@ -90,7 +98,7 @@ class AmcrestTuiViewer():
                             camera_name, 'password')).camera
                 }
             except (NoSectionError, NoOptionError) as e:
-                print(("ERROR! %s found at %s" % (e, self.AMCREST_CONF)))
+                print("ERROR! %s found at %s" % (e, self.AMCREST_CONF))
                 raise
 
     def _kill_process(self, alarm, stack):
@@ -117,16 +125,19 @@ class AmcrestTuiViewer():
         except Exception as e:
             raise RuntimeError(e)
 
+    # pylint: disable=unused-variable
     def run(self):
+        """Call run method."""
         for counter, camera in enumerate(self.amcrest_config):
-            with tempfile.NamedTemporaryFile(
-                    dir='/tmp', delete=True) as tmpfile:
+            with tempfile.NamedTemporaryFile(dir='/tmp',
+                                             delete=True) as tmpfile:
 
+                # pylint: disable=attribute-defined-outside-init
                 # Add new tmpfile name
                 self.dev = self.amcrest_config[camera]['device']
 
                 os.system("clear")
-                print(("Loading new image from: {0}".format(camera)))
+                print("Loading new image from: {0}".format(camera))
                 try:
                     self._snapshot(tmpfile.name)
                 except RuntimeError as e:
@@ -195,6 +206,7 @@ if __name__ == "__main__":
     except Exception:
         raise
 
+    # pylint: disable=fixme
     # FIXME: Add option to save the snapshots in the disk
     # (requires to set dir as well)
     tui_viewer = AmcrestTuiViewer(
