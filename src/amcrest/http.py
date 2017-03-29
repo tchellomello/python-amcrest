@@ -64,7 +64,6 @@ class Http(System, Network, MotionDetection, Snapshot,
 
         self._set_name()
 
-
     def _set_name(self):
         """Set device name."""
         try:
@@ -73,7 +72,6 @@ class Http(System, Network, MotionDetection, Snapshot,
         except AttributeError:
             self._name = None
             self._serial = None
-
 
     def __repr__(self):
         """Default object representation."""
