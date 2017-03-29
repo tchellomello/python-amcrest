@@ -14,7 +14,7 @@ import requests
 
 from requests.adapters import HTTPAdapter
 
-from amcrest.utils import clean_url
+from amcrest.utils import clean_url, pretty
 
 from amcrest.audio import Audio
 from amcrest.event import Event
@@ -61,6 +61,23 @@ class Http(System, Network, MotionDetection, Snapshot,
             self._retries_conn = MAX_RETRY_HTTP_CONNECTION
         else:
             self._retries_conn = retries_connection
+
+        self._set_name()
+
+
+    def _set_name(self):
+        """Set device name."""
+        try:
+            self._name = pretty(self.machine_name)
+            self._serial = self.serial_number
+        except AttributeError:
+            self._name = None
+            self._serial = None
+
+
+    def __repr__(self):
+        """Default object representation."""
+        return "<{0}: {1}>".format(self._name, self._serial)
 
     # Base methods
     def __base_url(self, param=""):

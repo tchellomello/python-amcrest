@@ -25,6 +25,14 @@ def clean_url(url):
     return host
 
 
+def pretty(value, delimiter='='):
+    """Format string key=value."""
+    try:
+        return value.split(delimiter)[1]
+    except AttributeError:
+        pass
+
+
 def percent(part, whole):
     """Convert data to percent"""
     result = 100 * float(part)/float(whole)
