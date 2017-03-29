@@ -20,7 +20,6 @@ pycrestdir = $(amcrestpythonlibdir)
 
 pycrest_PYTHON = \
 	__init__.py \
-	amcrest.py \
 	http.py \
 	config.py \
 	system.py \
