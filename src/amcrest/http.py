@@ -62,7 +62,15 @@ class Http(System, Network, MotionDetection, Snapshot,
         else:
             self._retries_conn = retries_connection
 
-        self._set_name()
+        try:
+            self._set_name()
+        except requests.exceptions.HTTPError as e:
+            # newer firmware requires digest auth, let's try that if we are still unauthorized
+            if e.response.status_code == 401:
+                self._token = requests.auth.HTTPDigestAuth(self._user, self._password)
+                self._set_name()
+            else:
+                raise
 
     def _set_name(self):
         """Set device name."""
