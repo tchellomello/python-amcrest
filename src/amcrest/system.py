@@ -66,7 +66,12 @@ class System(object):
         ret = self.command(
             'magicBox.cgi?action=getSoftwareVersion'
         )
-        version, build_date = ret.content.decode('utf-8').split()
+        swinfo = ret.content.decode('utf-8')
+        sep = None
+        if swinfo.find(',') >= 0:
+            swinfo = swinfo.strip() # trailing \r\n
+            sep = ','
+        version, build_date = swinfo.split(sep)
         return (version, build_date)
 
     @property
