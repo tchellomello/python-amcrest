@@ -32,6 +32,8 @@ class Storage(object):
     @property
     def storage_used(self, dev='/dev/mmc0', unit='GB'):
         ret = self.storage_device_info
+
+        # pylint: disable=fixme
         # TODO
         # Use regex to enhance the filter
         status = [s for s in ret.split() if '.UsedBytes=' in s][0]
@@ -40,6 +42,8 @@ class Storage(object):
     @property
     def storage_total(self, dev='/dev/mmc0', unit='GB'):
         ret = self.storage_device_info
+
+        # pylint: disable=fixme
         # TODO
         # Use regex to enhance the filter
         status = [s for s in ret.split() if '.TotalBytes=' in s][0]

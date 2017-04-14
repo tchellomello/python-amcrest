@@ -64,10 +64,12 @@ class Http(System, Network, MotionDetection, Snapshot,
 
         try:
             self._set_name()
-        except requests.exceptions.HTTPError as e:
-            # newer firmware requires digest auth, let's try that if we are still unauthorized
-            if e.response.status_code == 401:
-                self._token = requests.auth.HTTPDigestAuth(self._user, self._password)
+        except requests.exceptions.HTTPError as error:
+            # newer firmware requires digest auth
+            # let's try that if we are still unauthorized
+            if error.response.status_code == 401:
+                self._token = requests.auth.HTTPDigestAuth(self._user,
+                                                           self._password)
                 self._set_name()
             else:
                 raise
