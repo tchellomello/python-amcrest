@@ -142,8 +142,7 @@ class Event(object):
         event = self.event_channels_happened('VideoMotion')
         if 'channels' not in event:
             return False
-        else:
-            return True
+        return True
 
     @property
     def event_management(self):

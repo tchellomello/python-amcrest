@@ -165,8 +165,12 @@ make check-local
 %{_sysconfdir}/profile.d/amcrest-cli-autocomplete.sh
 
 %changelog
+* Sun Apr 16 2017 Marcelo Moreira de Mello <tchello.mello@gmail.com> 1.1-9
+- Added support to new Amcrest firmware V2.400.AC01.15.R.20170328 <david@neongoat.com>
+- Added support to new Amcrest firmware V2.420.AC00.17.R.20170322 <david@neongoat.com>
+
 * Sat Apr 08 2017 Marcelo Moreira de Mello <tchello.mello@gmail.com> 1.1-8
-* Added storage_used_percent function
+- Added storage_used_percent function
 
 * Tue Mar 28 2017  Marcelo Moreira de Mello <tchello.mello@gmail.com> 1.1-5
 - Introduced unittests
