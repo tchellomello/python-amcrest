@@ -11,6 +11,7 @@
 #
 # vim:sw=4:ts=4:et
 import requests
+import logging
 
 from requests.adapters import HTTPAdapter
 
@@ -33,6 +34,7 @@ from amcrest.video import Video
 
 from amcrest.config import TIMEOUT_HTTP_PROTOCOL, MAX_RETRY_HTTP_CONNECTION
 
+_LOGGER = logging.getLogger(__name__)
 
 # pylint: disable=too-many-ancestors
 class Http(System, Network, MotionDetection, Snapshot,
@@ -49,7 +51,6 @@ class Http(System, Network, MotionDetection, Snapshot,
         self._password = password
         self._verbose = verbose
         self._protocol = protocol
-        self._token = requests.auth.HTTPBasicAuth(self._user, self._password)
         self._base_url = self.__base_url()
 
         if timeout_protocol is None:
@@ -62,17 +63,36 @@ class Http(System, Network, MotionDetection, Snapshot,
         else:
             self._retries_conn = retries_connection
 
+        self._token = self._generate_token()
+        self._set_name()
+
+    def _generate_token(self):
+        """Discover which authentication method to use.
+
+        Latest firmwares requires HttpDigestAuth
+        Older firmwares requires HttpBasicAuth
+        """
+        url = self.__base_url('magicBox.cgi?action=getMachineName')
         try:
-            self._set_name()
+            # try old firmware first to force 401 if fails
+            self._authentication_type = 'basic'
+            auth = requests.auth.HTTPBasicAuth(self._user, self._password)
+            req = requests.get(url, auth=auth)
+            req.raise_for_status()
+
         except requests.exceptions.HTTPError as error:
-            # newer firmware requires digest auth
-            # let's try that if we are still unauthorized
-            if error.response.status_code == 401:
-                self._token = requests.auth.HTTPDigestAuth(self._user,
-                                                           self._password)
-                self._set_name()
-            else:
+            # if 401, then try new digest method
+            self._authentication_type = 'digest'
+            auth = requests.auth.HTTPDigestAuth(self._user, self._password)
+            req = requests.get(url, auth=auth)
+            req.raise_for_status()
+
+            # check if user passed
+            if 'invalid' in req.text.lower() or \
+               'error' in req.text.lower():
+                _LOGGER.info("%s Invalid credentials", req.text)
                 raise
+        return auth
 
     def _set_name(self):
         """Set device name."""
@@ -113,16 +133,33 @@ class Http(System, Network, MotionDetection, Snapshot,
         session.mount('https://', HTTPAdapter(max_retries=self._retries_conn))
 
         url = self.__base_url(cmd)
-        try:
-            resp = session.get(
-                url,
-                auth=self._token,
-                stream=True,
-                timeout=self._timeout_protocol,
-            )
-            resp.raise_for_status()
-        except:
+        resp = None
+        loop = 0
+        while loop <= self._retries_conn:
+            loop += 1
+            _LOGGER.debug("Running query attempt %s", loop)
+            try:
+                resp = session.get(
+                    url,
+                    auth=self._token,
+                    stream=True,
+                    timeout=self._timeout_protocol,
+                )
+                resp.raise_for_status()
+                break
+            except requests.exceptions.HTTPError as error:
+                _LOGGER.debug("Trying again due error %s", error)
+                continue
+
+            # keep the loop when 401
+            if resp.status_code == 401:
+                continue
+
+        # if we got here, let's raise because it did not work
+        if resp is None:
             raise
+
+        _LOGGER.debug("Query worked. Exit code: <%s>", resp.status_code)
         return resp
 
     def command_audio(self, cmd, file_content, http_header,
