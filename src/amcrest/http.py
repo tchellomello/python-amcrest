@@ -10,8 +10,8 @@
 # GNU General Public License for more details.
 #
 # vim:sw=4:ts=4:et
-import requests
 import logging
+import requests
 
 from requests.adapters import HTTPAdapter
 
@@ -35,6 +35,7 @@ from amcrest.video import Video
 from amcrest.config import TIMEOUT_HTTP_PROTOCOL, MAX_RETRY_HTTP_CONNECTION
 
 _LOGGER = logging.getLogger(__name__)
+
 
 # pylint: disable=too-many-ancestors
 class Http(System, Network, MotionDetection, Snapshot,
@@ -80,7 +81,7 @@ class Http(System, Network, MotionDetection, Snapshot,
             req = requests.get(url, auth=auth)
             req.raise_for_status()
 
-        except requests.exceptions.HTTPError as error:
+        except requests.exceptions.HTTPError:
             # if 401, then try new digest method
             self._authentication_type = 'digest'
             auth = requests.auth.HTTPDigestAuth(self._user, self._password)
@@ -157,7 +158,7 @@ class Http(System, Network, MotionDetection, Snapshot,
 
         # if we got here, let's raise because it did not work
         if resp is None:
-            raise
+            raise ValueError('Something went wrong!!!!')
 
         _LOGGER.debug("Query worked. Exit code: <%s>", resp.status_code)
         return resp
