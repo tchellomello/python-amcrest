@@ -76,14 +76,14 @@ class Http(System, Network, MotionDetection, Snapshot,
         url = self.__base_url('magicBox.cgi?action=getMachineName')
         try:
             # try old firmware first to force 401 if fails
-            self._authentication_type = 'basic'
+            self._authentication = 'basic'
             auth = requests.auth.HTTPBasicAuth(self._user, self._password)
             req = requests.get(url, auth=auth)
             req.raise_for_status()
 
         except requests.exceptions.HTTPError:
             # if 401, then try new digest method
-            self._authentication_type = 'digest'
+            self._authentication = 'digest'
             auth = requests.auth.HTTPDigestAuth(self._user, self._password)
             req = requests.get(url, auth=auth)
             req.raise_for_status()
