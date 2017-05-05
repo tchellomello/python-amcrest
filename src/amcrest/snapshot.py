@@ -44,7 +44,7 @@ class Snapshot(object):
             raw from http request
         """
         ret = self.command(
-            "snapshot.cgi?=channel={0}".format(channel),
+            "snapshot.cgi?channel={0}".format(channel),
             timeout_cmd=timeout
         )
 
