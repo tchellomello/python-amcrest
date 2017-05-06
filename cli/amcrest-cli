@@ -505,7 +505,7 @@ def main():
             args.port = config.getint(section, 'port')
             args.username = config.get(section, 'username')
             try:
-                args.password = config.get(section, 'password')
+                args.password = config.get(section, 'password', raw=True)
             except NoOptionError:
                 args.password = getpass.getpass()
         except (NoSectionError, NoOptionError) as e:
