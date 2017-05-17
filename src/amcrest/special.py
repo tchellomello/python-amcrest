@@ -34,6 +34,33 @@ class Special(object):
 
         return ret.raw
 
+    def rtsp_url(self, channelno=None, typeno=None):
+        """
+        Return RTSP streaming url
+
+        Params:
+            channelno: integer, the video channel index which starts from 1,
+                       default 1 if not specified.
+
+            typeno: the stream type, default 0 if not specified. It can be
+                    the following value:
+
+                    0-Main Stream
+                    1-Extra Stream 1 (Sub Stream)
+                    2-Extra Stream 2 (Sub Stream)
+        """
+        if channelno is None:
+            channelno = 1
+
+        if typeno is None:
+            typeno = 0
+
+        cmd = 'cam/realmonitor?channel={0}&subtype={1}'.format(
+            channelno, typeno)
+
+        return 'rtsp://{0}:{1}@{2}/{3}'.format(
+            self._user, self._password, self._host, cmd)
+
     # pylint: disable=pointless-string-statement
     """
     11/05/2016
@@ -58,6 +85,31 @@ class Special(object):
     https://amcrest.com/forum/technical-discussion-f3/lost-mjpeg-encode-for-main-stream-after-firmware-u-t1516.html
     """
 
+    def mjpeg_url(self, channelno=None, typeno=None):
+        """
+        Return MJPEG streaming url
+
+        Params:
+            channelno: integer, the video channel index which starts from 1,
+                       default 1 if not specified.
+
+            typeno: the stream type, default 0 if not specified. It can be
+                    the following value:
+
+                    0-Main Stream
+                    1-Extra Stream 1 (Sub Stream)
+                    2-Extra Stream 2 (Sub Stream)
+        """
+        if channelno is None:
+            channelno = 0
+
+        if typeno is None:
+            typeno = 1
+
+        cmd = "mjpg/video.cgi?channel={0}&subtype={1}".format(
+            channelno, typeno)
+        return '{0}{1}'.format(self._base_url, cmd)
+
     def mjpg_stream(self, channelno=None, typeno=None, path_file=None):
         """
         Params:
@@ -71,12 +123,7 @@ class Special(object):
                     1-Extra Stream 1 (Sub Stream)
                     2-Extra Stream 2 (Sub Stream)
         """
-        if channelno is None and typeno is None:
-            cmd = "mjpg/video.cgi?channel=0&subtype=1"
-        else:
-            cmd = "mjpg/video.cgi?channel={0}&subtype={1}".format(
-                channelno, typeno)
-
+        cmd = self.mjpeg_url(channelno=channelno, typeno=typeno)
         ret = self.command(cmd)
 
         if path_file:
