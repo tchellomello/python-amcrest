@@ -9,8 +9,8 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 define([VERSION_MAJOR], [1])
-define([VERSION_MINOR], [1])
-define([VERSION_FIX], [9])
+define([VERSION_MINOR], [2])
+define([VERSION_FIX], [0])
 define([VERSION_NUMBER], VERSION_MAJOR[.]VERSION_MINOR[.]VERSION_FIX)
 define([VERSION_SUFFIX], [_master])
 
