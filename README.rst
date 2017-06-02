@@ -16,7 +16,7 @@ Python Amcrest
 
 A Python 2.7/3.x module for `Amcrest Cameras <https://www.amcrest.com/>`_ using the SDK HTTP API.
 
-Documentation: ocumentation: `http://python-amcrest.readthedocs.io/ <http://python-amcrest.readthedocs.io/>`_
+Documentation: `http://python-amcrest.readthedocs.io/ <http://python-amcrest.readthedocs.io/>`_
 
 ------------
 Installation
