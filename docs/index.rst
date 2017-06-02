@@ -1,22 +1,16 @@
-==============
-Python Amcrest
-==============
+.. Python Amcrest documentation master file, created by
+   sphinx-quickstart on Fri Jun  2 01:30:31 2017.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
 
-.. image:: https://badge.fury.io/py/amcrest.svg
-    :target: https://badge.fury.io/py/amcrest
+Welcome to Python Amcrest's documentation!
+==========================================
 
-.. image:: https://travis-ci.org/tchellomello/python-amcrest.svg?branch=master
-    :target: https://travis-ci.org/tchellomello/python-amcrest
-
-.. image:: https://coveralls.io/repos/github/tchellomello/python-amcrest/badge.svg
-    :target: https://coveralls.io/github/tchellomello/python-amcrest
-
-.. image:: https://img.shields.io/pypi/pyversions/amcrest.svg
-    :target: https://pypi.python.org/pypi/amcrest
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
 
 A Python 2.7/3.x module for `Amcrest Cameras <https://www.amcrest.com/>`_ using the SDK HTTP API.
-
-Documentation: ocumentation: `http://python-amcrest.readthedocs.io/ <http://python-amcrest.readthedocs.io/>`_
 
 ------------
 Installation
@@ -148,3 +142,90 @@ If you have different model, feel fee to contribute and report your results.
 Help
 ----
 If you need any help, please join our community on the Gitter channels available at `Gitter <https://gitter.im/python-amcrest>`_.
+
+
+
+Developing
+==========
+
+.. autoclass:: amcrest.AmcrestCamera
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. autoclass:: amcrest.audio.Audio
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. autoclass:: amcrest.event.Event
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. autoclass:: amcrest.log.Log
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. autoclass:: amcrest.motion_detection.MotionDetection
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. autoclass:: amcrest.nas.Nas
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. autoclass:: amcrest.network.Network
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. autoclass:: amcrest.ptz.Ptz
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. autoclass:: amcrest.record.Record
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. autoclass:: amcrest.snapshot.Snapshot
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. autoclass:: amcrest.special.Special
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. autoclass:: amcrest.storage.Storage
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. autoclass:: amcrest.system.System
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. autoclass:: amcrest.user_management.UserManagement
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. autoclass:: amcrest.video.Video
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
