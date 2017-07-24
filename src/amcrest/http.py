@@ -110,7 +110,9 @@ class Http(System, Network, MotionDetection, Snapshot,
 
     def as_dict(self):
         """Callback for __dict__."""
-        return self.__dict__
+        cdict = self.__dict__.copy()
+        cdict['_token'] = '_redacted'
+        return cdict
 
     # Base methods
     def __base_url(self, param=""):
