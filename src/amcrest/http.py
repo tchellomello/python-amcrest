@@ -108,6 +108,12 @@ class Http(System, Network, MotionDetection, Snapshot,
         """Default object representation."""
         return "<{0}: {1}>".format(self._name, self._serial)
 
+    def as_dict(self):
+        """Callback for __dict__."""
+        cdict = self.__dict__.copy()
+        cdict['_token'] = '_redacted'
+        return cdict
+
     # Base methods
     def __base_url(self, param=""):
         return '%s://%s:%s/cgi-bin/%s' % (self._protocol, self._host,
