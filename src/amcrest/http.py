@@ -111,7 +111,9 @@ class Http(System, Network, MotionDetection, Snapshot,
     def as_dict(self):
         """Callback for __dict__."""
         cdict = self.__dict__.copy()
-        cdict['_token'] = '_redacted'
+        redacted = '**********'
+        cdict['_token'] = redacted
+        cdict['_password'] = redacted
         return cdict
 
     # Base methods
