@@ -140,6 +140,8 @@ Supportability Matrix
 +-------------------------+---------------+----------+-----------------+
 | IPM-HX1B                | Yes           |  working |                 |
 +-------------------------+---------------+----------+-----------------+
+| IP3M-941                | Yes           |  working |                 |
++-------------------------+---------------+----------+-----------------+
 
 If you have different model, feel fee to contribute and report your results.
 
