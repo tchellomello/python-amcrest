@@ -34,4 +34,7 @@ pycrest_PYTHON = \
 	log.py \
 	ptz.py \
 	special.py \
+	utils.py \
+	nas.py \
+	storage.py \
 	$(NULL)
