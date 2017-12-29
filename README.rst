@@ -142,7 +142,8 @@ Supportability Matrix
 +-------------------------+---------------+----------+-----------------+
 | IP3M-941                | Yes           |  working |                 |
 +-------------------------+---------------+----------+-----------------+
-
+| IP3M-HX2                | Yes (partial) |  working |                 |
++-------------------------+---------------+----------+-----------------+
 If you have different model, feel fee to contribute and report your results.
 
 
