@@ -53,7 +53,8 @@ class MotionDetection(object):
         if opt.lower() == "true" or opt.lower() == "false":
             ret = self.command(
                 'configManager.cgi?action='
-                'setConfig&MotionDetect[0].EventHandler.RecordEnable={0}'.format(opt.lower())
+                'setConfig&MotionDetect[0].EventHandler.RecordEnable={0}'
+                .format(opt.lower())
             )
             if "ok" in ret.content.decode('utf-8').lower():
                 return True
