@@ -127,10 +127,13 @@ class System(object):
             'Config.backup?action=All'
         )
 
+        if not ret:
+            return None
+
         if filename:
             with open(filename, "w+") as cfg:
                 cfg.write(ret.content.decode('utf-8'))
-            return
+            return None
 
         return ret.content.decode('utf-8')
 
