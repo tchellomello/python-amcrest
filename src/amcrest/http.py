@@ -81,7 +81,7 @@ class Http(System, Network, MotionDetection, Snapshot,
             req = requests.get(url, auth=auth)
             req.raise_for_status()
 
-        except requests.exceptions.HTTPError:
+        except requests.HTTPError:
             # if 401, then try new digest method
             self._authentication = 'digest'
             auth = requests.auth.HTTPDigestAuth(self._user, self._password)
@@ -156,7 +156,7 @@ class Http(System, Network, MotionDetection, Snapshot,
                 )
                 resp.raise_for_status()
                 break
-            except requests.exceptions.HTTPError as error:
+            except requests.HTTPError as error:
                 _LOGGER.debug("Trying again due error %s", error)
                 continue
 
