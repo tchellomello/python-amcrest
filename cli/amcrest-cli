@@ -493,7 +493,7 @@ def main():
         if len(config.sections()) > 1 and not args.camera:
             print("More than 1 camera found at %s. "
                   "Append the --camera option." % AMCREST_CONF)
-            return
+            sys.exit(-1)
 
         if args.camera:
             section = args.camera
@@ -510,7 +510,7 @@ def main():
                 args.password = getpass.getpass()
         except (NoSectionError, NoOptionError) as e:
             print("ERROR! %s found at %s" % (e, AMCREST_CONF))
-            return
+            sys.exit(-1)
 
     amcrest = AmcrestCamera(
         args.hostname,
@@ -526,18 +526,15 @@ def main():
             print(("Looks like amcrest device: {0}".format(ret)))
         else:
             print("No devices found, try again later!")
-        return
 
     if args.username and args.hostname and args.password:
 
         if args.telnet_config == -1:
             print((camera.telnet_config))
-            return
 
         elif args.mjpg_stream:
             if not args.save:
                 print("This option requires --save")
-                return
 
             timer_capture = float(args.mjpg_stream[0])
 
@@ -553,15 +550,12 @@ def main():
 
             print((camera.mjpg_stream(
                 channelno, typeno, path_file=args.save)))
-            return
 
         elif args.reboot:
             print((camera.reboot()))
-            return
 
         elif args.shutdown:
             print((camera.shutdown()))
-            return
 
         elif args.audio_send_stream:
             if len(args.audio_send_stream) <= 3:
@@ -574,12 +568,10 @@ def main():
             codec = args.audio_send_stream[3]
 
             camera.audio_send_stream(httptype, channel, filename, codec)
-            return
 
         elif args.audio_stream_capture:
             if not args.save:
                 print("This option requires --save")
-                return
 
             if len(args.audio_stream_capture) <= 2:
                 print("Requires arguments: httptype, channel, timer_capture!")
@@ -598,36 +590,30 @@ def main():
                 camera.audio_stream_capture(httptype, channel)
 
         elif args.play_wav:
-            return camera.play_wav(path_file=args.play_wav)
+            camera.play_wav(path_file=args.play_wav)
 
         elif args.wlan_config:
             print((camera.wlan_config))
-            return
 
         elif args.scan_wlan_devices:
             print((camera.scan_wlan_devices(args.scan_wlan_devices)))
-            return
 
         elif args.telnet_config:
             camera.telnet_config = args.telnet_config
-            return
 
         elif args.ptz_config:
             print((camera.ptz_config))
-            return
 
         elif args.ptz_auto_movement:
             print((camera.ptz_auto_movement))
-            return
 
         elif args.ptz_presets_list:
             print((camera.ptz_presets_list()))
-            return
 
         elif args.ptz_goto_preset:
             if len(args.ptz_goto_preset) < 2:
                 print("Requires arguments: channel preset_point_number")
-                return
+                sys.exit(-1)
 
             action = 'start'
             channel = args.ptz_goto_preset[0]
@@ -636,104 +622,73 @@ def main():
 
         elif args.log_clear_all:
             print((camera.log_clear_all))
-            return
 
         elif args.video_standard == -1:
             print((camera.video_standard))
-            return
 
         elif args.video_standard:
             camera.video_standard = args.video_standard
-            return
 
         elif args.coordinates_current_window:
             print((camera.coordinates_current_window(
                 args.coordinates_current_window)))
-            return
 
         elif args.video_widget_config:
             print((camera.video_widget_config))
-            return
 
         elif args.video_input_capability:
             print((camera.video_input_capability))
-            return
 
         elif args.video_in_options:
             print((camera.video_in_options))
-            return
 
         elif args.video_out_options:
             print((camera.video_out_options))
-            return
 
         elif args.video_max_remote_input_channels:
             print((camera.video_max_remote_input_channels))
-            return
 
         elif args.video_output_channels_device_supported:
             print((camera.video_output_channels_device_supported))
-            return
 
         elif args.video_input_channels_device_supported:
             print((camera.video_input_channels_device_supported))
-            return
 
         elif args.video_channel_title:
             print((camera.video_channel_title))
-            return
 
         elif args.encode_region_interested:
             print((camera.encode_region_interested))
-            return
 
         elif args.encode_media:
             print((camera.encode_media))
-            return
 
         elif args.encode_config_capability:
             print((camera.encode_config_capability))
-            return
 
         elif args.encode_capability:
             print((camera.encode_capability))
-            return
 
         elif args.video_max_extra_stream:
             print((camera.video_max_extra_stream))
-            return
 
         elif args.video_color_config:
             print((camera.video_color_config))
-            return
 
         elif args.factory_create:
             print((camera.factory_create))
-            return
 
         elif args.record_capability:
             print((camera.record_capability))
-            return
-
-        elif args.record_mode == -1:
-            print((camera.record_mode))
-            return
-
-        elif args.record_mode is not None:
-            camera.record_mode = args.record_mode
-            return
 
         elif args.record_config == -1:
             print((camera.record_config))
-            return
 
         elif args.record_config is not None:
             camera.record_config = args.record_config
-            return
 
         elif args.media_global_config:
             print((camera.media_global_config))
-            return
 
         elif args.audio_input_channels_numbers:
             print((camera.audio_input_channels_numbers))
@@ -806,7 +761,7 @@ def main():
             if len(args.add_user) <= 2:
                 print("This option requires at least: "
                       "username, password and group")
-                return
+                sys.exit(-1)
 
             user = args.add_user[0]
             pwd = args.add_user[1]
@@ -829,33 +784,30 @@ def main():
 
             print((camera.add_user(user, pwd, grp,
                                    sharable, reserved, memo)))
-            return
 
         elif args.modify_user:
             if len(args.modify_user) <= 2:
                 print("This option requires at least: "
                       "username, attribute and new value")
-                return
+                sys.exit(-1)
 
             user = args.modify_user[0]
             attr = args.modify_user[1]
             newvalue = args.modify_user[2]
 
             print((camera.modify_user(user, attr, newvalue)))
-            return
 
         elif args.modify_password:
             if len(args.modify_password) <= 2:
                 print("This option requires at least: "
                       "username, new password and old password")
-                return
+                sys.exit(-1)
 
             user = args.modify_password[0]
             newpwd = args.modify_password[1]
             oldpwd = args.modify_password[2]
 
             print((camera.modify_password(user, newpwd, oldpwd)))
-            return
 
         elif args.delete_user:
             print((camera.delete_user(args.delete_user)))
@@ -904,23 +856,18 @@ def main():
 
         elif args.upnp_config == -1:
             print((camera.upnp_config))
-            return
 
         elif args.upnp_config is not None:
             camera.upnp_config = args.upnp_config
-            return
 
         elif args.upnp_status == -1:
             print((camera.upnp_status))
-            return
 
         elif args.ntp_config == -1:
             print((camera.ntp_config))
-            return
 
         elif args.ntp_config is not None:
             camera.ntp_config = args.ntp_config
-            return
 
         elif args.network_interfaces:
             print((camera.network_interfaces))
