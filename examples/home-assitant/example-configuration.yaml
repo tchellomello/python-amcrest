@@ -1,0 +1,12 @@
+# Example of configuration for Home Assistant
+# ~/.homeassistant/configuration.yaml
+amcrest:
+  - host: 192.168.1.5
+    name: LivingRoom
+    username: admin
+    password: super-password
+
+  - host: 192.168.1.6
+    name: Garage
+    username: admin
+    password: super-password

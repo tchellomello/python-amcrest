@@ -65,3 +65,5 @@ def to_unit(value, unit='B'):
     if unit in byte_array:
         result = value / 1024**byte_array.index(unit)
         return (float('{:.{prec}f}'.format(result, prec=PRECISION)), unit)
+
+    return value
