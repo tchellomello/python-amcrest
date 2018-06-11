@@ -4,6 +4,7 @@ from setuptools import setup, find_packages
 setup(name='amcrest',
       version='1.2.3',
       description='Python wrapper implementation for Amcrest cameras.',
+      long_description='Python wrapper implementation for Amcrest cameras.',
       author='Douglas Schilling Landgraf, Marcelo Moreira de Mello',
       author_email='dougsland@gmail.com, tchello.mello@gmail.com',
       url='http://github.com/tchellomello/python-amcrest',
