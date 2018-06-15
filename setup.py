@@ -1,10 +1,16 @@
 #!/usr/bin/env python
 from setuptools import setup, find_packages
 
+
+def readme():
+    with open('README.rst') as desc:
+        return desc.read()
+
+
 setup(name='amcrest',
       version='1.2.3',
       description='Python wrapper implementation for Amcrest cameras.',
-      long_description='Python wrapper implementation for Amcrest cameras.',
+      long_description=readme(),
       author='Douglas Schilling Landgraf, Marcelo Moreira de Mello',
       author_email='dougsland@gmail.com, tchello.mello@gmail.com',
       url='http://github.com/tchellomello/python-amcrest',
