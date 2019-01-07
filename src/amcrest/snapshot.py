@@ -49,6 +49,7 @@ class Snapshot(object):
         """
         ret = self.command(
             "snapshot.cgi?channel={0}".format(channel),
+            retries=retry,
             timeout_cmd=timeout
         )
 
