@@ -55,7 +55,6 @@ class Snapshot(object):
         if not ret.ok:
             if ret.status_code == 401:
                 _LOGGER.error("%s - %s", ret.reason, ret.url)
-                return
 
         if path_file:
             with open(path_file, 'wb') as out_file:
