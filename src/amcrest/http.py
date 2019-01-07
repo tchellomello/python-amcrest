@@ -131,7 +131,6 @@ class Http(System, Network, MotionDetection, Snapshot,
             timeout_cmd - timeout, default 3sec
             retries - maximum number of retries each connection should attempt
         """
-        import rpdb; rpdb.set_trace()
         if timeout_cmd is not None:
             self._timeout_protocol = timeout_cmd
 
