@@ -10,7 +10,11 @@
 # GNU General Public License for more details.
 #
 # vim:sw=4:ts=4:et
+import logging
 import shutil
+
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class Snapshot(object):
@@ -24,7 +28,7 @@ class Snapshot(object):
     def snapshot_config(self):
         return self.__get_config('Snap')
 
-    def snapshot(self, channel=0, path_file=None, timeout=None):
+    def snapshot(self, channel=0, path_file=None, timeout=None, retry=None):
         """
         Args:
 
@@ -47,6 +51,11 @@ class Snapshot(object):
             "snapshot.cgi?channel={0}".format(channel),
             timeout_cmd=timeout
         )
+
+        if not ret.ok:
+            if ret.status_code == 401:
+                _LOGGER.error("%s - %s", ret.reason, ret.url)
+                return
 
         if path_file:
             with open(path_file, 'wb') as out_file:
