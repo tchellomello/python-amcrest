@@ -142,10 +142,7 @@ class Http(System, Network, MotionDetection, Snapshot,
         session.mount('https://', HTTPAdapter(max_retries=self._retries_conn))
 
         url = self.__base_url(cmd)
-        resp = None
-        loop = 0
-        while loop <= self._retries_conn:
-            loop += 1
+        for loop in range(1, 2 + self._retries_conn):
             _LOGGER.debug("Running query attempt %s", loop)
             try:
                 resp = session.get(
@@ -157,16 +154,12 @@ class Http(System, Network, MotionDetection, Snapshot,
                 resp.raise_for_status()
                 break
             except requests.HTTPError as error:
-                _LOGGER.debug("Trying again due error %s", error)
-                continue
-
-            # keep the loop when 401
-            if resp.status_code == 401:
-                continue
-
-        # if we got here, let's raise because it did not work
-        if resp is None:
-            raise ValueError('Something went wrong!!!!')
+                if loop <= self._retries_conn:
+                    _LOGGER.warning("Trying again due to error %s", error)
+                    continue
+                else:
+                    _LOGGER.error("Query failed due to error %s", error)
+                    raise
 
         _LOGGER.debug("Query worked. Exit code: <%s>", resp.status_code)
         return resp
