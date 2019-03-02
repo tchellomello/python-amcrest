@@ -59,13 +59,18 @@ class Http(System, Network, MotionDetection, Snapshot,
         else:
             self._timeout_protocol = timeout_protocol
 
-        if retries_connection is None:
-            self._retries_conn = MAX_RETRY_HTTP_CONNECTION
-        else:
-            self._retries_conn = retries_connection
+        self._retries_conn = None
+        self._set_command_session(retries_connection or MAX_RETRY_HTTP_CONNECTION)
 
         self._token = self._generate_token()
         self._set_name()
+
+    def _set_command_session(self, max_retries):
+        if max_retries is not None and self._retries_conn != max_retries:
+            self._retries_conn = max_retries
+            self._session = requests.Session()
+            self._session.mount('http://', HTTPAdapter(max_retries=max_retries))
+            self._session.mount('https://', HTTPAdapter(max_retries=max_retries))
 
     def _generate_token(self):
         """Discover which authentication method to use.
@@ -134,18 +139,13 @@ class Http(System, Network, MotionDetection, Snapshot,
         if timeout_cmd is not None:
             self._timeout_protocol = timeout_cmd
 
-        if retries is not None:
-            self._retries_conn = retries
-
-        session = requests.Session()
-        session.mount('http://', HTTPAdapter(max_retries=self._retries_conn))
-        session.mount('https://', HTTPAdapter(max_retries=self._retries_conn))
+        self._set_command_session(retries)
 
         url = self.__base_url(cmd)
         for loop in range(1, 2 + self._retries_conn):
             _LOGGER.debug("Running query attempt %s", loop)
             try:
-                resp = session.get(
+                resp = self._session.get(
                     url,
                     auth=self._token,
                     stream=True,
