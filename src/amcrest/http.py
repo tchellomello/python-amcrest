@@ -60,7 +60,8 @@ class Http(System, Network, MotionDetection, Snapshot,
             self._timeout_protocol = timeout_protocol
 
         self._retries_conn = None
-        self._set_command_session(retries_connection or MAX_RETRY_HTTP_CONNECTION)
+        self._set_command_session(
+            retries_connection or MAX_RETRY_HTTP_CONNECTION)
 
         self._token = self._generate_token()
         self._set_name()
@@ -69,8 +70,10 @@ class Http(System, Network, MotionDetection, Snapshot,
         if max_retries is not None and self._retries_conn != max_retries:
             self._retries_conn = max_retries
             self._session = requests.Session()
-            self._session.mount('http://', HTTPAdapter(max_retries=max_retries))
-            self._session.mount('https://', HTTPAdapter(max_retries=max_retries))
+            self._session.mount(
+                'http://', HTTPAdapter(max_retries=max_retries))
+            self._session.mount(
+                'https://', HTTPAdapter(max_retries=max_retries))
 
     def _generate_token(self):
         """Discover which authentication method to use.
