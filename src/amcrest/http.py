@@ -157,7 +157,7 @@ class Http(System, Network, MotionDetection, Snapshot,
                 resp.raise_for_status()
                 break
             except requests.HTTPError as error:
-                if loop <= self._retries_conn:
+                if loop <= retries:
                     _LOGGER.warning("Trying again due to error %s", error)
                     continue
                 else:
