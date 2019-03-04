@@ -66,7 +66,7 @@ Usage
     CTRL-C to stop the continuous audio flow or use a timer
 
     #Move camera down
-    camera.ptz_control_command(action="start", code="Down", arg1=0, arg2=0, arg3=0)))
+    camera.ptz_control_command(action="start", code="Down", arg1=0, arg2=0, arg3=0)
 
     #Record realtime stream into a file
     camera.realtime_stream(path_file="/home/user/Desktop/myvideo")
@@ -144,7 +144,7 @@ Supportability Matrix
 +-------------------------+---------------+----------+-----------------+
 | IPM-HX1B                | Yes           |  working |                 |
 +-------------------------+---------------+----------+-----------------+
-| IP3M-941                | Yes           |  working |                 |
+| IP3M-941/941W           | Yes           |  working |                 |
 +-------------------------+---------------+----------+-----------------+
 | IP3M-HX2                | Yes (partial) |  working |                 |
 +-------------------------+---------------+----------+-----------------+
