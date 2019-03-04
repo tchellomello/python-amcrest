@@ -12,8 +12,8 @@
 # vim:sw=4:ts=4:et
 import logging
 import requests
-
 from requests.adapters import HTTPAdapter
+import threading
 
 from amcrest.utils import clean_url, pretty
 
@@ -54,15 +54,12 @@ class Http(System, Network, MotionDetection, Snapshot,
         self._protocol = protocol
         self._base_url = self.__base_url()
 
-        if timeout_protocol is None:
-            self._timeout_protocol = TIMEOUT_HTTP_PROTOCOL
-        else:
-            self._timeout_protocol = timeout_protocol
+        self._retries_default = (retries_connection or
+                                 MAX_RETRY_HTTP_CONNECTION)
+        self._timeout_default = timeout_protocol or TIMEOUT_HTTP_PROTOCOL
 
-        if retries_connection is None:
-            self._retries_conn = MAX_RETRY_HTTP_CONNECTION
-        else:
-            self._retries_conn = retries_connection
+        self._session = {}
+        self._get_session_lock = threading.Lock()
 
         self._token = self._generate_token()
         self._set_name()
@@ -124,6 +121,18 @@ class Http(System, Network, MotionDetection, Snapshot,
     def get_base_url(self):
         return self._base_url
 
+    def _get_session(self, max_retries):
+        with self._get_session_lock:
+            try:
+                return self._session[max_retries]
+            except KeyError:
+                session = requests.Session()
+                adapter = HTTPAdapter(max_retries=max_retries)
+                session.mount('http://', adapter)
+                session.mount('https://', adapter)
+                self._session[max_retries] = session
+                return session
+
     def command(self, cmd, retries=None, timeout_cmd=None):
         """
         Args:
@@ -131,30 +140,24 @@ class Http(System, Network, MotionDetection, Snapshot,
             timeout_cmd - timeout, default 3sec
             retries - maximum number of retries each connection should attempt
         """
-        if timeout_cmd is not None:
-            self._timeout_protocol = timeout_cmd
+        retries = retries or self._retries_default
+        timeout = timeout_cmd or self._timeout_default
 
-        if retries is not None:
-            self._retries_conn = retries
-
-        session = requests.Session()
-        session.mount('http://', HTTPAdapter(max_retries=self._retries_conn))
-        session.mount('https://', HTTPAdapter(max_retries=self._retries_conn))
-
+        session = self._get_session(retries)
         url = self.__base_url(cmd)
-        for loop in range(1, 2 + self._retries_conn):
+        for loop in range(1, 2 + retries):
             _LOGGER.debug("Running query attempt %s", loop)
             try:
                 resp = session.get(
                     url,
                     auth=self._token,
                     stream=True,
-                    timeout=self._timeout_protocol,
+                    timeout=timeout,
                 )
                 resp.raise_for_status()
                 break
             except requests.HTTPError as error:
-                if loop <= self._retries_conn:
+                if loop <= retries:
                     _LOGGER.warning("Trying again due to error %s", error)
                     continue
                 else:
@@ -168,8 +171,7 @@ class Http(System, Network, MotionDetection, Snapshot,
                       timeout=None):
         url = self.__base_url(cmd)
 
-        if timeout is not None:
-            timeout = self._timeout_protocol
+        timeout = timeout or self._timeout_default
 
         try:
             requests.post(
