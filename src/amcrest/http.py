@@ -13,7 +13,6 @@
 import logging
 import requests
 from requests.adapters import HTTPAdapter
-import threading
 
 from amcrest.utils import clean_url, pretty
 
@@ -57,9 +56,6 @@ class Http(System, Network, MotionDetection, Snapshot,
         self._retries_default = (retries_connection or
                                  MAX_RETRY_HTTP_CONNECTION)
         self._timeout_default = timeout_protocol or TIMEOUT_HTTP_PROTOCOL
-
-        self._session = {}
-        self._get_session_lock = threading.Lock()
 
         self._token = self._generate_token()
         self._set_name()
@@ -121,17 +117,12 @@ class Http(System, Network, MotionDetection, Snapshot,
     def get_base_url(self):
         return self._base_url
 
-    def _get_session(self, max_retries):
-        with self._get_session_lock:
-            try:
-                return self._session[max_retries]
-            except KeyError:
-                session = requests.Session()
-                adapter = HTTPAdapter(max_retries=max_retries)
-                session.mount('http://', adapter)
-                session.mount('https://', adapter)
-                self._session[max_retries] = session
-                return session
+    def get_session(self, max_retries):
+        session = requests.Session()
+        adapter = HTTPAdapter(max_retries=max_retries)
+        session.mount('http://', adapter)
+        session.mount('https://', adapter)
+        return session
 
     def command(self, cmd, retries=None, timeout_cmd=None):
         """
@@ -143,7 +134,7 @@ class Http(System, Network, MotionDetection, Snapshot,
         retries = retries or self._retries_default
         timeout = timeout_cmd or self._timeout_default
 
-        session = self._get_session(retries)
+        session = self.get_session(retries)
         url = self.__base_url(cmd)
         for loop in range(1, 2 + retries):
             _LOGGER.debug("Running query attempt %s", loop)
