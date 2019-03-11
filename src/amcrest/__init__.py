@@ -10,7 +10,7 @@
 # GNU General Public License for more details.
 #
 # vim:sw=4:ts=4:et
-from .exceptions import *
+from .exceptions import AmcrestError, CommError, LoginError
 from .http import Http
 
 

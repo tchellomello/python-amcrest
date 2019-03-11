@@ -15,7 +15,7 @@ import logging
 import requests
 from requests.adapters import HTTPAdapter
 
-from .exceptions import *
+from .exceptions import CommError, LoginError
 from .utils import clean_url, pretty
 
 from .audio import Audio
