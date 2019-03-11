@@ -11,27 +11,29 @@
 #
 # vim:sw=4:ts=4:et
 import logging
+
 import requests
 from requests.adapters import HTTPAdapter
 
-from amcrest.utils import clean_url, pretty
+from .exceptions import *
+from .utils import clean_url, pretty
 
-from amcrest.audio import Audio
-from amcrest.event import Event
-from amcrest.log import Log
-from amcrest.motion_detection import MotionDetection
-from amcrest.nas import Nas
-from amcrest.network import Network
-from amcrest.ptz import Ptz
-from amcrest.record import Record
-from amcrest.snapshot import Snapshot
-from amcrest.special import Special
-from amcrest.storage import Storage
-from amcrest.system import System
-from amcrest.user_management import UserManagement
-from amcrest.video import Video
+from .audio import Audio
+from .event import Event
+from .log import Log
+from .motion_detection import MotionDetection
+from .nas import Nas
+from .network import Network
+from .ptz import Ptz
+from .record import Record
+from .snapshot import Snapshot
+from .special import Special
+from .storage import Storage
+from .system import System
+from .user_management import UserManagement
+from .video import Video
 
-from amcrest.config import TIMEOUT_HTTP_PROTOCOL, MAX_RETRY_HTTP_CONNECTION
+from .config import TIMEOUT_HTTP_PROTOCOL, MAX_RETRY_HTTP_CONNECTION
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -60,32 +62,40 @@ class Http(System, Network, MotionDetection, Snapshot,
         self._token = self._generate_token()
         self._set_name()
 
-    def _generate_token(self):
-        """Discover which authentication method to use.
+    def get_session(self, max_retries=None):
+        session = requests.Session()
+        max_retries = max_retries or self._retries_default
+        adapter = HTTPAdapter(max_retries=max_retries)
+        session.mount('http://', adapter)
+        session.mount('https://', adapter)
+        return session
 
-        Latest firmwares requires HttpDigestAuth
-        Older firmwares requires HttpBasicAuth
-        """
+    def _generate_token(self):
+        """Create authentation to use with requests."""
+        session = self.get_session()
         url = self.__base_url('magicBox.cgi?action=getMachineName')
         try:
-            # try old firmware first to force 401 if fails
-            self._authentication = 'basic'
+            # try old basic method
             auth = requests.auth.HTTPBasicAuth(self._user, self._password)
-            req = requests.get(url, auth=auth)
+            req = session.get(url, auth=auth, timeout=self._timeout_default)
+            if not req.ok:
+                # try new digest method
+                auth = requests.auth.HTTPDigestAuth(
+                    self._user, self._password)
+                req = session.get(
+                    url, auth=auth, timeout=self._timeout_default)
             req.raise_for_status()
+        except requests.RequestException as error:
+            _LOGGER.error(error)
+            raise CommError('Could not communicate with camera')
 
-        except requests.HTTPError:
-            # if 401, then try new digest method
-            self._authentication = 'digest'
-            auth = requests.auth.HTTPDigestAuth(self._user, self._password)
-            req = requests.get(url, auth=auth)
-            req.raise_for_status()
+        # check if user passed
+        result = req.text.lower()
+        if 'invalid' in result or 'error' in result:
+            _LOGGER.error('Result from camera: %s',
+                          req.text.strip().replace('\r\n', ': '))
+            raise LoginError('Invalid credentials')
 
-            # check if user passed
-            if 'invalid' in req.text.lower() or \
-               'error' in req.text.lower():
-                _LOGGER.info("%s Invalid credentials", req.text)
-                raise
         return auth
 
     def _set_name(self):
@@ -117,13 +127,6 @@ class Http(System, Network, MotionDetection, Snapshot,
     def get_base_url(self):
         return self._base_url
 
-    def get_session(self, max_retries):
-        session = requests.Session()
-        adapter = HTTPAdapter(max_retries=max_retries)
-        session.mount('http://', adapter)
-        session.mount('https://', adapter)
-        return session
-
     def command(self, cmd, retries=None, timeout_cmd=None):
         """
         Args:
@@ -147,13 +150,13 @@ class Http(System, Network, MotionDetection, Snapshot,
                 )
                 resp.raise_for_status()
                 break
-            except requests.HTTPError as error:
+            except requests.RequestException as error:
                 if loop <= retries:
                     _LOGGER.warning("Trying again due to error %s", error)
                     continue
                 else:
                     _LOGGER.error("Query failed due to error %s", error)
-                    raise
+                    raise CommError('Could not communicate with camera')
 
         _LOGGER.debug("Query worked. Exit code: <%s>", resp.status_code)
         return resp
