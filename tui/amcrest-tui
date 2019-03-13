@@ -200,11 +200,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Check if we have permission to framebuffer device
-    try:
-        with open(args.framebuffer_device, 'r') as f:
-            pass
-    except Exception:
-        raise
+    with open(args.framebuffer_device, 'r') as f:
+        pass
 
     # pylint: disable=fixme
     # FIXME: Add option to save the snapshots in the disk
