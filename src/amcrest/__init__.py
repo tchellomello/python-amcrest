@@ -10,8 +10,8 @@
 # GNU General Public License for more details.
 #
 # vim:sw=4:ts=4:et
-
-from amcrest.http import Http
+from .exceptions import AmcrestError, CommError, LoginError  # noqa: F401
+from .http import Http
 
 
 class AmcrestCamera(object):
