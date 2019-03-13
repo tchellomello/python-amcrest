@@ -3,6 +3,8 @@ amcrest.exceptions
 
 This module contains the set of amcrest's exceptions.
 """
+
+
 class AmcrestError(Exception):
     """General Amcrest error occurred."""
 
