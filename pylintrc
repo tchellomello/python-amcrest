@@ -36,7 +36,8 @@ disable=
   too-many-statements,
   too-many-lines,
   too-few-public-methods,
-  abstract-method
+  abstract-method,
+  useless-object-inheritance
 
 [EXCEPTIONS]
 overgeneral-exceptions=Exception
