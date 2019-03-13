@@ -55,8 +55,8 @@ class Http(System, Network, MotionDetection, Snapshot,
         self._protocol = protocol
         self._base_url = self.__base_url()
 
-        self._retries_default = (retries_connection
-                                 or MAX_RETRY_HTTP_CONNECTION)
+        self._retries_default = (
+            retries_connection or MAX_RETRY_HTTP_CONNECTION)
         self._timeout_default = timeout_protocol or TIMEOUT_HTTP_PROTOCOL
 
         self._token = self._generate_token()
