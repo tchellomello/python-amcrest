@@ -12,6 +12,8 @@
 # vim:sw=4:ts=4:et
 import shutil
 
+from . import AmcrestError
+
 
 class Special(object):
 
@@ -61,7 +63,7 @@ class Special(object):
         try:
             port = ':' + [x.split('=')[1] for x in self.rtsp_config.split()
                           if x.startswith('table.RTSP.Port=')][0]
-        except:
+        except (AmcrestError, IndexError):
             port = ''
         return 'rtsp://{}:{}@{}{}/{}'.format(
             self._user, self._password, self._host, port, cmd)
