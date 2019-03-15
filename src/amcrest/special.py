@@ -12,6 +12,8 @@
 # vim:sw=4:ts=4:et
 import shutil
 
+from . import AmcrestError
+
 
 class Special(object):
 
@@ -58,8 +60,13 @@ class Special(object):
         cmd = 'cam/realmonitor?channel={0}&subtype={1}'.format(
             channelno, typeno)
 
-        return 'rtsp://{0}:{1}@{2}/{3}'.format(
-            self._user, self._password, self._host, cmd)
+        try:
+            port = ':' + [x.split('=')[1] for x in self.rtsp_config.split()
+                          if x.startswith('table.RTSP.Port=')][0]
+        except (AmcrestError, IndexError):
+            port = ''
+        return 'rtsp://{}:{}@{}{}/{}'.format(
+            self._user, self._password, self._host, port, cmd)
 
     # pylint: disable=pointless-string-statement
     """

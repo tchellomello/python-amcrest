@@ -233,3 +233,11 @@ class Network(object):
             'configManager.cgi?action=setConfig&{0}'.format(ntp_opt)
         )
         return ret.content.decode('utf-8')
+
+    @property
+    def rtsp_config(self):
+        """Get RTSP configuration."""
+        ret = self.command(
+            'configManager.cgi?action=getConfig&name=RTSP'
+        )
+        return ret.content.decode('utf-8')
