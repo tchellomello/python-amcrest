@@ -67,3 +67,22 @@ def to_unit(value, unit='B'):
         return (float('{:.{prec}f}'.format(result, prec=PRECISION)), unit)
 
     return value
+
+
+def extract_audio_video_enabled(param, resp):
+    """Extract if any audio/video stream enabled from response."""
+    return 'true' in [part.split('=')[1] for part in resp.split()
+                      if '.{}Enable='.format(param) in part]
+
+
+def enable_audio_video_cmd(param, enable):
+    """Return command to enable/disable all audio/video streams."""
+    cmd = 'configManager.cgi?action=setConfig'
+    formats = [('Extra', 3), ('Main', 4)]
+    if param == 'Video':
+        formats.append(('Snap', 3))
+    for fmt, num in formats:
+        for i in range(num):
+            cmd += '&Encode[0].{}Format[{}].{}Enable={}'.format(
+                fmt, i, param, str(enable).lower())
+    return cmd
