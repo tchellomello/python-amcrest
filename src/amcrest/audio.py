@@ -12,6 +12,8 @@
 # vim:sw=4:ts=4:et
 import shutil
 
+from . import utils
+
 
 class Audio(object):
 
@@ -113,3 +115,13 @@ class Audio(object):
                 shutil.copyfileobj(ret.raw, out_file)
 
         return ret.raw
+
+    @property
+    def audio_enabled(self):
+        """Return if any audio stream enabled."""
+        return utils.extract_audio_video_enabled('Audio', self.encode_media)
+
+    @audio_enabled.setter
+    def audio_enabled(self, enable):
+        """Enable/disable all audio streams."""
+        self.command(utils.enable_audio_video_cmd('Audio', enable))

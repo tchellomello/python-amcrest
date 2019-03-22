@@ -10,6 +10,7 @@
 # GNU General Public License for more details.
 #
 # vim:sw=4:ts=4:et
+from . import utils
 
 
 class Video(object):
@@ -134,3 +135,21 @@ class Video(object):
             'configManager.cgi?action=getConfig&name=VideoOut'
         )
         return ret.content.decode('utf-8')
+
+    @property
+    def video_enabled(self):
+        """Return if any video stream enabled."""
+        return utils.extract_audio_video_enabled('Video', self.encode_media)
+
+    @video_enabled.setter
+    def video_enabled(self, enable):
+        """Enable/disable all video streams."""
+        self.command(utils.enable_audio_video_cmd('Video', enable))
+        # It's not clear why from the HTTP API SDK doc, but setting InfraRed
+        # to false sets the Night Vision Mode to SmartIR, whereas setting it
+        # to true sets the Night Vision Mode to OFF. Night Vision Mode has a
+        # third setting of Manual, but that must be selected some other way
+        # via the HTTP API.
+        self.command(
+            'configManager.cgi?action=setConfig'
+            '&VideoInOptions[0].InfraRed={}'.format(str(not enable).lower()))
