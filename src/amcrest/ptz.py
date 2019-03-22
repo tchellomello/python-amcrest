@@ -220,6 +220,22 @@ class Ptz(object):
         )
         return ret.content.decode('utf-8')
 
+    def tour(self, action='start', channel=0, start=True, tour_path_number=1):
+        """
+        Params:
+            action              - start or stop
+            channel             - channel number
+            start               - True (StartTour) or False (StopTour)
+            tour_path_number    - tour path number
+        """
+        ret = self.command(
+            'ptz.cgi?action={0}&channel={1}&code={2}Tour&arg1={3}'
+            '&arg2=0&arg3=0&arg4=0'.format(
+                action, channel, 'Start' if start else 'Stop',
+                tour_path_number)
+        )
+        return ret.content.decode('utf-8')
+
     def move_left_up(self, action=None, channel=0,
                      vertical_speed=1, horizontal_speed=1):
         """

@@ -129,6 +129,62 @@ class Video(object):
         )
         return ret.content.decode('utf-8')
 
+    def video_in_option(self, param, profile='Day'):
+        """
+        Return video input option.
+        
+        Params:
+            param - parameter, such as 'DayNightColor'
+            profile - 'Day', 'Night' or 'Normal'
+        """
+        if profile == 'Day':
+            field = param
+        else:
+            field = '{}Options.{}'.format(profile, param)
+        return utils.pretty(
+            [opt for opt in self.video_in_options.split()
+             if '].{}='.format(field) in opt][0])
+
+    def set_video_in_option(self, param, value, profile='Day'):
+        if profile == 'Day':
+            field = param
+        else:
+            field = '{}Options.{}'.format(profile, param)
+        ret = self.command(
+            'configManager.cgi?action=setConfig'
+            '&VideoInOptions[0].{}={}'.format(field, value)
+        )
+        return ret.content.decode('utf-8')
+
+    @property
+    def day_night_color(self):
+        """
+        Return Day & Night Color Mode for Day profile.
+        
+        Result is 0: always multicolor
+                  1: autoswitch along with brightness
+                  2: always monochrome
+        """
+        return int(self.video_in_option('DayNightColor'))
+
+    @day_night_color.setter
+    def day_night_color(self, value):
+        return self.set_video_in_option('DayNightColor', value)
+
+    @property
+    def smart_ir(self):
+        """Return if SmartIR is on."""
+        return self.video_in_option('InfraRed') == 'false'
+
+    @smart_ir.setter
+    def smart_ir(self, value):
+        # It's not clear why from the HTTP API SDK doc, but setting InfraRed
+        # to false sets the Night Vision Mode to SmartIR, whereas setting it
+        # to true sets the Night Vision Mode to OFF. Night Vision Mode has a
+        # third setting of Manual, but that must be selected some other way
+        # via the HTTP API.
+        return self.set_video_in_option('InfraRed', str(not value).lower())
+
     @property
     def video_out_options(self):
         ret = self.command(
@@ -143,13 +199,5 @@ class Video(object):
 
     @video_enabled.setter
     def video_enabled(self, enable):
-        """Enable/disable all video streams."""
         self.command(utils.enable_audio_video_cmd('Video', enable))
-        # It's not clear why from the HTTP API SDK doc, but setting InfraRed
-        # to false sets the Night Vision Mode to SmartIR, whereas setting it
-        # to true sets the Night Vision Mode to OFF. Night Vision Mode has a
-        # third setting of Manual, but that must be selected some other way
-        # via the HTTP API.
-        self.command(
-            'configManager.cgi?action=setConfig'
-            '&VideoInOptions[0].InfraRed={}'.format(str(not enable).lower()))
+        self.smart_ir = enable
