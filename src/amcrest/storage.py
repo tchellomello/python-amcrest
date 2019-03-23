@@ -10,7 +10,8 @@
 # GNU General Public License for more details.
 #
 # vim:sw=4:ts=4:et
-from amcrest.utils import to_unit, percent
+from .exceptions import AmcrestError
+from .utils import to_unit, percent, pretty
 
 
 class Storage(object):
@@ -29,26 +30,26 @@ class Storage(object):
         )
         return ret.content.decode('utf-8')
 
+    def _extract_storage_value(self, param, unit):
+        try:
+            return to_unit(
+                pretty([part for part in self.storage_device_info.split()
+                        if '.{}='.format(param) in part][0]),
+                unit)
+        except (AmcrestError, AttributeError, IndexError):
+            return 'unknown', 'GB'
+
     @property
-    def storage_used(self, dev='/dev/mmc0', unit='GB'):
-        ret = self.storage_device_info
-
-        # pylint: disable=fixme
-        # TODO
-        # Use regex to enhance the filter
-        status = [s for s in ret.split() if '.UsedBytes=' in s][0]
-        return to_unit(status.split('=')[-1], unit)
+    def storage_used(self):
+        return self._extract_storage_value('UsedBytes', 'GB')
 
     @property
-    def storage_total(self, dev='/dev/mmc0', unit='GB'):
-        ret = self.storage_device_info
-
-        # pylint: disable=fixme
-        # TODO
-        # Use regex to enhance the filter
-        status = [s for s in ret.split() if '.TotalBytes=' in s][0]
-        return to_unit(status.split('=')[-1], unit)
+    def storage_total(self):
+        return self._extract_storage_value('TotalBytes', 'GB')
 
     @property
     def storage_used_percent(self):
-        return percent(self.storage_used[0], self.storage_total[0])
+        try:
+            return percent(self.storage_used[0], self.storage_total[0])
+        except (ValueError, ZeroDivisionError):
+            return 'unknown'

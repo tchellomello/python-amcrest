@@ -132,7 +132,7 @@ class Video(object):
     def video_in_option(self, param, profile='Day'):
         """
         Return video input option.
-        
+
         Params:
             param - parameter, such as 'DayNightColor'
             profile - 'Day', 'Night' or 'Normal'
@@ -160,7 +160,7 @@ class Video(object):
     def day_night_color(self):
         """
         Return Day & Night Color Mode for Day profile.
-        
+
         Result is 0: always multicolor
                   1: autoswitch along with brightness
                   2: always monochrome

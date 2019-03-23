@@ -35,8 +35,7 @@ def pretty(value, delimiter='='):
 
 def percent(part, whole):
     """Convert data to percent"""
-    result = 100 * float(part) / float(whole)
-    return float('{:.{prec}f}'.format(result, prec=PRECISION))
+    return round(100 * float(part) / float(whole), PRECISION)
 
 
 def str2bool(value):
@@ -64,7 +63,7 @@ def to_unit(value, unit='B'):
 
     if unit in byte_array:
         result = value / 1024**byte_array.index(unit)
-        return (float('{:.{prec}f}'.format(result, prec=PRECISION)), unit)
+        return round(result, PRECISION), unit
 
     return value
 
