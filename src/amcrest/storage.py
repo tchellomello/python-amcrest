@@ -10,9 +10,20 @@
 # GNU General Public License for more details.
 #
 # vim:sw=4:ts=4:et
+import re
+
 from .exceptions import AmcrestError
 from .utils import to_unit, percent, pretty
 
+_USED = '.UsedBytes'
+_TOTAL = '.TotalBytes'
+
+
+def _express_as(value, unit):
+    try:
+        return to_unit(value, unit)
+    except (TypeError, ValueError):
+        return 'unknown', unit
 
 class Storage(object):
 
@@ -30,26 +41,45 @@ class Storage(object):
         )
         return ret.content.decode('utf-8')
 
-    def _extract_storage_value(self, param, unit):
+    def _get_storage_values(self, *params):
         try:
-            return to_unit(
-                pretty([part for part in self.storage_device_info.split()
-                        if '.{}='.format(param) in part][0]),
-                unit)
-        except (AmcrestError, AttributeError, IndexError):
-            return 'unknown', 'GB'
+            info = self.storage_device_info
+        except AmcrestError:
+            if len(params) == 1:
+                return None
+            return [None for i in range(len(params))]
+        ret = []
+        for param in params:
+            try:
+                ret.append(
+                    re.search('.{}=([0-9.]+)'.format(param), info).group(1))
+            except AttributeError:
+                ret.append(None)
+        if len(params) == 1:
+            return ret[0]
+        return ret
 
     @property
     def storage_used(self):
-        return self._extract_storage_value('UsedBytes', 'GB')
+        return _express_as(self._get_storage_values(_USED), 'GB')
 
     @property
     def storage_total(self):
-        return self._extract_storage_value('TotalBytes', 'GB')
+        return _express_as(self._get_storage_values(_TOTAL), 'GB')
 
     @property
     def storage_used_percent(self):
+        used, total = self._get_storage_values(_USED, _TOTAL)
         try:
-            return percent(self.storage_used[0], self.storage_total[0])
-        except (ValueError, ZeroDivisionError):
+            return percent(used, total)
+        except (TypeError, ValueError, ZeroDivisionError):
             return 'unknown'
+
+    @property
+    def storage_all(self):
+        used, total = self._get_storage_values(_USED, _TOTAL)
+        try:
+            used_percent = percent(used, total)
+        except (TypeError, ValueError, ZeroDivisionError):
+            used_percent = 'unknown'
+        return used_percent, _express_as(used, 'GB'), _express_as(total, 'GB')
