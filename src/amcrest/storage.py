@@ -13,7 +13,7 @@
 import re
 
 from .exceptions import AmcrestError
-from .utils import to_unit, percent, pretty
+from .utils import to_unit, percent
 
 _USED = '.UsedBytes'
 _TOTAL = '.TotalBytes'
@@ -24,6 +24,7 @@ def _express_as(value, unit):
         return to_unit(value, unit)
     except (TypeError, ValueError):
         return 'unknown', unit
+
 
 class Storage(object):
 
@@ -82,4 +83,7 @@ class Storage(object):
             used_percent = percent(used, total)
         except (TypeError, ValueError, ZeroDivisionError):
             used_percent = 'unknown'
-        return used_percent, _express_as(used, 'GB'), _express_as(total, 'GB')
+        return {
+            'used_percent': used_percent,
+            'used': _express_as(used, 'GB'),
+            'total': _express_as(total, 'GB')}
