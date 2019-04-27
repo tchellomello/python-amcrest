@@ -63,7 +63,7 @@ class Special(object):
         try:
             port = ':' + [x.split('=')[1] for x in self.rtsp_config.split()
                           if x.startswith('table.RTSP.Port=')][0]
-        except (AmcrestError, IndexError):
+        except IndexError:
             port = ''
         return 'rtsp://{}:{}@{}{}/{}'.format(
             self._user, self._password, self._host, port, cmd)

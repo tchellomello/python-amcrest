@@ -43,12 +43,7 @@ class Storage(object):
         return ret.content.decode('utf-8')
 
     def _get_storage_values(self, *params):
-        try:
-            info = self.storage_device_info
-        except AmcrestError:
-            if len(params) == 1:
-                return None
-            return [None for i in range(len(params))]
+        info = self.storage_device_info
         ret = []
         for param in params:
             try:
