@@ -11,8 +11,9 @@
 #
 # vim:sw=4:ts=4:et
 import shutil
+from urllib3.exceptions import HTTPError
 
-from . import AmcrestError
+from .exceptions import CommError
 
 
 class Special(object):
@@ -27,12 +28,17 @@ class Special(object):
         """
         ret = self.command(
             'realmonitor.cgi?action=getStream&channel={0}&subtype={1}'.format(
-                channel, typeno)
+                channel, typeno), stream=True
         )
 
         if path_file:
-            with open(path_file, 'wb') as out_file:
-                shutil.copyfileobj(ret.raw, out_file)
+            try:
+                with open(path_file, 'wb') as out_file:
+                    shutil.copyfileobj(ret.raw, out_file)
+            except HTTPError as error:
+                _LOGGER.debug("%s Realtime stream capture to file failed due "
+                              "to error: %s", self, repr(error))
+                raise CommError(error)
 
         return ret.raw
 
@@ -131,10 +137,16 @@ class Special(object):
                     2-Extra Stream 2 (Sub Stream)
         """
         cmd = self.mjpeg_url(channelno=channelno, typeno=typeno)
-        ret = self.command(cmd)
+        ret = self.command(cmd, stream=True)
 
         if path_file:
-            with open(path_file, 'wb') as out_file:
-                shutil.copyfileobj(ret.raw, out_file)
+            try:
+                with open(path_file, 'wb') as out_file:
+                    shutil.copyfileobj(ret.raw, out_file)
+            except HTTPError as error:
+                _LOGGER.debug(
+                    "%s MJPEG stream capture to file failed due to error: %s",
+                    self, repr(error))
+                raise CommError(error)
 
         return ret.raw

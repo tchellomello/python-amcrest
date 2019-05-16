@@ -11,8 +11,10 @@
 #
 # vim:sw=4:ts=4:et
 import shutil
+from urllib3.exceptions import HTTPError
 
 from . import utils
+from .exceptions import CommError
 
 
 class Audio(object):
@@ -108,11 +110,17 @@ class Audio(object):
 
         ret = self.command(
             'audio.cgi?action=getAudio&httptype={0}&channel={1}'.format(
-                httptype, channel))
+                httptype, channel), stream=True)
 
         if path_file:
-            with open(path_file, 'wb') as out_file:
-                shutil.copyfileobj(ret.raw, out_file)
+            try:
+                with open(path_file, 'wb') as out_file:
+                    shutil.copyfileobj(ret.raw, out_file)
+            except HTTPError as error:
+                _LOGGER.debug(
+                    "%s Audio stream capture to file failed due to error: %s",
+                    self, repr(error))
+                raise CommError(error)
 
         return ret.raw
 

@@ -11,6 +11,7 @@
 #
 # vim:sw=4:ts=4:et
 import logging
+import threading
 
 import requests
 from requests.adapters import HTTPAdapter
@@ -47,6 +48,7 @@ class Http(System, Network, MotionDetection, Snapshot,
                  password, verbose=True, protocol='http',
                  retries_connection=None, timeout_protocol=None):
 
+        self._token_lock = threading.Lock()
         self._host = clean_url(host)
         self._port = port
         self._user = user
@@ -56,60 +58,55 @@ class Http(System, Network, MotionDetection, Snapshot,
         self._base_url = self.__base_url()
 
         self._retries_default = (
-            retries_connection or MAX_RETRY_HTTP_CONNECTION)
+            retries_connection if retries_connection is not None
+            else MAX_RETRY_HTTP_CONNECTION)
         self._timeout_default = timeout_protocol or TIMEOUT_HTTP_PROTOCOL
 
-        self._token = self._generate_token()
-        self._set_name()
-
-    def get_session(self, max_retries=None):
-        session = requests.Session()
-        max_retries = max_retries or self._retries_default
-        adapter = HTTPAdapter(max_retries=max_retries)
-        session.mount('http://', adapter)
-        session.mount('https://', adapter)
-        return session
+        self._token = None
+        self._name = None
+        self._serial = None
+        # Ignore comm errors in case camera happens to be off or there are
+        # temporary network issues. User can retry later and we'll get token
+        # then if camera is accessible again.
+        try:
+            self._generate_token()
+        except CommError:
+            pass
 
     def _generate_token(self):
         """Create authentation to use with requests."""
-        session = self.get_session()
-        url = self.__base_url('magicBox.cgi?action=getMachineName')
+        cmd = 'magicBox.cgi?action=getMachineName'
+        _LOGGER.debug('%s Trying Basic Authentication', self)
+        self._token = requests.auth.HTTPBasicAuth(self._user, self._password)
         try:
-            # try old basic method
-            auth = requests.auth.HTTPBasicAuth(self._user, self._password)
-            req = session.get(url, auth=auth, timeout=self._timeout_default)
-            if not req.ok:
-                # try new digest method
-                auth = requests.auth.HTTPDigestAuth(
-                    self._user, self._password)
-                req = session.get(
-                    url, auth=auth, timeout=self._timeout_default)
-            req.raise_for_status()
-        except requests.RequestException as error:
-            _LOGGER.error(error)
-            raise CommError('Could not communicate with camera')
+            resp = self._command(cmd).content.decode('utf-8')
+        except CommError:
+            _LOGGER.debug('%s Trying Digest Authentication', self)
+            self._token = requests.auth.HTTPDigestAuth(
+                self._user, self._password)
+            try:
+                resp = self._command(cmd).content.decode('utf-8')
+            except CommError as error:
+                self._token = None
+                raise error
 
         # check if user passed
-        result = req.text.lower()
+        result = resp.lower()
         if 'invalid' in result or 'error' in result:
-            _LOGGER.error('Result from camera: %s',
-                          req.text.strip().replace('\r\n', ': '))
+            _LOGGER.debug('%s Result from camera: %s', self,
+                          resp.strip().replace('\r\n', ': '))
+            self._token = None
             raise LoginError('Invalid credentials')
 
-        return auth
+        self._name = pretty(resp.strip())
 
-    def _set_name(self):
-        """Set device name."""
-        try:
-            self._name = pretty(self.machine_name)
-            self._serial = self.serial_number
-        except AttributeError:
-            self._name = None
-            self._serial = None
+        _LOGGER.debug('%s Retrieving serial number', self)
+        self._serial = pretty(self._command(
+            'magicBox.cgi?action=getSerialNo').content.decode('utf-8').strip())
 
     def __repr__(self):
         """Default object representation."""
-        return "<{0}: {1}>".format(self._name, self._serial)
+        return "<{0}:{1}>".format(self._name, self._serial)
 
     def as_dict(self):
         """Callback for __dict__."""
@@ -127,53 +124,58 @@ class Http(System, Network, MotionDetection, Snapshot,
     def get_base_url(self):
         return self._base_url
 
-    def command(self, cmd, retries=None, timeout_cmd=None):
+    def command(self, cmd, retries=None, timeout_cmd=None, stream=False):
         """
         Args:
             cmd - command to execute via http
-            timeout_cmd - timeout, default 3sec
             retries - maximum number of retries each connection should attempt
+            timeout_cmd - timeout
+            stream - if True do not download entire response immediately
         """
-        retries = retries or self._retries_default
-        timeout = timeout_cmd or self._timeout_default
+        with self._token_lock:
+            if not self._token:
+                self._generate_token()
+        return self._command(cmd, retries, timeout_cmd, stream)
 
-        session = self.get_session(retries)
+    def _command(self, cmd, retries=None, timeout_cmd=None, stream=False):
+        _LOGGER.debug("%s Running query", self)
+        session = requests.Session()
+        max_retries = retries if retries is not None else self._retries_default
+        if max_retries:
+            adapter = HTTPAdapter(max_retries=max_retries)
+            session.mount('http://', adapter)
+            session.mount('https://', adapter)
         url = self.__base_url(cmd)
-        for loop in range(1, 2 + retries):
-            _LOGGER.debug("Running query attempt %s", loop)
-            try:
-                resp = session.get(
-                    url,
-                    auth=self._token,
-                    stream=True,
-                    timeout=timeout,
-                )
-                resp.raise_for_status()
-                break
-            except requests.RequestException as error:
-                if loop <= retries:
-                    _LOGGER.warning("Trying again due to error %s", error)
-                    continue
-                else:
-                    _LOGGER.error("Query failed due to error %s", error)
-                    raise CommError('Could not communicate with camera')
+        try:
+            resp = session.get(
+                url,
+                auth=self._token,
+                stream=stream,
+                timeout=timeout_cmd or self._timeout_default,
+            )
+            resp.raise_for_status()
+        except requests.RequestException as error:
+            _LOGGER.debug(
+                "%s Query failed due to error: %s", self, repr(error))
+            raise CommError(error)
 
-        _LOGGER.debug("Query worked. Exit code: <%s>", resp.status_code)
+        _LOGGER.debug(
+            "%s Query worked. Exit code: <%s>", self, resp.status_code)
         return resp
 
     def command_audio(self, cmd, file_content, http_header,
                       timeout=None):
+        with self._token_lock:
+            if not self._token:
+                self._generate_token()
         url = self.__base_url(cmd)
-
-        timeout = timeout or self._timeout_default
-
         try:
             requests.post(
                 url,
                 files=file_content,
                 auth=self._token,
                 headers=http_header,
-                timeout=timeout
+                timeout=timeout or self._timeout_default
             )
         except requests.exceptions.ReadTimeout:
             pass

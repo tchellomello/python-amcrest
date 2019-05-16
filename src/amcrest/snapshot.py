@@ -11,6 +11,9 @@
 #
 # vim:sw=4:ts=4:et
 import shutil
+from urllib3.exceptions import HTTPError
+
+from .exceptions import CommError
 
 
 class Snapshot(object):
@@ -45,11 +48,17 @@ class Snapshot(object):
         """
         ret = self.command(
             "snapshot.cgi?channel={0}".format(channel),
-            timeout_cmd=timeout
+            timeout_cmd=timeout, stream=True
         )
 
         if path_file:
-            with open(path_file, 'wb') as out_file:
-                shutil.copyfileobj(ret.raw, out_file)
+            try:
+                with open(path_file, 'wb') as out_file:
+                    shutil.copyfileobj(ret.raw, out_file)
+            except HTTPError as error:
+                _LOGGER.debug(
+                    "%s Snapshot to file failed due to error: %s",
+                    self, repr(error))
+                raise CommError(error)
 
         return ret.raw
