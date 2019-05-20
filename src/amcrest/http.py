@@ -14,7 +14,6 @@ import logging
 import threading
 
 import requests
-from requests.adapters import HTTPAdapter
 
 from .exceptions import CommError, LoginError
 from .utils import clean_url, pretty
@@ -80,13 +79,13 @@ class Http(System, Network, MotionDetection, Snapshot,
         self._token = requests.auth.HTTPBasicAuth(self._user, self._password)
         try:
             resp = self._command(cmd).content.decode('utf-8')
-        except CommError:
+        except LoginError:
             _LOGGER.debug('%s Trying Digest Authentication', self)
             self._token = requests.auth.HTTPDigestAuth(
                 self._user, self._password)
             try:
                 resp = self._command(cmd).content.decode('utf-8')
-            except CommError as error:
+            except LoginError as error:
                 self._token = None
                 raise error
 
@@ -138,26 +137,32 @@ class Http(System, Network, MotionDetection, Snapshot,
         return self._command(cmd, retries, timeout_cmd, stream)
 
     def _command(self, cmd, retries=None, timeout_cmd=None, stream=False):
-        _LOGGER.debug("%s Running query", self)
         session = requests.Session()
-        max_retries = retries if retries is not None else self._retries_default
-        if max_retries:
-            adapter = HTTPAdapter(max_retries=max_retries)
-            session.mount('http://', adapter)
-            session.mount('https://', adapter)
         url = self.__base_url(cmd)
-        try:
-            resp = session.get(
-                url,
-                auth=self._token,
-                stream=stream,
-                timeout=timeout_cmd or self._timeout_default,
-            )
-            resp.raise_for_status()
-        except requests.RequestException as error:
-            _LOGGER.debug(
-                "%s Query failed due to error: %s", self, repr(error))
-            raise CommError(error)
+        if retries is None:
+            retries = self._retries_default
+        for loop in range(1, 2 + retries):
+            _LOGGER.debug("%s Running query attempt %s", self, loop)
+            try:
+                resp = session.get(
+                    url,
+                    auth=self._token,
+                    stream=stream,
+                    timeout=timeout_cmd or self._timeout_default,
+                )
+                if resp.status_code == 401:
+                    raise LoginError
+                resp.raise_for_status()
+            except requests.RequestException as error:
+                if loop > retries:
+                    _LOGGER.debug(
+                        "%s Query failed due to error: %r", self, error)
+                    raise CommError(error)
+                _LOGGER.warning(
+                    "%s Trying again due to error: %r", self, error)
+                continue
+            else:
+                break
 
         _LOGGER.debug(
             "%s Query worked. Exit code: <%s>", self, resp.status_code)
