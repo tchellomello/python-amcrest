@@ -11,6 +11,7 @@
 #
 # vim:sw=4:ts=4:et
 import logging
+import re
 import threading
 
 import requests
@@ -154,12 +155,12 @@ class Http(System, Network, MotionDetection, Snapshot,
                     raise LoginError
                 resp.raise_for_status()
             except requests.RequestException as error:
+                msg = re.sub(r'at 0x[0-9a-fA-F]+', 'at ADDRESS', repr(error))
                 if loop > retries:
                     _LOGGER.debug(
-                        "%s Query failed due to error: %r", self, error)
+                        "%s Query failed due to error: %s", self, msg)
                     raise CommError(error)
-                _LOGGER.warning(
-                    "%s Trying again due to error: %r", self, error)
+                _LOGGER.warning("%s Trying again due to error: %s", self, msg)
                 continue
             else:
                 break
