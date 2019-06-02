@@ -27,17 +27,15 @@ class Snapshot(object):
     def snapshot_config(self):
         return self.__get_config('Snap')
 
-    def snapshot(self, channel=0, path_file=None, timeout=None):
+    def snapshot(self, channel=None, path_file=None, timeout=None):
         """
         Args:
 
             channel:
-                Values according with Amcrest API:
-                0 - regular snapshot
-                1 - motion detection snapshot
-                2 - alarm snapshot
+                Video input channel number
 
-                If no channel param is used, default is 0
+                If no channel param is used, don't send channel parameter
+                so camera will use its default channel
 
             path_file:
                 If path_file is provided, save the snapshot
@@ -46,10 +44,10 @@ class Snapshot(object):
         Return:
             raw from http request
         """
-        ret = self.command(
-            "snapshot.cgi?channel={0}".format(channel),
-            timeout_cmd=timeout, stream=True
-        )
+        cmd = "snapshot.cgi"
+        if channel is not None:
+            cmd += "?channel={}".format(channel)
+        ret = self.command(cmd, timeout_cmd=timeout, stream=True)
 
         if path_file:
             try:
