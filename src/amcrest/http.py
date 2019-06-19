@@ -45,7 +45,7 @@ class Http(System, Network, MotionDetection, Snapshot,
            Log, Ptz, Special, Storage, Nas):
 
     def __init__(self, host, port, user,
-                 password, verbose=True, protocol='http', verify=True,
+                 password, verbose=True, protocol='http', ssl_verify=True,
                  retries_connection=None, timeout_protocol=None):
 
         self._token_lock = threading.Lock()
@@ -55,7 +55,7 @@ class Http(System, Network, MotionDetection, Snapshot,
         self._password = password
         self._verbose = verbose
         self._protocol = protocol
-        self._verify = verify
+        self._verify = ssl_verify
         self._base_url = self.__base_url()
 
         self._retries_default = (
