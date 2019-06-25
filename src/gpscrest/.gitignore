@@ -1,19 +1,4 @@
-# autotools
-aclocal.m4
-autom4te.cache/
-config.status
-configure
-install-sh
-missing
-py-compile
-*.tar.gz
-Makefile
-Makefile.in
-tmp.repos
-
-# spec 
-python-amcrest.spec
-
+# ---> Python
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -45,7 +30,6 @@ var/
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
 *.spec
-.pypirc
 
 # Installer logs
 pip-log.txt
@@ -60,7 +44,6 @@ htmlcov/
 nosetests.xml
 coverage.xml
 *,cover
-.hypothesis/
 
 # Translations
 *.mo
@@ -68,14 +51,6 @@ coverage.xml
 
 # Django stuff:
 *.log
-local_settings.py
-
-# Flask stuff:
-instance/
-.webassets-cache
-
-# Scrapy stuff:
-.scrapy
 
 # Sphinx documentation
 docs/_build/
@@ -83,27 +58,5 @@ docs/_build/
 # PyBuilder
 target/
 
-# IPython Notebook
-.ipynb_checkpoints
-
-# pyenv
-.python-version
-
-# celery beat schedule file
-celerybeat-schedule
-
-# dotenv
-.env
-
-# virtualenv
-venv/
-ENV/
-
-# Spyder project settings
-.spyderproject
-
-# Rope project settings
-.ropeproject
-
-# Ignore GPSCrest
-src/gpscrest/gpscrest/__main__.py
+# VSCode
+.vscode/
