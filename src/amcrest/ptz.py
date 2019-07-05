@@ -220,7 +220,7 @@ class Ptz(object):
         )
         return ret.content.decode('utf-8')
 
-    def set_preset(self, action=None, channel=0, preset_point_number=1):
+    def set_preset(self, action='start', channel=0, preset_point_number=1):
         """
         Params:
             action              - start or stop
