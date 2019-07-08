@@ -147,7 +147,7 @@ class Audio(object):
         Method launched as Thread by audio_stream_capture
         Params:
                 ret - response streamed from the HTTP request
-                delay - time to be waiting before to close the stream response"""
+                delay - waiting time before closing the stream response"""
         time.sleep(delay)
         ret.close()
 
