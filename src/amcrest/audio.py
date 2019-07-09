@@ -11,9 +11,6 @@
 #
 # vim:sw=4:ts=4:et
 import shutil
-import threading
-import time
-import sys
 from urllib3.exceptions import HTTPError
 
 from . import utils
@@ -95,14 +92,13 @@ class Audio(object):
         )
 
     def audio_stream_capture(self, httptype=None,
-                             channel=None, path_file=None, delay=None):
+                             channel=None, path_file=None):
         """
         Params:
 
             path_file - path to output file
-            channel - integer
+            channel: - integer
             httptype - type string (singlepart or multipart)
-            delay - float or int
 
                 singlepart: HTTP content is a continuos flow of audio packets
                 multipart: HTTP content type is multipart/x-mixed-replace, and
@@ -111,21 +107,13 @@ class Audio(object):
         """
         if httptype is None and channel is None:
             raise RuntimeError("Requires htttype and channel")
-        if not(type(delay) in [int,float] or (delay is None)):
-            raise RuntimeError("Delay must be float type or int type or None value")
-
 
         ret = self.command(
             'audio.cgi?action=getAudio&httptype={0}&channel={1}'.format(
                 httptype, channel), stream=True)
+
         if path_file:
             try:
-                if delay!=None:
-                    thread=threading.Thread(target=self.audio_stream_close,args=(ret,delay,))
-                    thread.start()
-                    timer_running=True
-                else:
-                    timer_running=False
                 with open(path_file, 'wb') as out_file:
                     shutil.copyfileobj(ret.raw, out_file)
             except HTTPError as error:
@@ -133,15 +121,10 @@ class Audio(object):
                     "%s Audio stream capture to file failed due to error: %s",
                     self, repr(error))
                 raise CommError(error)
-            except :
-                if not(thread.join()==None and timer_running):
-                _LOGGER.debug(
-                    "%s Audio stream capture to file failed due to unexpected error: %s",
-                    self, repr(sys.exc_info()[0]))
-
 
         return ret.raw
 
+<<<<<<< HEAD
     def audio_stream_close(self,ret,delay):
         """
         Method launched as Thread by audio_stream_capture
@@ -151,6 +134,8 @@ class Audio(object):
         time.sleep(delay)
         ret.close()
 
+=======
+>>>>>>> parent of f670b70... Audio stream timer added
     @property
     def audio_enabled(self):
         """Return if any audio stream enabled."""
