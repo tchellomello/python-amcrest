@@ -11,7 +11,7 @@
 
 # Skips check since rhel default repos lack flake8
 %if ! 0%{?rhel}
-%{!?with_check:%global with_check 1}
+%{!?with_check:%global with_check 0}
 %else
 %{!?with_check:%global with_check 0}
 %endif

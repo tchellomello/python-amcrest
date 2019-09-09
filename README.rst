@@ -150,6 +150,8 @@ Supportability Matrix
 +-------------------------+---------------+----------+-----------------+
 | IP3M-HX2                | Yes           |  working |                 |
 +-------------------------+---------------+----------+-----------------+
+| IP8M-T2499EW-28M        | Yes           |  working |                 |
++-------------------------+---------------+----------+-----------------+
 
 If you have different model, feel fee to contribute and report your results.
 
