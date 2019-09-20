@@ -89,6 +89,9 @@ class Http(System, Network, MotionDetection, Snapshot,
             except LoginError as error:
                 self._token = None
                 raise error
+        except CommError:
+            self._token = None
+            raise
 
         # check if user passed
         result = resp.lower()
