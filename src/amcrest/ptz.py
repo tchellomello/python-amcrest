@@ -220,6 +220,19 @@ class Ptz(object):
         )
         return ret.content.decode('utf-8')
 
+    def set_preset(self, action='start', channel=0, preset_point_number=1):
+        """
+        Params:
+            action              - start or stop
+            channel             - channel number
+            preset_point_number - preset point number
+        """
+        ret = self.command(
+            'ptz.cgi?action={0}&channel={1}&code=SetPreset&arg1=0'
+            '&arg2={2}&arg3=0'.format(action, channel, preset_point_number)
+        )
+        return ret.content.decode('utf-8')
+
     def tour(self, action='start', channel=0, start=True, tour_path_number=1):
         """
         Params:
