@@ -28,7 +28,7 @@ class AmcrestCamera(object):
             password=password,
             verbose=verbose,
             protocol=protocol,
-            verify=verify,
+            ssl_verify=verify,
             retries_connection=retries_connection,
             timeout_protocol=timeout_protocol
         )
