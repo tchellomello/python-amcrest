@@ -22,6 +22,7 @@ from .utils import clean_url, pretty
 from .audio import Audio
 from .event import Event
 from .log import Log
+from .media import Media
 from .motion_detection import MotionDetection
 from .nas import Nas
 from .network import Network
@@ -42,7 +43,7 @@ _LOGGER = logging.getLogger(__name__)
 # pylint: disable=too-many-ancestors
 class Http(System, Network, MotionDetection, Snapshot,
            UserManagement, Event, Audio, Record, Video,
-           Log, Ptz, Special, Storage, Nas):
+           Log, Ptz, Special, Storage, Nas, Media):
 
     def __init__(self, host, port, user,
                  password, verbose=True, protocol='http', ssl_verify=True,

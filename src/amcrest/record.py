@@ -22,13 +22,6 @@ class Record(object):
         return ret.content.decode('utf-8')
 
     @property
-    def factory_create(self):
-        ret = self.command(
-            'mediaFileFind.cgi?action=factory.create'
-        )
-        return ret.content.decode('utf-8')
-
-    @property
     def record_config(self):
         ret = self.command(
             'configManager.cgi?action=getConfig&name=Record'
