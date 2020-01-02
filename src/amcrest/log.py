@@ -30,7 +30,8 @@ class Log(object):
 
     def log_find_start(self, start_time, end_time):
         ret = self.command(
-            'log.cgi?action=startFind&condition.StartTime={0}&condition.EndTime={1}'
+            'log.cgi?action=startFind'
+            '&condition.StartTime={0}&condition.EndTime={1}'
             .format(
                 start_time.strftime('%Y-%m-%d %H:%M:%S'),
                 end_time.strftime('%Y-%m-%d %H:%M:%S')))
@@ -38,22 +39,27 @@ class Log(object):
         return ret.content.decode('utf-8')
 
     def log_find_next(self, token):
-        ret = self.command('log.cgi?action=doFind&token={0}&count=100'.format(token))
+        ret = self.command('log.cgi?action=doFind&token={0}&count=100'
+                           .format(token))
         return ret.content.decode('utf-8')
 
     def log_find_stop(self, token):
-        ret = self.command('log.cgi?action=stopFind&token={0}'.format(token))
+        ret = self.command('log.cgi?action=stopFind&token={0}'
+                           .format(token))
         return ret.content.decode('utf-8')
-    
+
     def log_find(self, start_time, end_time):
         token = self.log_find_start(start_time, end_time).strip().split('=')[1]
         to_query = True
 
         while to_query:
             content = self.log_find_next(token)
-            tag, count = (list(content.split('\r\n', 1)[0].split('=')) + [None])[:2]
-            to_query = False
+            tag, count = (
+                list(content.split('\r\n', 1)[0].split('=')) +
+                [None])[:2]
             
+            to_query = False
+
             if (tag == 'found') and (int(count) > 0):
                 to_query = True
 

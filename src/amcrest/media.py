@@ -15,6 +15,7 @@ import logging
 
 _LOGGER = logging.getLogger(__name__)
 
+
 class Media(object):
 
     def factory_create(self):
@@ -38,8 +39,10 @@ class Media(object):
         )
         return ret.content.decode('utf-8')
 
-    def media_file_find_start(self, factory_id, start_time, end_time, channel=0,
-                         directories=[], types=[], flags=[], events=[], stream=None):
+    def media_file_find_start(self, factory_id,
+                              start_time, end_time, channel=0,
+                              directories=[], types=[], flags=[],
+                              events=[], stream=None):
         """
         https://s3.amazonaws.com/amcrest-files/Amcrest+HTTP+API+3.2017.pdf
 
@@ -88,8 +91,8 @@ class Media(object):
             'mediaFileFind.cgi?action=findNextFile&object={0}&count=100'
             .format(factory_id)
         )
-        
-        return ret.content.decode('utf-8')        
+
+        return ret.content.decode('utf-8')
 
     def find_files(self, start_time, end_time, channel=0,
                    directories=[], types=[], flags=[], events=[], stream=None):
@@ -139,7 +142,8 @@ class Media(object):
                 _LOGGER.debug("%s findNextFile", self)
                 content = self.media_file_find_next(factory_id)
 
-                # The first line is 'found=N'. However, it can be 'Error' if e.g. no more files found
+                # The first line is 'found=N'.
+                # However, it can be 'Error' if e.g. no more files found
                 tag, count = (list(content.split('\r\n', 1)[0].split('=')) + [None])[:2]
                 _LOGGER.debug("%s returned %s %s", self, tag, count)
                     
