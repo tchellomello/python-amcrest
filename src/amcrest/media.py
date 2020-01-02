@@ -144,16 +144,17 @@ class Media(object):
 
                 # The first line is 'found=N'.
                 # However, it can be 'Error' if e.g. no more files found
-                tag, count = (list(content.split('\r\n', 1)[0].split('=')) + [None])[:2]
+                tag, count = (list(content.split('\r\n', 1)[0]
+                                   .split('=')) + [None])[:2]
                 _LOGGER.debug("%s returned %s %s", self, tag, count)
-                    
+
                 if tag == 'found':
                     count = int(count)
                 else:
                     count = None
 
                 yield content
-                
+
             self.factory_close(factory_id)
             self.factory_destroy(factory_id)
         else:
