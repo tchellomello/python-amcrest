@@ -122,15 +122,15 @@ class Media(object):
         _LOGGER.debug("%s findFile for factory_id=%s", self, factory_id)
 
         search = self.media_file_find_start(
-            factory_id = factory_id,
-            start_time = start_time,
-            end_time = end_time,
-            channel = channel,
-            directories = directories,
-            types = types,
-            flags = flags,
-            events = events,
-            stream = stream)
+            factory_id=factory_id,
+            start_time=start_time,
+            end_time=end_time,
+            channel=channel,
+            directories=directories,
+            types=types,
+            flags=flags,
+            events=events,
+            stream=stream)
         
         if "ok" in search.lower():
             count = 100
@@ -149,18 +149,19 @@ class Media(object):
                     count = None
 
                 yield content
-            
+                
             self.factory_close(factory_id)
             self.factory_destroy(factory_id)
         else:
-            _LOGGER.debug("%s returned error: %s", self, ret.content)
+            _LOGGER.debug("%s returned error: %s", self, search)
 
     def download_file(self, file_path, timeout=None, stream=False):
         """
-        file_path: File location like returned by FilePath property of find_files()
-                   Example: /mnt/sd/2019-12-31/001/dav/00/00.12.00-00.20.00[M][0@0][0].mp4
+        file_path: File location like returned by FilePath from find_files()
+                   Example: /mnt/sd/2019-12-31/001/dav/00/00.12.00-00.20.00.mp4
         timeout:   Use default if None
-        stream:    If True use streaming download instead of reading content into memory 
+        stream:    If True use streaming download instead of
+                   reading content into memory
         """
         ret = self.command(
             'RPC_Loadfile/{0}'.format(file_path),
