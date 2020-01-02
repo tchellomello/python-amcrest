@@ -146,6 +146,7 @@ class Http(System, Network, MotionDetection, Snapshot,
         session = requests.Session()
         session.verify = self._verify
         url = self.__base_url(cmd)
+        _LOGGER.debug("%s HTTP query %s", self, url)
         if retries is None:
             retries = self._retries_default
         for loop in range(1, 2 + retries):

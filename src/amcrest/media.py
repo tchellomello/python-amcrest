@@ -11,6 +11,9 @@
 #
 # vim:sw=4:ts=4:et
 
+import logging
+
+_LOGGER = logging.getLogger(__name__)
 
 class Media(object):
 
@@ -18,6 +21,7 @@ class Media(object):
         ret = self.command(
             'mediaFileFind.cgi?action=factory.create'
         )
+        print(ret.content)
         return ret.content.decode('utf-8')
 
     def factory_close(self, factory_id):
@@ -34,8 +38,61 @@ class Media(object):
         )
         return ret.content.decode('utf-8')
 
-    def find_file(self, start_time, end_time, channel=0,
-                  directories=[], types=[], flags=[], events=[], stream=None):
+    def media_file_find_start(self, factory_id, start_time, end_time, channel=0,
+                         directories=[], types=[], flags=[], events=[], stream=None):
+        """
+        https://s3.amazonaws.com/amcrest-files/Amcrest+HTTP+API+3.2017.pdf
+
+        factory_id : returned by factory_create()
+
+        dir : in which directories you want to find the file. It is an array.
+                The index starts from 1. The range of dir is {"/mnt/dvr/sda0",
+                "/mnt/dvr/sda1"}. This condition can be omitted. If omitted,
+                find files in all the directories.
+
+        type : which types of the file you want to find. It is an array. The
+                index starts from 0. The range of type is {"dav", "jpg", "mp4"}
+                If omitted, find files with all the types.
+
+        flag : which flags of the file you want to find. It is an array. The
+                index starts from 0. The range of flag is {"Timing", "Manual",
+                "Marker", "Event", "Mosaic", "Cutout"}. If omitted, find files
+                with all the flags.
+
+        event : by which event the record file is triggered. It is an array.
+                The index starts from 0. The range of event is {"AlarmLocal",
+                "VideoMotion", "VideoLoss", "VideoBlind", "Traffic*"}. This
+                condition can be omitted. If omitted, find files of all the
+                events. stream : which video stream type you want to find.
+                The range of stream is {"Main", "Extra1", "Extra2", "Extra3"}.
+                If omitted, find files with all the stream types.
+        """
+        ret = self.command(
+            'mediaFileFind.cgi?action=findFile&object={0}&condition.Channel'
+            '={1}&condition.StartTime={2}&condition.EndTime={3}'
+            .format(factory_id, channel, start_time, end_time)
+            + ''.join(['&condition.Dirs[{0}]={1}'.format(k, v)
+                       for k, v in enumerate(directories)])
+            + ''.join(['&condition.Types[{0}]={1}'.format(k, v)
+                       for k, v in enumerate(types)])
+            + ''.join(['&condition.Flag[{0}]={1}'.format(k, v)
+                       for k, v in enumerate(flags)])
+            + ''.join(['&condition.Events[{0}]={1}'.format(k, v)
+                       for k, v in enumerate(events)])
+            + ('&condition.VideoStream={0}'.format(stream) if stream else '')
+        )
+        return ret.content.decode('utf-8')
+
+    def media_file_find_next(self, factory_id):
+        ret = self.command(
+            'mediaFileFind.cgi?action=findNextFile&object={0}&count=100'
+            .format(factory_id)
+        )
+        
+        return ret.content.decode('utf-8')        
+
+    def find_files(self, start_time, end_time, channel=0,
+                   directories=[], types=[], flags=[], events=[], stream=None):
         """
         https://s3.amazonaws.com/amcrest-files/Amcrest+HTTP+API+3.2017.pdf
 
@@ -62,34 +119,53 @@ class Media(object):
                 If omitted, find files with all the stream types.
         """
         factory_id = self.factory_create().strip().split('=')[1]
+        _LOGGER.debug("%s findFile for factory_id=%s", self, factory_id)
 
-        ret = self.command(
-            'mediaFileFind.cgi?action=findFile&object={0}&condition.Channel'
-            '={1}&condition.StartTime={2}&condition.EndTime={3}'
-            .format(factory_id, channel, start_time, end_time)
-            + ''.join(['&condition.Dirs[{0}]={1}'.format(k, v)
-                       for k, v in enumerate(directories)])
-            + ''.join(['&condition.Types[{0}]={1}'.format(k, v)
-                       for k, v in enumerate(types)])
-            + ''.join(['&condition.Flag[{0}]={1}'.format(k, v)
-                       for k, v in enumerate(flags)])
-            + ''.join(['&condition.Events[{0}]={1}'.format(k, v)
-                       for k, v in enumerate(events)])
-            + ('&condition.VideoStream={0}'.format(stream) if stream else '')
-        )
-        if "ok" in ret.content.decode('utf-8').lower():
-            ret = self.command(
-                'mediaFileFind.cgi?action=findNextFile&object={0}&count=100'
-                .format(factory_id)
-            )
+        search = self.media_file_find_start(
+            factory_id = factory_id,
+            start_time = start_time,
+            end_time = end_time,
+            channel = channel,
+            directories = directories,
+            types = types,
+            flags = flags,
+            events = events,
+            stream = stream)
+        
+        if "ok" in search.lower():
+            count = 100
+
+            while count and count > 0:
+                _LOGGER.debug("%s findNextFile", self)
+                content = self.media_file_find_next(factory_id)
+
+                # The first line is 'found=N'. However, it can be 'Error' if e.g. no more files found
+                tag, count = (list(content.split('\r\n', 1)[0].split('=')) + [None])[:2]
+                _LOGGER.debug("%s returned %s %s", self, tag, count)
+                    
+                if tag == 'found':
+                    count = int(count)
+                else:
+                    count = None
+
+                yield content
+            
             self.factory_close(factory_id)
             self.factory_destroy(factory_id)
+        else:
+            _LOGGER.debug("%s returned error: %s", self, ret.content)
 
-            return ret.content.decode('utf-8')
-
-    def download_file(self, file_path):
+    def download_file(self, file_path, timeout=None, stream=False):
+        """
+        file_path: File location like returned by FilePath property of find_files()
+                   Example: /mnt/sd/2019-12-31/001/dav/00/00.12.00-00.20.00[M][0@0][0].mp4
+        timeout:   Use default if None
+        stream:    If True use streaming download instead of reading content into memory 
+        """
         ret = self.command(
-            'RPC_Loadfile/{0}'.format(file_path)
+            'RPC_Loadfile/{0}'.format(file_path),
+            timeout_cmd=timeout,
+            stream=stream
         )
         return ret.content
 
