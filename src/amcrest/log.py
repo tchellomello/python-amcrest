@@ -55,9 +55,9 @@ class Log(object):
         while to_query:
             content = self.log_find_next(token)
             tag, count = (
-                list(content.split('\r\n', 1)[0].split('=')) +
-                [None])[:2]
-            
+                list(content.split('\r\n', 1)[0]
+                     .split('=')) + [None])[:2]
+
             to_query = False
 
             if (tag == 'found') and (int(count) > 0):

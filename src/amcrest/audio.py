@@ -11,10 +11,13 @@
 #
 # vim:sw=4:ts=4:et
 import shutil
-from urllib3.exceptions import HTTPError
+import logging
 
+from urllib3.exceptions import HTTPError
 from . import utils
 from .exceptions import CommError
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class Audio(object):

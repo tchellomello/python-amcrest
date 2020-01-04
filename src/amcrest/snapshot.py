@@ -11,9 +11,11 @@
 #
 # vim:sw=4:ts=4:et
 import shutil
+import logging
 from urllib3.exceptions import HTTPError
-
 from .exceptions import CommError
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class Snapshot(object):

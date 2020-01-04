@@ -22,7 +22,6 @@ class Media(object):
         ret = self.command(
             'mediaFileFind.cgi?action=factory.create'
         )
-        print(ret.content)
         return ret.content.decode('utf-8')
 
     def factory_close(self, factory_id):
@@ -41,8 +40,8 @@ class Media(object):
 
     def media_file_find_start(self, factory_id,
                               start_time, end_time, channel=0,
-                              directories=[], types=[], flags=[],
-                              events=[], stream=None):
+                              directories=(), types=(), flags=(),
+                              events=(), stream=None):
         """
         https://s3.amazonaws.com/amcrest-files/Amcrest+HTTP+API+3.2017.pdf
 
@@ -70,19 +69,26 @@ class Media(object):
                 The range of stream is {"Main", "Extra1", "Extra2", "Extra3"}.
                 If omitted, find files with all the stream types.
         """
+
+        c_dirs = ''.join(['&condition.Dirs[{0}]={1}'.format(k, v)
+                          for k, v in enumerate(directories)])
+
+        c_types = ''.join(['&condition.Types[{0}]={1}'.format(k, v)
+                           for k, v in enumerate(types)])
+
+        c_flag = ''.join(['&condition.Flag[{0}]={1}'.format(k, v)
+                          for k, v in enumerate(flags)])
+
+        c_events = ''.join(['&condition.Events[{0}]={1}'.format(k, v)
+                            for k, v in enumerate(events)])
+
+        c_vs = ('&condition.VideoStream={0}'.format(stream) if stream else '')
+
         ret = self.command(
             'mediaFileFind.cgi?action=findFile&object={0}&condition.Channel'
-            '={1}&condition.StartTime={2}&condition.EndTime={3}'
-            .format(factory_id, channel, start_time, end_time)
-            + ''.join(['&condition.Dirs[{0}]={1}'.format(k, v)
-                       for k, v in enumerate(directories)])
-            + ''.join(['&condition.Types[{0}]={1}'.format(k, v)
-                       for k, v in enumerate(types)])
-            + ''.join(['&condition.Flag[{0}]={1}'.format(k, v)
-                       for k, v in enumerate(flags)])
-            + ''.join(['&condition.Events[{0}]={1}'.format(k, v)
-                       for k, v in enumerate(events)])
-            + ('&condition.VideoStream={0}'.format(stream) if stream else '')
+            '={1}&condition.StartTime={2}&condition.EndTime={3}{4}{5}{6}{7}{8}'
+            .format(factory_id, channel, start_time, end_time, c_dirs, c_types,
+                    c_flag, c_events, c_vs)
         )
         return ret.content.decode('utf-8')
 
@@ -95,7 +101,7 @@ class Media(object):
         return ret.content.decode('utf-8')
 
     def find_files(self, start_time, end_time, channel=0,
-                   directories=[], types=[], flags=[], events=[], stream=None):
+                   directories=(), types=(), flags=(), events=(), stream=None):
         """
         https://s3.amazonaws.com/amcrest-files/Amcrest+HTTP+API+3.2017.pdf
 
@@ -134,7 +140,7 @@ class Media(object):
             flags=flags,
             events=events,
             stream=stream)
-        
+
         if "ok" in search.lower():
             count = 100
 
