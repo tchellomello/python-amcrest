@@ -38,9 +38,9 @@ class Log(object):
 
         return ret.content.decode('utf-8')
 
-    def log_find_next(self, token):
-        ret = self.command('log.cgi?action=doFind&token={0}&count=100'
-                           .format(token))
+    def log_find_next(self, token, count=100):
+        ret = self.command('log.cgi?action=doFind&token={0}&count={1}'
+                           .format(token, count))
         return ret.content.decode('utf-8')
 
     def log_find_stop(self, token):

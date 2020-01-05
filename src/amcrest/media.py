@@ -14,6 +14,7 @@
 import logging
 
 _LOGGER = logging.getLogger(__name__)
+# fmt: off
 
 
 class Media(object):
@@ -92,10 +93,10 @@ class Media(object):
         )
         return ret.content.decode('utf-8')
 
-    def media_file_find_next(self, factory_id):
+    def media_file_find_next(self, factory_id, count=100):
         ret = self.command(
-            'mediaFileFind.cgi?action=findNextFile&object={0}&count=100'
-            .format(factory_id)
+            'mediaFileFind.cgi?action=findNextFile&object={0}&count={1}'
+            .format(factory_id, count)
         )
 
         return ret.content.decode('utf-8')
@@ -192,3 +193,4 @@ class Media(object):
             .format(channel, start_time, end_time, stream)
         )
         return ret.content
+# fmt: on
