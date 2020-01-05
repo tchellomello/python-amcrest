@@ -14,11 +14,11 @@
 import datetime
 from amcrest import AmcrestCamera
 
-amcrest = AmcrestCamera('192.168.1.10', 80, 'admin', 'super_password')
+amcrest = AmcrestCamera("192.168.1.10", 80, "admin", "super_password")
 camera = amcrest.camera
 
 end_time = datetime.datetime.now()
-start_time = end_time-datetime.timedelta(hours=1)
+start_time = end_time - datetime.timedelta(hours=1)
 
 for text in camera.log_find(start_time, end_time):
-    print (text)
+    print(text)
