@@ -12,7 +12,6 @@
 # vim:sw=4:ts=4:et
 import re
 
-from .exceptions import AmcrestError
 from .utils import to_unit, percent
 
 _USED = '.UsedBytes'
