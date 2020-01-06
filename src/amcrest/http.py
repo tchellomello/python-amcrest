@@ -158,6 +158,7 @@ class Http(System, Network, MotionDetection, Snapshot,
                     stream=stream,
                     timeout=timeout_cmd or self._timeout_default,
                 )
+                _LOGGER.debug('Completed with status_code %s, content \n%s', resp.status_code, resp.content)
                 if resp.status_code == 401:
                     raise LoginError
                 resp.raise_for_status()
