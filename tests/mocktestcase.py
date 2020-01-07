@@ -5,7 +5,7 @@ from unittest import TestCase
 try:
     import urllib.parse
     fn_urlencode = urllib.parse.urlencode
-except:
+except ImportError:
     import urllib
     fn_urlencode = urllib.urlencode
 
@@ -20,10 +20,9 @@ class MockTestCase(TestCase):
     def get_root_url(self):
         return 'http://{}:{}'.format(self.get_host(), self.get_port())
 
-    def format_url(self, method, args={}):
-        args_str = '?' + fn_urlencode(args) if len(args) > 0 else ''
+    def format_url(self, method, args=None):
+        args_str = '?' + fn_urlencode(args) if args and len(args) > 0 else ''
         result = self.get_root_url() + '/cgi-bin/' + method + args_str
-        print (result)
         return result
 
     def add_init_responses(self):
