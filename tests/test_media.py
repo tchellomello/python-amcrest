@@ -1,67 +1,58 @@
 """Test log.py functions."""
 import responses
 import datetime
-import amcrest
-from unittest import TestCase
+
+from .mocktestcase import MockTestCase
 
 
-class TestMedia(TestCase):
+class TestMedia(MockTestCase):
     """Tests for media.py."""
     @responses.activate
     def test_download_file(self):
-        responses.add(
-            responses.GET,
-            'http://www.example.com:80/cgi-bin/magicBox.cgi?action=getMachineName',
-            body='name=AMCTEST_MACHINE',
-            status=200)
-
-        responses.add(
-            responses.GET,
-            'http://www.example.com:80/cgi-bin/magicBox.cgi?action=getSerialNo',
-            body='sn=AMCTESTSERIALNO',
-            status=200)
+        self.add_init_responses()
 
         body = '*'.join([str(x) for x in range(17)])
 
         responses.add(
             responses.GET,
-            'http://www.example.com:80/cgi-bin/RPC_Loadfile//mnt/sd/test.dat',
+            self.format_url('RPC_Loadfile//mnt/sd/test.dat'),
             body=body,
             status=200)
 
-        c = amcrest.AmcrestCamera('www.example.com', 80, 'admin', 'test').camera
+        c = self.get_amcrest().camera
         content = c.download_file('/mnt/sd/test.dat').decode('utf-8')
         self.assertEqual(body, content)
 
     @responses.activate
     def test_log_find(self):
-        responses.add(
-            responses.GET,
-            'http://www.example.com:80/cgi-bin/magicBox.cgi?action=getMachineName',
-            body='name=AMCTEST_MACHINE',
-            status=200)
+        self.add_init_responses()
 
         responses.add(
             responses.GET,
-            'http://www.example.com:80/cgi-bin/magicBox.cgi?action=getSerialNo',
-            body='sn=AMCTESTSERIALNO',
-            status=200)
-
-        responses.add(
-            responses.GET,
-            'http://www.example.com:80/cgi-bin/mediaFileFind.cgi?action=factory.create',
+            self.format_url('mediaFileFind.cgi', {
+                'action': 'factory.create'}),
             body='result=123\r\n',
             status=200)
 
         responses.add(
             responses.GET,
-            'http://www.example.com:80/cgi-bin/mediaFileFind.cgi?action=findFile&object=123&condition.Channel=0&condition.StartTime=2020-01-02 03:04:05&condition.EndTime=2020-01-02 03:04:10',
+            self.format_url('mediaFileFind.cgi', {
+                'action': 'findFile',
+                'object': 123,
+                'condition.Channel': 0,
+                'condition.StartTime': datetime.datetime(2020, 1, 2, 3, 4, 5),
+                'condition.EndTime': datetime.datetime(2020, 1, 2, 3, 4, 10)}),
             body='OK\r\n',
             status=200)
 
+        url_next = self.format_url('mediaFileFind.cgi', {
+            'action': 'findNextFile',
+            'object': 123,
+            'count': 100})
+
         responses.add(
             responses.GET,
-            'http://www.example.com:80/cgi-bin/mediaFileFind.cgi?action=findNextFile&object=123&count=100',
+            url_next,
             body='\r\n'.join('''found=2
 items[0].Channel=0
 items[0].Cluster=0
@@ -117,7 +108,7 @@ items[1].WorkDirSN=0
 
         responses.add(
             responses.GET,
-            'http://www.example.com:80/cgi-bin/mediaFileFind.cgi?action=findNextFile&object=123&count=100',
+            url_next,
             body='\r\n'.join('''found=2
 items[0].Channel=0
 items[0].Cluster=0
@@ -149,7 +140,7 @@ items[0].WorkDirSN=0
 
         responses.add(
             responses.GET,
-            'http://www.example.com:80/cgi-bin/mediaFileFind.cgi?action=findNextFile&object=123&count=100',
+            url_next,
             body='\r\n'.join('''found=0
 
 '''.splitlines()),
@@ -157,7 +148,9 @@ items[0].WorkDirSN=0
 
         responses.add(
             responses.GET,
-            'http://www.example.com:80/cgi-bin/mediaFileFind.cgi?action=factory.close&object=123',
+            self.format_url('mediaFileFind.cgi', {
+                'action': 'factory.close',
+                'object': 123}),
             body='\r\n'.join('''Error
 ErrorID=2, Detail=Invalid Request!
 
@@ -166,14 +159,16 @@ ErrorID=2, Detail=Invalid Request!
 
         responses.add(
             responses.GET,
-            'http://www.example.com:80/cgi-bin/mediaFileFind.cgi?action=factory.destroy&object=123',
+            self.format_url('mediaFileFind.cgi', {
+                'action': 'factory.destroy',
+                'object': 123}),
             body='\r\n'.join('''Error
 ErrorID=2, Detail=Invalid Request!
 
 '''.splitlines()),
             status=200)
 
-        c = amcrest.AmcrestCamera('www.example.com', 80, 'admin', 'test').camera
+        c = self.get_amcrest().camera
         time_start = datetime.datetime(2020, 1, 2, 3, 4, 5)
         time_end = datetime.datetime(2020, 1, 2, 3, 4, 10)
         media = list(c.find_files(time_start, time_end))
