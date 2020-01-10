@@ -155,8 +155,9 @@ class Special(object):
                 raise CommError(error)
 
         return ret.raw
-        
-    def get_event_stream(self, eventcode='VideoMotion', callback=None, timeout=(TIMEOUT_HTTP_PROTOCOL,3600*24*365)):
+
+    def get_event_stream(self, eventcode='VideoMotion', callback=None,
+                         timeout=(TIMEOUT_HTTP_PROTOCOL, 3600*24*365)):
         """
         Params:
         eventcode:
@@ -172,11 +173,11 @@ class Special(object):
         StorageFailure: storage failure event
         StorageLowSpace: storage low space event
         AlarmOutput: alarm output event
-        
+
         callback:
         function to use to process data when running in a Thread
         event data is passed as the first argument
-        
+
         timeout:
         int or tuple, requests timeout format
         no-data timeout, set to a long value for streaming
@@ -187,16 +188,19 @@ class Special(object):
                 stream=True,
                 timeout_cmd=timeout
             )
-            if ret.encoding is None: ret.encoding = 'utf-8' #stupid thing required by requests when streaming
+            if ret.encoding is None:
+                ret.encoding = 'utf-8'  #required by requests when streaming
             while True:
                 for line in ret.iter_lines(3, decode_unicode=True):
                     if line.lower().startswith('content-length'):
-                        content_length = int(''.join(x for x in line if x.isdigit()))
-                        #: pause the generator
+                        cont_len = int(''.join(x for x in line
+                                               if x.isdigit()))
+                        # pause the generator
                         break
-                            
-                #: Continue the generator and read the exact amount of the body (plus 2 as there are 2 returns included).        
-                for text in ret.iter_content(content_length+2, decode_unicode=True): 
+
+                # Continue the generator and read the exact amount of the body
+                # (plus 2 as there are 2 returns included).
+                for text in ret.iter_content(cont_len+2, decode_unicode=True):
                     if callback:
                         callback(text.strip())
                     else:
