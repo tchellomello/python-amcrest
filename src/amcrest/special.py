@@ -15,6 +15,8 @@ import logging
 
 from urllib3.exceptions import HTTPError
 from .exceptions import CommError
+from requests.exceptions import ConnectionError
+from .config import TIMEOUT_HTTP_PROTOCOL
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -153,3 +155,58 @@ class Special(object):
                 raise CommError(error)
 
         return ret.raw
+        
+    def get_event_stream(self, eventcode='VideoMotion', callback=None, timeout=(TIMEOUT_HTTP_PROTOCOL,3600*24*365)):
+        """
+        Params:
+        eventcode:
+        string list of events
+        eg 'VideoMotion,VideoLoss'
+        NOTE: No spaces allowed!
+
+        VideoMotion: motion detection event
+        VideoLoss: video loss detection event
+        VideoBlind: video blind detection event
+        AlarmLocal: alarm detection event
+        StorageNotExist: storage not exist event
+        StorageFailure: storage failure event
+        StorageLowSpace: storage low space event
+        AlarmOutput: alarm output event
+        
+        callback:
+        function to use to process data when running in a Thread
+        event data is passed as the first argument
+        
+        timeout:
+        int or tuple, requests timeout format
+        no-data timeout, set to a long value for streaming
+        """
+        try:
+            ret = self.command(
+                'eventManager.cgi?action=attach&codes=[{0}]'.format(eventcode),
+                stream=True,
+                timeout_cmd=timeout
+            )
+            if ret.encoding is None: ret.encoding = 'utf-8' #stupid thing required by requests when streaming
+            while True:
+                for line in ret.iter_lines(3, decode_unicode=True):
+                    if line.lower().startswith('content-length'):
+                        content_length = int(''.join(x for x in line if x.isdigit()))
+                        #: pause the generator
+                        break
+                            
+                #: Continue the generator and read the exact amount of the body (plus 2 as there are 2 returns included).        
+                for text in ret.iter_content(content_length+2, decode_unicode=True): 
+                    if callback:
+                        callback(text.strip())
+                    else:
+                        return text.strip()
+                    break
+
+        except ConnectionError:
+            _LOGGER.debug("%s Get event stream timeout", self)
+            return None
+        except HTTPError as error:
+            _LOGGER.debug("%s Get event stream failed due "
+                          "to error: %s", self, repr(error))
+        return None
