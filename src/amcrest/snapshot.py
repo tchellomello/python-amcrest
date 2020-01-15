@@ -13,6 +13,7 @@
 import shutil
 import logging
 from urllib3.exceptions import HTTPError
+
 from .exceptions import CommError
 
 _LOGGER = logging.getLogger(__name__)
@@ -29,7 +30,7 @@ class Snapshot(object):
     def snapshot_config(self):
         return self.__get_config('Snap')
 
-    def snapshot(self, channel=None, path_file=None, timeout=None):
+    def snapshot(self, channel=None, path_file=None, timeout=None, stream=True):
         """
         Args:
 
@@ -44,21 +45,25 @@ class Snapshot(object):
                 in the path
 
         Return:
-            raw from http request
+            raw from http request if stream is True
+            response content if stream is False
         """
         cmd = "snapshot.cgi"
         if channel is not None:
             cmd += "?channel={}".format(channel)
-        ret = self.command(cmd, timeout_cmd=timeout, stream=True)
+        ret = self.command(cmd, timeout_cmd=timeout, stream=stream)
 
         if path_file:
-            try:
-                with open(path_file, 'wb') as out_file:
-                    shutil.copyfileobj(ret.raw, out_file)
-            except HTTPError as error:
-                _LOGGER.debug(
-                    "%s Snapshot to file failed due to error: %s",
-                    self, repr(error))
-                raise CommError(error)
+            with open(path_file, 'wb') as out_file:
+                if stream:
+                    try:
+                        shutil.copyfileobj(ret.raw, out_file)
+                    except HTTPError as error:
+                        _LOGGER.debug(
+                            "%s Snapshot to file failed due to error: %s",
+                            self, repr(error))
+                        raise CommError(error)
+                else:
+                    out_file.write(ret.content)
 
-        return ret.raw
+        return ret.raw if stream else ret.content
