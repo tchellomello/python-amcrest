@@ -30,7 +30,8 @@ class Snapshot(object):
     def snapshot_config(self):
         return self.__get_config('Snap')
 
-    def snapshot(self, channel=None, path_file=None, timeout=None, stream=True):
+    def snapshot(self, channel=None, path_file=None, timeout=None,
+                 stream=True):
         """
         Args:
 
