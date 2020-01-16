@@ -69,13 +69,6 @@ class Http(System, Network, MotionDetection, Snapshot,
         self._token = None
         self._name = None
         self._serial = None
-        # Ignore comm errors in case camera happens to be off or there are
-        # temporary network issues. User can retry later and we'll get token
-        # then if camera is accessible again.
-        try:
-            self._generate_token()
-        except CommError:
-            pass
 
     def _generate_token(self):
         """Create authentation to use with requests."""
