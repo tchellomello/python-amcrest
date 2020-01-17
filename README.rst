@@ -61,6 +61,10 @@ Usage
     camera.snapshot(0, "/home/user/Desktop/snapshot00.jpeg")
     <requests.packages.urllib3.response.HTTPResponse object at 0x7f84945083c8>
 
+    #Capture snapshot of a specific channel. Useful with NVR.
+    camera.snapshot(channel=2, file_path="/home/user/Desktop/snapshot01.jpeg")
+    <requests.packages.urllib3.response.HTTPResponse object at 0x7f8494508567>
+
     #Capture audio
     camera.audio_stream_capture(httptype="singlepart", channel=1, path_file="/home/user/Desktop/audio.aac")
     CTRL-C to stop the continuous audio flow or use a timer

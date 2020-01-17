@@ -19,7 +19,7 @@ class AmcrestCamera(object):
 
     def __init__(self, host, port, user,
                  password, verbose=True, protocol='http', ssl_verify=True,
-                 retries_connection=None, timeout_protocol=None):
+                 retries_connection=None, timeout_protocol=None, channel=None):
         super(AmcrestCamera, self).__init__()
         self.camera = Http(
             host=host,
@@ -30,5 +30,6 @@ class AmcrestCamera(object):
             protocol=protocol,
             ssl_verify=ssl_verify,
             retries_connection=retries_connection,
-            timeout_protocol=timeout_protocol
+            timeout_protocol=timeout_protocol,
+            channel=channel
         )

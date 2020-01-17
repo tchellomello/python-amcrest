@@ -47,7 +47,7 @@ class Http(System, Network, MotionDetection, Snapshot,
 
     def __init__(self, host, port, user,
                  password, verbose=True, protocol='http', ssl_verify=True,
-                 retries_connection=None, timeout_protocol=None):
+                 retries_connection=None, timeout_protocol=None, channel=None):
 
         self._token_lock = threading.Lock()
         self._cmd_id_lock = threading.Lock()
@@ -69,6 +69,7 @@ class Http(System, Network, MotionDetection, Snapshot,
         self._token = None
         self._name = None
         self._serial = None
+        self._channel = channel
 
     def _generate_token(self):
         """Create authentation to use with requests."""
