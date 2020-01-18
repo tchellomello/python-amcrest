@@ -145,6 +145,11 @@ class Event(object):
         return True
 
     @property
+    def is_alarm_triggered(self):
+        event = self.event_channels_happened('AlarmLocal')
+        return bool('channels' in event)
+
+    @property
     def event_management(self):
         ret = self.command(
             'eventManager.cgi?action=getCaps'
