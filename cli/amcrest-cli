@@ -14,6 +14,8 @@
 
 # pylint: disable=invalid-name
 
+from __future__ import print_function
+
 import os
 import signal
 import sys
@@ -31,7 +33,10 @@ except ImportError:
 
 from amcrest import AmcrestCamera
 
-AMCREST_CONF = os.path.join(os.getenv("HOME"), '.config/amcrest.conf')
+if os.name == 'nt':
+    AMCREST_CONF = os.path.join(os.getenv("HOMEPATH"), '.config\\amcrest.conf')
+else:
+    AMCREST_CONF = os.path.join(os.getenv("HOME"), '.config/amcrest.conf')
 
 
 def graceful_exit(_signo, _stack_frame):

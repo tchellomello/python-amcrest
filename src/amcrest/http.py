@@ -22,6 +22,7 @@ from .utils import clean_url, pretty
 from .audio import Audio
 from .event import Event
 from .log import Log
+from .media import Media
 from .motion_detection import MotionDetection
 from .nas import Nas
 from .network import Network
@@ -42,19 +43,22 @@ _LOGGER = logging.getLogger(__name__)
 # pylint: disable=too-many-ancestors
 class Http(System, Network, MotionDetection, Snapshot,
            UserManagement, Event, Audio, Record, Video,
-           Log, Ptz, Special, Storage, Nas):
+           Log, Ptz, Special, Storage, Nas, Media):
 
     def __init__(self, host, port, user,
-                 password, verbose=True, protocol='http',
+                 password, verbose=True, protocol='http', ssl_verify=True,
                  retries_connection=None, timeout_protocol=None):
 
         self._token_lock = threading.Lock()
+        self._cmd_id_lock = threading.Lock()
+        self._cmd_id = 0
         self._host = clean_url(host)
         self._port = port
         self._user = user
         self._password = password
         self._verbose = verbose
         self._protocol = protocol
+        self._verify = ssl_verify
         self._base_url = self.__base_url()
 
         self._retries_default = (
@@ -65,13 +69,6 @@ class Http(System, Network, MotionDetection, Snapshot,
         self._token = None
         self._name = None
         self._serial = None
-        # Ignore comm errors in case camera happens to be off or there are
-        # temporary network issues. User can retry later and we'll get token
-        # then if camera is accessible again.
-        try:
-            self._generate_token()
-        except CommError:
-            pass
 
     def _generate_token(self):
         """Create authentation to use with requests."""
@@ -79,16 +76,16 @@ class Http(System, Network, MotionDetection, Snapshot,
         _LOGGER.debug('%s Trying Basic Authentication', self)
         self._token = requests.auth.HTTPBasicAuth(self._user, self._password)
         try:
-            resp = self._command(cmd).content.decode('utf-8')
-        except LoginError:
-            _LOGGER.debug('%s Trying Digest Authentication', self)
-            self._token = requests.auth.HTTPDigestAuth(
-                self._user, self._password)
             try:
                 resp = self._command(cmd).content.decode('utf-8')
-            except LoginError as error:
-                self._token = None
-                raise error
+            except LoginError:
+                _LOGGER.debug('%s Trying Digest Authentication', self)
+                self._token = requests.auth.HTTPDigestAuth(
+                    self._user, self._password)
+                resp = self._command(cmd).content.decode('utf-8')
+        except CommError:
+            self._token = None
+            raise
 
         # check if user passed
         result = resp.lower()
@@ -138,35 +135,41 @@ class Http(System, Network, MotionDetection, Snapshot,
         return self._command(cmd, retries, timeout_cmd, stream)
 
     def _command(self, cmd, retries=None, timeout_cmd=None, stream=False):
-        session = requests.Session()
         url = self.__base_url(cmd)
+        with self._cmd_id_lock:
+            cmd_id = self._cmd_id = self._cmd_id + 1
+        _LOGGER.debug("%s HTTP query %i: %s", self, cmd_id, url)
         if retries is None:
             retries = self._retries_default
         for loop in range(1, 2 + retries):
-            _LOGGER.debug("%s Running query attempt %s", self, loop)
+            _LOGGER.debug("%s Running query %i attempt %s", self, cmd_id, loop)
             try:
-                resp = session.get(
+                resp = requests.get(
                     url,
                     auth=self._token,
                     stream=stream,
                     timeout=timeout_cmd or self._timeout_default,
+                    verify=self._verify,
                 )
                 if resp.status_code == 401:
+                    _LOGGER.debug(
+                        "%s Query %i: Unauthorized (401)", self, cmd_id)
+                    self._token = None
                     raise LoginError
                 resp.raise_for_status()
             except requests.RequestException as error:
-                msg = re.sub(r'at 0x[0-9a-fA-F]+', 'at ADDRESS', repr(error))
+                _LOGGER.debug(
+                    "%s Query %i failed due to error: %r", self, cmd_id, error)
                 if loop > retries:
-                    _LOGGER.debug(
-                        "%s Query failed due to error: %s", self, msg)
                     raise CommError(error)
+                msg = re.sub(r'at 0x[0-9a-fA-F]+', 'at ADDRESS', repr(error))
                 _LOGGER.warning("%s Trying again due to error: %s", self, msg)
                 continue
             else:
                 break
 
-        _LOGGER.debug(
-            "%s Query worked. Exit code: <%s>", self, resp.status_code)
+        _LOGGER.debug("%s Query %i worked. Exit code: <%s>",
+                      self, cmd_id, resp.status_code)
         return resp
 
     def command_audio(self, cmd, file_content, http_header,
