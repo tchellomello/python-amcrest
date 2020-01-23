@@ -21,12 +21,12 @@ _LOGGER = logging.getLogger(__name__)
 
 
 def _event_lines(ret):
-    line = ''
+    line = ""
     for char in ret.iter_content(decode_unicode=True):
         line = line + char
-        if line.endswith('\r\n'):
+        if line.endswith("\r\n"):
             yield line.strip()
-            line = ''
+            line = ""
 
 
 class Event(object):
@@ -193,21 +193,21 @@ class Event(object):
         except TypeError:
             timeout_cmd = (self._timeout_default, None)
         ret = self.command(
-            'eventManager.cgi?action=attach&codes=[{0}]'.format(eventcodes),
+            "eventManager.cgi?action=attach&codes=[{0}]".format(eventcodes),
             timeout_cmd=timeout_cmd,
-            stream=True
+            stream=True,
         )
         if ret.encoding is None:
-            ret.encoding = 'utf-8'
-
+            ret.encoding = "utf-8"
         try:
             for line in _event_lines(ret):
-                if line.lower().startswith('content-length:'):
-                    chunk_size = int(line.split(':')[1])
-                    yield next(ret.iter_content(
-                        chunk_size=chunk_size, decode_unicode=True))
+                if line.lower().startswith("content-length:"):
+                    chunk_size = int(line.split(":")[1])
+                    yield next(
+                        ret.iter_content(chunk_size=chunk_size, decode_unicode=True)
+                    )
         except (RequestException, HTTPError) as error:
-            _LOGGER.debug('%s Error during event streaming: %r', self, error)
+            _LOGGER.debug("%s Error during event streaming: %r", self, error)
             raise CommError(error)
         finally:
             ret.close()
