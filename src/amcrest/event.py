@@ -188,6 +188,10 @@ class Event(object):
         StorageLowSpace: storage low space event
         AlarmOutput: alarm output event
         """
+        urllib3_logger = logging.getLogger("urllib3.connectionpool")
+        if not any(isinstance(x, NoHeaderErrorFilter) for x in urllib3_logger.filters):
+            urllib3_logger.addFilter(NoHeaderErrorFilter())
+
         try:
             timeout_cmd = (self._timeout_default[0], None)
         except TypeError:
@@ -211,3 +215,15 @@ class Event(object):
             raise CommError(error)
         finally:
             ret.close()
+
+
+class NoHeaderErrorFilter(logging.Filter):
+    """
+    Filter out urllib3 Header Parsing Errors due to a urllib3 bug.
+
+    See https://github.com/urllib3/urllib3/issues/800
+    """
+
+    def filter(self, record):
+        """Filter out Header Parsing Errors."""
+        return "Failed to parse headers" not in record.getMessage()
