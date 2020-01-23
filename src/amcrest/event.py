@@ -10,6 +10,23 @@
 # GNU General Public License for more details.
 #
 # vim:sw=4:ts=4:et
+import logging
+
+from requests import RequestException
+from urllib3.exceptions import HTTPError
+
+from .exceptions import CommError
+
+_LOGGER = logging.getLogger(__name__)
+
+
+def _event_lines(ret):
+    line = ''
+    for char in ret.iter_content(decode_unicode=True):
+        line = line + char
+        if line.endswith('\r\n'):
+            yield line.strip()
+            line = ''
 
 
 class Event(object):
@@ -155,3 +172,42 @@ class Event(object):
             'eventManager.cgi?action=getCaps'
         )
         return ret.content.decode('utf-8')
+
+    def event_stream(self, eventcodes):
+        """
+        Return a stream of event info lines.
+
+        eventcodes: One or more event codes separated by commas with no spaces
+
+        VideoMotion: motion detection event
+        VideoLoss: video loss detection event
+        VideoBlind: video blind detection event
+        AlarmLocal: alarm detection event
+        StorageNotExist: storage not exist event
+        StorageFailure: storage failure event
+        StorageLowSpace: storage low space event
+        AlarmOutput: alarm output event
+        """
+        try:
+            timeout_cmd = (self._timeout_default[0], None)
+        except TypeError:
+            timeout_cmd = (self._timeout_default, None)
+        ret = self.command(
+            'eventManager.cgi?action=attach&codes=[{0}]'.format(eventcodes),
+            timeout_cmd=timeout_cmd,
+            stream=True
+        )
+        if ret.encoding is None:
+            ret.encoding = 'utf-8'
+
+        try:
+            for line in _event_lines(ret):
+                if line.lower().startswith('content-length:'):
+                    chunk_size = int(line.split(':')[1])
+                    yield next(ret.iter_content(
+                        chunk_size=chunk_size, decode_unicode=True))
+        except (RequestException, HTTPError) as error:
+            _LOGGER.debug('%s Error during event streaming: %r', self, error)
+            raise CommError(error)
+        finally:
+            ret.close()
