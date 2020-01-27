@@ -192,10 +192,13 @@ class Event(object):
         if not any(isinstance(x, NoHeaderErrorFilter) for x in urllib3_logger.filters):
             urllib3_logger.addFilter(NoHeaderErrorFilter())
 
+        # Remove read timeout since there's no telling when, if ever,
+        # an event will come.
         try:
             timeout_cmd = (self._timeout_default[0], None)
         except TypeError:
             timeout_cmd = (self._timeout_default, None)
+
         ret = self.command(
             "eventManager.cgi?action=attach&codes=[{0}]".format(eventcodes),
             timeout_cmd=timeout_cmd,
@@ -203,6 +206,7 @@ class Event(object):
         )
         if ret.encoding is None:
             ret.encoding = "utf-8"
+
         try:
             for line in _event_lines(ret):
                 if line.lower().startswith("content-length:"):
