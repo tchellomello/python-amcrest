@@ -173,7 +173,7 @@ class Event(object):
         )
         return ret.content.decode('utf-8')
 
-    def event_stream(self, eventcodes):
+    def event_stream(self, eventcodes, retries=None, timeout_cmd=None):
         """
         Return a stream of event info lines.
 
@@ -192,15 +192,17 @@ class Event(object):
         if not any(isinstance(x, NoHeaderErrorFilter) for x in urllib3_logger.filters):
             urllib3_logger.addFilter(NoHeaderErrorFilter())
 
-        # Remove read timeout since there's no telling when, if ever,
-        # an event will come.
-        try:
-            timeout_cmd = (self._timeout_default[0], None)
-        except TypeError:
-            timeout_cmd = (self._timeout_default, None)
+        # If timeout is not specified, then use default, but remove read timeout since
+        # there's no telling when, if ever, an event will come.
+        if timeout_cmd is None:
+            try:
+                timeout_cmd = (self._timeout_default[0], None)
+            except TypeError:
+                timeout_cmd = (self._timeout_default, None)
 
         ret = self.command(
             "eventManager.cgi?action=attach&codes=[{0}]".format(eventcodes),
+            retries=retries,
             timeout_cmd=timeout_cmd,
             stream=True,
         )
