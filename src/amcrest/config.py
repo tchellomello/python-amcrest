@@ -13,8 +13,13 @@
 
 # How long to wait for the server send data before giving up, as a float
 # or a (connect timeout, read timeout) tuple.
-# Default value from requests library is 3
-TIMEOUT_HTTP_PROTOCOL = 3.0
+# requests library suggests a value slightly larger than a multiple of 3.
+TIMEOUT_HTTP_PROTOCOL = 6.05
+
+# Socket TCP keep alive parameters.
+KEEPALIVE_IDLE = 20
+KEEPALIVE_INTERVAL = 10
+KEEPALIVE_COUNT = 5
 
 # Retries - maximum number of retries each connection should attempt
 # Default value from requests library is 3

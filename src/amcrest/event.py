@@ -10,6 +10,23 @@
 # GNU General Public License for more details.
 #
 # vim:sw=4:ts=4:et
+import logging
+
+from requests import RequestException
+from urllib3.exceptions import HTTPError
+
+from .exceptions import CommError
+
+_LOGGER = logging.getLogger(__name__)
+
+
+def _event_lines(ret):
+    line = ""
+    for char in ret.iter_content(decode_unicode=True):
+        line = line + char
+        if line.endswith("\r\n"):
+            yield line.strip()
+            line = ""
 
 
 class Event(object):
@@ -155,3 +172,64 @@ class Event(object):
             'eventManager.cgi?action=getCaps'
         )
         return ret.content.decode('utf-8')
+
+    def event_stream(self, eventcodes, retries=None, timeout_cmd=None):
+        """
+        Return a stream of event info lines.
+
+        eventcodes: One or more event codes separated by commas with no spaces
+
+        VideoMotion: motion detection event
+        VideoLoss: video loss detection event
+        VideoBlind: video blind detection event
+        AlarmLocal: alarm detection event
+        StorageNotExist: storage not exist event
+        StorageFailure: storage failure event
+        StorageLowSpace: storage low space event
+        AlarmOutput: alarm output event
+        """
+        urllib3_logger = logging.getLogger("urllib3.connectionpool")
+        if not any(isinstance(x, NoHeaderErrorFilter) for x in urllib3_logger.filters):
+            urllib3_logger.addFilter(NoHeaderErrorFilter())
+
+        # If timeout is not specified, then use default, but remove read timeout since
+        # there's no telling when, if ever, an event will come.
+        if timeout_cmd is None:
+            try:
+                timeout_cmd = (self._timeout_default[0], None)
+            except TypeError:
+                timeout_cmd = (self._timeout_default, None)
+
+        ret = self.command(
+            "eventManager.cgi?action=attach&codes=[{0}]".format(eventcodes),
+            retries=retries,
+            timeout_cmd=timeout_cmd,
+            stream=True,
+        )
+        if ret.encoding is None:
+            ret.encoding = "utf-8"
+
+        try:
+            for line in _event_lines(ret):
+                if line.lower().startswith("content-length:"):
+                    chunk_size = int(line.split(":")[1])
+                    yield next(
+                        ret.iter_content(chunk_size=chunk_size, decode_unicode=True)
+                    )
+        except (RequestException, HTTPError) as error:
+            _LOGGER.debug("%s Error during event streaming: %r", self, error)
+            raise CommError(error)
+        finally:
+            ret.close()
+
+
+class NoHeaderErrorFilter(logging.Filter):
+    """
+    Filter out urllib3 Header Parsing Errors due to a urllib3 bug.
+
+    See https://github.com/urllib3/urllib3/issues/800
+    """
+
+    def filter(self, record):
+        """Filter out Header Parsing Errors."""
+        return "Failed to parse headers" not in record.getMessage()
