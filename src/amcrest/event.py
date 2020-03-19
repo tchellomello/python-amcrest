@@ -11,6 +11,7 @@
 #
 # vim:sw=4:ts=4:et
 import logging
+import re
 
 from requests import RequestException
 from urllib3.exceptions import HTTPError
@@ -18,6 +19,7 @@ from urllib3.exceptions import HTTPError
 from .exceptions import CommError
 
 _LOGGER = logging.getLogger(__name__)
+_START_STOP = re.compile(r"Code=([^;]+);action=(Start|Stop)", flags=re.S)
 
 
 def _event_lines(ret):
@@ -221,6 +223,13 @@ class Event(object):
             raise CommError(error)
         finally:
             ret.close()
+
+    def event_actions(self, eventcodes, retries=None, timeout_cmd=None):
+        """Return a stream of event (code, start) tuples."""
+        for event_info in self.event_stream(eventcodes, retries, timeout_cmd):
+            _LOGGER.debug("%s event info: %r", self, event_info)
+            for code, action in _START_STOP.findall(event_info):
+                yield code, action == "Start"
 
 
 class NoHeaderErrorFilter(logging.Filter):
