@@ -48,12 +48,12 @@ from .config import (
 
 _LOGGER = logging.getLogger(__name__)
 
-_KEEPALIVE_OPTS = HTTPConnection.default_socket_options + [
+_KEEPALIVE_OPTS = HTTPConnection.default_socket_options + list(filter(lambda option: option[1], [
     (socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1),
-    (socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, KEEPALIVE_IDLE),
+    (socket.IPPROTO_TCP, socket.TCP_KEEPIDLE if hasattr(socket, "TCP_KEEPIDLE") else None, KEEPALIVE_IDLE), # TCP_KEEPIDLE doesn't exist for Mac
     (socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, KEEPALIVE_INTERVAL),
     (socket.IPPROTO_TCP, socket.TCP_KEEPCNT, KEEPALIVE_COUNT),
-]
+]))
 
 
 class SOHTTPAdapter(HTTPAdapter):

@@ -12,6 +12,7 @@
 #
 # vim:sw=4:ts=4:et
 
+import datetime
 
 class System(object):
     """Amcrest system class."""
@@ -47,6 +48,14 @@ class System(object):
     def __get_config(self, config_name):
         ret = self.command(
             'configManager.cgi?action=getConfig&name={0}'.format(config_name)
+        )
+        return ret.content.decode('utf-8')
+
+    def __set_config(self, *argv):
+        config_strs = "&".join(map(lambda pair: str(pair[0]) + "=" + str(pair[1]), argv))
+        print('configManager.cgi?action=setConfig&{0}'.format(config_strs))
+        ret = self.command(
+            'configManager.cgi?action=setConfig&{0}'.format(config_strs)
         )
         return ret.content.decode('utf-8')
 
@@ -165,3 +174,16 @@ class System(object):
 
         ret = self.command(cmd)
         return ret.content.decode('utf-8')
+
+    def setAutoReboot(self, date, everyday=False):
+        # No reboot
+        if date is None:
+            return self.__set_config(("AutoMaintain.AutoRebootDay", -1))
+        assert isinstance(date, datetime.datetime)
+        date_info = date.timetuple()
+        config = {
+            "AutoMaintain.AutoRebootDay": 7 if everyday else date.isoweekday(),
+            "AutoMaintain.AutoRebootHour": date_info.tm_hour,
+            "AutoMaintain.AutoRebootMinute": date_info.tm_min
+        }
+        return self.__set_config(*config.items())
