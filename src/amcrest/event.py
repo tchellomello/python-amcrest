@@ -19,8 +19,7 @@ from urllib3.exceptions import HTTPError
 from .exceptions import CommError
 
 _LOGGER = logging.getLogger(__name__)
-_START_STOP = re.compile(r"Code=([^;]+);action=(Start|Stop)", flags=re.S)
-
+_REG_PARSE_KEY_VALUE = re.compile(r"(?P<key>.+?)(?:=)(?P<value>.+?)(?:;|$)")
 
 def _event_lines(ret):
     line = ""
@@ -225,11 +224,14 @@ class Event(object):
             ret.close()
 
     def event_actions(self, eventcodes, retries=None, timeout_cmd=None):
-        """Return a stream of event (code, start) tuples."""
+        """Return a stream of event (code, payload) tuples."""
         for event_info in self.event_stream(eventcodes, retries, timeout_cmd):
             _LOGGER.debug("%s event info: %r", self, event_info)
-            for code, action in _START_STOP.findall(event_info):
-                yield code, action == "Start"
+            payload = dict()
+             for Key, Value in _REG_PARSE_KEY_VALUE.findall(event_info.strip().replace('\n', '')):
+                payload[Key] = Value
+            _LOGGER.debug("%s generate new event, code: %s , payload: %s", self, payload['Code'], payload)
+            yield payload['Code'], payload
 
 
 class NoHeaderErrorFilter(logging.Filter):
