@@ -20,6 +20,7 @@ from .exceptions import CommError
 
 _LOGGER = logging.getLogger(__name__)
 _REG_PARSE_KEY_VALUE = re.compile(r"(?P<key>.+?)(?:=)(?P<value>.+?)(?:;|$)")
+_REG_PARSER_MALFORMED_JSON = re.compile(r'(?P<key>"[^"\\]*(?:\\.[^"\\]*)*"|[^\s"]+)\s:\s(?P<value>"[^"\\]*(?:\\.[^"\\]*)*"|[^\s"]+)')
 
 def _event_lines(ret):
     line = ""
@@ -229,10 +230,16 @@ class Event(object):
             _LOGGER.debug("%s event info: %r", self, event_info)
             payload = dict()
              for Key, Value in _REG_PARSE_KEY_VALUE.findall(event_info.strip().replace('\n', '')):
+                if Key == 'data':
+                  tmpData = dict()
+                  for DataKey, DataValue in _REG_PARSER_MALFORMED_JSON.findall(Value):
+                    tmpData[DataKey.replace('"', '')] = DataValue.replace('"', '')
+                  Value = tmpData
                 payload[Key] = Value
             _LOGGER.debug("%s generate new event, code: %s , payload: %s", self, payload['Code'], payload)
             yield payload['Code'], payload
-
+            
+           
 
 class NoHeaderErrorFilter(logging.Filter):
     """
