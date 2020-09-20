@@ -229,7 +229,7 @@ class Event(object):
         for event_info in self.event_stream(eventcodes, retries, timeout_cmd):
             _LOGGER.debug("%s event info: %r", self, event_info)
             payload = dict()
-             for Key, Value in _REG_PARSE_KEY_VALUE.findall(event_info.strip().replace('\n', '')):
+            for Key, Value in _REG_PARSE_KEY_VALUE.findall(event_info.strip().replace('\n', '')):
                 if Key == 'data':
                   tmpData = dict()
                   for DataKey, DataValue in _REG_PARSE_MALFORMED_JSON.findall(Value):
