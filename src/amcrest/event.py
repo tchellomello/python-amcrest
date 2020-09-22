@@ -241,7 +241,7 @@ class Event(object):
                     Value = tmpData
                 payload[Key] = Value
             _LOGGER.debug(
-                "%s generate new event, code: %s , payload: %s", 
+                "%s generate new event, code: %s , payload: %s",
                 self, payload['Code'], payload
             )
             yield payload['Code'], payload
