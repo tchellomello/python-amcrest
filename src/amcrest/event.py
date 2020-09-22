@@ -232,11 +232,11 @@ class Event(object):
             _LOGGER.debug("%s event info: %r", self, event_info)
             payload = dict()
             for Key, Value \
-                in _REG_PARSE_KEY_VALUE.findall(event_info.strip().replace('\n', '')):
+                    in _REG_PARSE_KEY_VALUE.findall(event_info.strip().replace('\n', '')):
                 if Key == 'data':
                     tmpData = dict()
                     for DataKey, DataValue \
-                        in _REG_PARSE_MALFORMED_JSON.findall(Value):
+                            in _REG_PARSE_MALFORMED_JSON.findall(Value):
                         tmpData[DataKey.replace('"', '')] = DataValue.replace('"', '')
                     Value = tmpData
                 payload[Key] = Value
