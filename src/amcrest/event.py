@@ -151,6 +151,8 @@ class Event(object):
         StorageFailure: storage failure event
         StorageLowSpace: storage low space event
         AlarmOutput: alarm output event
+        SmartMotionHuman: human detection event
+        SmartMotionVehicle: vehicle detection event
         """
         ret = self.command(
             'eventManager.cgi?action=getEventIndexes&code={0}'.format(
@@ -170,6 +172,20 @@ class Event(object):
         event = self.event_channels_happened('AlarmLocal')
         return bool('channels' in event)
 
+    @property
+    def is_human_detected(self):
+        event = self.event_channels_happened('SmartMotionHuman')
+        if 'channels' not in event:
+            return False
+        return True
+    
+    @property
+    def is_vehicle_detected(self):
+        event = self.event_channels_happened('SmartMotionVehicle')
+        if 'channels' not in event:
+            return False
+        return True
+    
     @property
     def event_management(self):
         ret = self.command(
@@ -191,6 +207,8 @@ class Event(object):
         StorageFailure: storage failure event
         StorageLowSpace: storage low space event
         AlarmOutput: alarm output event
+        SmartMotionHuman: human detection event
+        SmartMotionVehicle: vehicle detection event
         """
         urllib3_logger = logging.getLogger("urllib3.connectionpool")
         if not any(isinstance(x, NoHeaderErrorFilter) for x in urllib3_logger.filters):
