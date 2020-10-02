@@ -178,14 +178,14 @@ class Event(object):
         if 'channels' not in event:
             return False
         return True
-    
+
     @property
     def is_vehicle_detected(self):
         event = self.event_channels_happened('SmartMotionVehicle')
         if 'channels' not in event:
             return False
         return True
-    
+
     @property
     def event_management(self):
         ret = self.command(
