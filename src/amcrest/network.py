@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 2 of the License.
@@ -10,14 +8,17 @@
 # GNU General Public License for more details.
 #
 # vim:sw=4:ts=4:et
-from contextlib import closing
 import socket
 import threading
+from contextlib import closing
+from typing import List
+
+from .http import Http
 
 
-class Network(object):
+class Network(Http):
 
-    amcrest_ips = []
+    amcrest_ips: List = []
     __RTSP_PORT = 554
     __PWGPSI_PORT = 3800
 
@@ -53,16 +54,7 @@ class Network(object):
 
         # Maximum range from mask
         # Format is mask: max_range
-        max_range = {
-            16: 256,
-            24: 256,
-            25: 128,
-            27: 32,
-            28: 16,
-            29: 8,
-            30: 4,
-            31: 2
-        }
+        max_range = {16: 256, 24: 256, 25: 128, 27: 32, 28: 16, 29: 8, 30: 4, 31: 2}
 
         # If user didn't provide mask, use /24
         if "/" not in subnet:
@@ -101,26 +93,20 @@ class Network(object):
         else:
             for seq1 in range(0, max_range[mask]):
                 ipaddr = "{0}.{1}".format(network, seq1)
-                thd = threading.Thread(
-                    target=self.__raw_scan, args=(ipaddr, timeout)
-                )
+                thd = threading.Thread(target=self.__raw_scan, args=(ipaddr, timeout))
                 thd.start()
 
         return self.amcrest_ips
 
     @property
     def wlan_config(self):
-        ret = self.command(
-            'configManager.cgi?action=getConfig&name=WLan'
-        )
-        return ret.content.decode('utf-8')
+        ret = self.command("configManager.cgi?action=getConfig&name=WLan")
+        return ret.content.decode()
 
     @property
     def telnet_config(self):
-        ret = self.command(
-            'configManager.cgi?action=getConfig&name=Telnet'
-        )
-        return ret.content.decode('utf-8')
+        ret = self.command("configManager.cgi?action=getConfig&name=Telnet")
+        return ret.content.decode()
 
     @telnet_config.setter
     def telnet_config(self, status):
@@ -130,38 +116,29 @@ class Network(object):
             true  - Telnet is enabled
         """
         ret = self.command(
-            'configManager.cgi?action=setConfig&Telnet.Enable={0}'.format(
-                status)
+            "configManager.cgi?action=setConfig&Telnet.Enable={0}".format(status)
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode()
 
     @property
     def network_config(self):
-        ret = self.command(
-            'configManager.cgi?action=getConfig&name=Network'
-        )
-        return ret.content.decode('utf-8')
+        ret = self.command("configManager.cgi?action=getConfig&name=Network")
+        return ret.content.decode()
 
     @property
     def network_interfaces(self):
-        ret = self.command(
-            'netApp.cgi?action=getInterfaces'
-        )
-        return ret.content.decode('utf-8')
+        ret = self.command("netApp.cgi?action=getInterfaces")
+        return ret.content.decode()
 
     @property
     def upnp_status(self):
-        ret = self.command(
-            'netApp.cgi?action=getUPnPStatus'
-        )
-        return ret.content.decode('utf-8')
+        ret = self.command("netApp.cgi?action=getUPnPStatus")
+        return ret.content.decode()
 
     @property
     def upnp_config(self):
-        ret = self.command(
-            'configManager.cgi?action=getConfig&name=UPnP'
-        )
-        return ret.content.decode('utf-8')
+        ret = self.command("configManager.cgi?action=getConfig&name=UPnP")
+        return ret.content.decode()
 
     @upnp_config.setter
     def upnp_config(self, upnp_opt):
@@ -203,20 +180,16 @@ class Network(object):
         upnp_opt format:
         <paramName>=<paramValue>[&<paramName>=<paramValue>...]
         """
-        ret = self.command(
-            'configManager.cgi?action=setConfig&{0}'.format(upnp_opt)
-        )
-        return ret.content.decode('utf-8')
+        ret = self.command("configManager.cgi?action=setConfig&{0}".format(upnp_opt))
+        return ret.content.decode()
 
     @property
     def ntp_config(self):
-        ret = self.command(
-            'configManager.cgi?action=getConfig&name=NTP'
-        )
-        return ret.content.decode('utf-8')
+        ret = self.command("configManager.cgi?action=getConfig&name=NTP")
+        return ret.content.decode()
 
     @ntp_config.setter
-    def ntp_config(self, ntp_opt):
+    def ntp_config(self, ntp_opt: str) -> str:
         """
         ntp_opt is the NTP options listed as example below:
 
@@ -229,15 +202,43 @@ class Network(object):
         ntp_opt format:
         <paramName>=<paramValue>[&<paramName>=<paramValue>...]
         """
-        ret = self.command(
-            'configManager.cgi?action=setConfig&{0}'.format(ntp_opt)
-        )
-        return ret.content.decode('utf-8')
+        ret = self.command("configManager.cgi?action=setConfig&{0}".format(ntp_opt))
+        return ret.content.decode()
 
     @property
-    def rtsp_config(self):
+    def rtsp_config(self) -> str:
         """Get RTSP configuration."""
-        ret = self.command(
-            'configManager.cgi?action=getConfig&name=RTSP'
+        ret = self.command("configManager.cgi?action=getConfig&name=RTSP")
+        return ret.content.decode()
+
+    def rtsp_url(self, channel: int = 1, stream_type: int = 0) -> str:
+        """
+        Return RTSP streaming url
+
+        Params:
+            channelno: integer, the video channel index which starts from 1,
+                       default 1 if not specified.
+
+            typeno: the stream type, default 0 if not specified. It can be
+                    the following value:
+
+                    0-Main Stream
+                    1-Extra Stream 1 (Sub Stream)
+                    2-Extra Stream 2 (Sub Stream)
+        """
+        cmd = f"cam/realmonitor?channel={channel}&subtype={stream_type}"
+
+        try:
+            port_num = [
+                x.split("=")[1]
+                for x in self.rtsp_config.split()
+                if x.startswith("table.RTSP.Port=")
+            ][0]
+        except IndexError:
+            port = ""
+        else:
+            port = f":{port_num}"
+
+        return "rtsp://{}:{}@{}{}/{}".format(
+            self._user, self._password, self._host, port, cmd
         )
-        return ret.content.decode('utf-8')
