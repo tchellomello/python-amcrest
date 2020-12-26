@@ -60,12 +60,16 @@ class Record(Http):
         <paramName>=<paramValue>[&<paramName>=<paramValue>...]
         """
 
-        ret = self.command("configManager.cgi?action=setConfig&{0}".format(rec_opt))
+        ret = self.command(
+            "configManager.cgi?action=setConfig&{0}".format(rec_opt)
+        )
         return ret.content.decode()
 
     @property
     def media_global_config(self) -> str:
-        ret = self.command("configManager.cgi?action=getConfig&name=MediaGlobal")
+        ret = self.command(
+            "configManager.cgi?action=getConfig&name=MediaGlobal"
+        )
         return ret.content.decode()
 
     def record_mode(self, *, channel: int = 0) -> str:
@@ -73,7 +77,9 @@ class Record(Http):
 
         ret = self.command("configManager.cgi?action=getConfig&name=RecordMode")
         statuses = [
-            pretty(s) for s in ret.content.decode().split() if f"[{channel}].Mode=" in s
+            pretty(s)
+            for s in ret.content.decode().split()
+            if f"[{channel}].Mode=" in s
         ]
         if len(statuses) != 1:
             return "Unknown"

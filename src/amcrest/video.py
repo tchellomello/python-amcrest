@@ -44,12 +44,16 @@ class Video(Http):
 
     @property
     def encode_region_interested(self) -> str:
-        ret = self.command("configManager.cgi?action=getConfig&name=VideoEncodeROI")
+        ret = self.command(
+            "configManager.cgi?action=getConfig&name=VideoEncodeROI"
+        )
         return ret.content.decode()
 
     @property
     def video_channel_title(self) -> str:
-        ret = self.command("configManager.cgi?action=getConfig&name=ChannelTitle")
+        ret = self.command(
+            "configManager.cgi?action=getConfig&name=ChannelTitle"
+        )
         return ret.content.decode()
 
     # pylint: disable=invalid-name
@@ -74,21 +78,29 @@ class Video(Http):
 
     @property
     def video_standard(self) -> str:
-        ret = self.command("configManager.cgi?action=getConfig&name=VideoStandard")
+        ret = self.command(
+            "configManager.cgi?action=getConfig&name=VideoStandard"
+        )
         return ret.content.decode()
 
     @video_standard.setter
     def video_standard(self, std: str) -> str:
-        ret = self.command(f"configManager.cgi?action=setConfig&VideoStandard={std}")
+        ret = self.command(
+            f"configManager.cgi?action=setConfig&VideoStandard={std}"
+        )
         return ret.content.decode()
 
     @property
     def video_widget_config(self) -> str:
-        ret = self.command("configManager.cgi?action=getConfig&name=VideoWidget")
+        ret = self.command(
+            "configManager.cgi?action=getConfig&name=VideoWidget"
+        )
         return ret.content.decode()
 
     def video_input_capability(self, channel: int) -> str:
-        ret = self.command(f"devVideoInput.cgi?action=getCaps&channel={channel}")
+        ret = self.command(
+            f"devVideoInput.cgi?action=getCaps&channel={channel}"
+        )
         return ret.content.decode()
 
     def video_coordinates_current_window(self, channel: int) -> str:
@@ -99,7 +111,9 @@ class Video(Http):
 
     @property
     def video_in_options(self) -> str:
-        ret = self.command("configManager.cgi?action=getConfig&name=VideoInOptions")
+        ret = self.command(
+            "configManager.cgi?action=getConfig&name=VideoInOptions"
+        )
         return ret.content.decode()
 
     def video_in_option(self, param: str) -> List[str]:
@@ -140,7 +154,9 @@ class Video(Http):
     def set_day_night_color(self, value: int, channel: int) -> str:
         return self.set_video_in_option("DayNightColor", value, channel=channel)
 
-    def get_smart_ir(self, *, channel: Optional[int] = None) -> Union[bool, List[bool]]:
+    def get_smart_ir(
+        self, *, channel: Optional[int] = None
+    ) -> Union[bool, List[bool]]:
         """Return if SmartIR is on."""
         ret = [value == "false" for value in self.video_in_option("InfraRed")]
         if channel is None:

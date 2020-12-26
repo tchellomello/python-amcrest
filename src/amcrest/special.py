@@ -22,7 +22,10 @@ _LOGGER = logging.getLogger(__name__)
 
 class Special(Http):
     def realtime_stream(
-        self, channel: int = 1, stream_type: int = 0, path_file: Optional[str] = None
+        self,
+        channel: int = 1,
+        stream_type: int = 0,
+        path_file: Optional[str] = None,
     ):
         """
         If the stream is redirect to a file, use mplayer tool to
@@ -42,7 +45,8 @@ class Special(Http):
                     shutil.copyfileobj(ret.raw, out_file)
             except HTTPError as error:
                 _LOGGER.debug(
-                    "%s Realtime stream capture to file failed due " "to error: %s",
+                    "%s Realtime stream capture to file failed due "
+                    "to error: %s",
                     self,
                     repr(error),
                 )
@@ -90,7 +94,10 @@ class Special(Http):
         return cmd
 
     def mjpg_stream(
-        self, channel: int = 1, stream_type: int = 1, path_file: Optional[str] = None
+        self,
+        channel: int = 1,
+        stream_type: int = 1,
+        path_file: Optional[str] = None,
     ):
         """
         Params:

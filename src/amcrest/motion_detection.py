@@ -17,7 +17,9 @@ from .utils import pretty
 
 class MotionDetection(Http):
     def __get_config(self, config_name) -> str:
-        ret = self.command(f"configManager.cgi?action=getConfig&name={config_name}")
+        ret = self.command(
+            f"configManager.cgi?action=getConfig&name={config_name}"
+        )
         return ret.content.decode()
 
     @property
@@ -31,7 +33,9 @@ class MotionDetection(Http):
 
     def is_record_on_motion_detection(self, *, channel: int = 0) -> bool:
         ret = self.motion_detection
-        status = [pretty(s) for s in ret.split() if ".RecordEnable=" in s][channel]
+        status = [pretty(s) for s in ret.split() if ".RecordEnable=" in s][
+            channel
+        ]
         return str2bool(status)  # pylint: disable=no-value-for-parameter
 
     def set_motion_detection(self, opt: bool, *, channel: int = 0) -> bool:

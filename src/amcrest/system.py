@@ -146,5 +146,7 @@ class System(Http):
 
     def __get_config(self, config_name: str) -> str:
         """Get the config"""
-        ret = self.command(f"configManager.cgi?action=getConfig&name={config_name}")
+        ret = self.command(
+            f"configManager.cgi?action=getConfig&name={config_name}"
+        )
         return ret.content.decode()

@@ -88,7 +88,9 @@ class Http:
             if retries_connection is not None
             else MAX_RETRY_HTTP_CONNECTION
         )
-        self._timeout_default: TimeoutT = timeout_protocol or TIMEOUT_HTTP_PROTOCOL
+        self._timeout_default: TimeoutT = (
+            timeout_protocol or TIMEOUT_HTTP_PROTOCOL
+        )
 
         self._token: Optional[requests.auth.AuthBase] = None
         self._name: Optional[str] = None
@@ -100,11 +102,15 @@ class Http:
         try:
             try:
                 _LOGGER.debug("%s Trying Basic Authentication", self)
-                self._token = requests.auth.HTTPBasicAuth(self._user, self._password)
+                self._token = requests.auth.HTTPBasicAuth(
+                    self._user, self._password
+                )
                 resp = self._command(cmd).content.decode()
             except LoginError:
                 _LOGGER.debug("%s Trying Digest Authentication", self)
-                self._token = requests.auth.HTTPDigestAuth(self._user, self._password)
+                self._token = requests.auth.HTTPDigestAuth(
+                    self._user, self._password
+                )
                 resp = self._command(cmd).content.decode()
         except Exception:
             self._token = None
@@ -114,7 +120,9 @@ class Http:
         result = resp.lower()
         if "invalid" in result or "error" in result:
             _LOGGER.debug(
-                "%s Result from camera: %s", self, resp.strip().replace("\r\n", ": ")
+                "%s Result from camera: %s",
+                self,
+                resp.strip().replace("\r\n", ": "),
             )
             self._token = None
             raise LoginError("Invalid credentials")
@@ -123,7 +131,9 @@ class Http:
 
         _LOGGER.debug("Retrieving serial number for %s", self._name)
         self._serial = pretty(
-            self._command("magicBox.cgi?action=getSerialNo").content.decode().strip()
+            self._command("magicBox.cgi?action=getSerialNo")
+            .content.decode()
+            .strip()
         )
 
     def __repr__(self) -> str:
@@ -189,7 +199,9 @@ class Http:
                 )
 
             for loop in range(1, 2 + retries):
-                _LOGGER.debug("%s Running query %i attempt %s", self, cmd_id, loop)
+                _LOGGER.debug(
+                    "%s Running query %i attempt %s", self, cmd_id, loop
+                )
                 try:
                     resp = session.get(
                         url,
@@ -199,28 +211,42 @@ class Http:
                         verify=self._verify,
                     )
                     if resp.status_code == 401:
-                        _LOGGER.debug("%s Query %i: Unauthorized (401)", self, cmd_id)
+                        _LOGGER.debug(
+                            "%s Query %i: Unauthorized (401)", self, cmd_id
+                        )
                         self._token = None
                         raise LoginError()
                     resp.raise_for_status()
                 except requests.RequestException as error:
                     _LOGGER.debug(
-                        "%s Query %i failed due to error: %r", self, cmd_id, error
+                        "%s Query %i failed due to error: %r",
+                        self,
+                        cmd_id,
+                        error,
                     )
                     if loop > retries:
                         raise CommError(error)
-                    msg = re.sub(r"at 0x[0-9a-fA-F]+", "at ADDRESS", repr(error))
-                    _LOGGER.warning("%s Trying again due to error: %s", self, msg)
+                    msg = re.sub(
+                        r"at 0x[0-9a-fA-F]+", "at ADDRESS", repr(error)
+                    )
+                    _LOGGER.warning(
+                        "%s Trying again due to error: %s", self, msg
+                    )
                     continue
                 else:
                     break
 
         _LOGGER.debug(
-            "%s Query %i worked. Exit code: <%s>", self, cmd_id, resp.status_code
+            "%s Query %i worked. Exit code: <%s>",
+            self,
+            cmd_id,
+            resp.status_code,
         )
         return resp
 
-    def command_audio(self, cmd, file_content, http_header, timeout=None) -> None:
+    def command_audio(
+        self, cmd, file_content, http_header, timeout=None
+    ) -> None:
         with self._token_lock:
             if not self._token:
                 self._generate_token()

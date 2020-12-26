@@ -28,7 +28,9 @@ _REG_PARSE_MALFORMED_JSON = re.compile(
 
 class Event(Http):
     def event_handler_config(self, handlername: str) -> str:
-        ret = self.command(f"configManager.cgi?action=getConfig&name={handlername}")
+        ret = self.command(
+            f"configManager.cgi?action=getConfig&name={handlername}"
+        )
         return ret.content.decode()
 
     @property
@@ -104,7 +106,9 @@ class Event(Http):
         StorageLowSpace: storage low space event
         AlarmOutput: alarm output event
         """
-        ret = self.command(f"eventManager.cgi?action=getEventIndexes&code={eventcode}")
+        ret = self.command(
+            f"eventManager.cgi?action=getEventIndexes&code={eventcode}"
+        )
         output = ret.content.decode()
         if "Error" in output:
             return []
@@ -149,7 +153,9 @@ class Event(Http):
         AlarmOutput: alarm output event
         """
         urllib3_logger = logging.getLogger("urllib3.connectionpool")
-        if not any(isinstance(x, NoHeaderErrorFilter) for x in urllib3_logger.filters):
+        if not any(
+            isinstance(x, NoHeaderErrorFilter) for x in urllib3_logger.filters
+        ):
             urllib3_logger.addFilter(NoHeaderErrorFilter())
 
         # If timeout is not specified, then use default, but remove read timeout since
@@ -173,10 +179,14 @@ class Event(Http):
                     if line.lower().startswith("content-length:"):
                         chunk_size = int(line.split(":")[1])
                         yield next(
-                            ret.iter_content(chunk_size=chunk_size, decode_unicode=True)
+                            ret.iter_content(
+                                chunk_size=chunk_size, decode_unicode=True
+                            )
                         )
             except (RequestException, HTTPError) as error:
-                _LOGGER.debug("%s Error during event streaming: %r", self, error)
+                _LOGGER.debug(
+                    "%s Error during event streaming: %r", self, error
+                )
                 raise CommError(error) from error
 
     def event_actions(

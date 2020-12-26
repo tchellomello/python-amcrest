@@ -23,7 +23,9 @@ _LOGGER = logging.getLogger(__name__)
 
 class Snapshot(Http):
     def _get_config(self, config_name: str) -> str:
-        ret = self.command(f"configManager.cgi?action=getConfig&name={config_name}")
+        ret = self.command(
+            f"configManager.cgi?action=getConfig&name={config_name}"
+        )
         return ret.content.decode()
 
     @property

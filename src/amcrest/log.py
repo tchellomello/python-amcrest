@@ -47,7 +47,9 @@ class Log(Http):
         ret = self.command(f"log.cgi?action=stopFind&token={token}")
         return ret.content.decode()
 
-    def log_find(self, start_time: datetime, end_time: datetime) -> Iterable[str]:
+    def log_find(
+        self, start_time: datetime, end_time: datetime
+    ) -> Iterable[str]:
         token = self.log_find_start(start_time, end_time).strip().split("=")[1]
         if int(token) <= 0:
             return

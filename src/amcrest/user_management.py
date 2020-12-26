@@ -30,7 +30,9 @@ class UserManagement(Http):
         return ret.content.decode()
 
     def info_group(self, group):
-        ret = self.command("userManager.cgi?action=getGroupInfo&name={0}".format(group))
+        ret = self.command(
+            "userManager.cgi?action=getGroupInfo&name={0}".format(group)
+        )
         return ret.content.decode()
 
     @property
@@ -45,7 +47,13 @@ class UserManagement(Http):
         return ret.content.decode()
 
     def add_user(
-        self, username, password, group, sharable=True, reserved=False, memo=None
+        self,
+        username,
+        password,
+        group,
+        sharable=True,
+        reserved=False,
+        memo=None,
     ):
         """
         Params:
@@ -65,7 +73,11 @@ class UserManagement(Http):
             "userManager.cgi?action=addUser&user.Name={0}"
             "&user.Password={1}&user.Group={2}&user.Sharable={3}"
             "&user.Reserved={4}".format(
-                username, password, group.lower(), sharable.lower(), reserved.lower()
+                username,
+                password,
+                group.lower(),
+                sharable.lower(),
+                reserved.lower(),
             )
         )
 

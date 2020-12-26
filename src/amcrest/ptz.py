@@ -24,7 +24,9 @@ class Ptz(Http):
 
     @property
     def ptz_auto_movement(self) -> str:
-        ret = self.command("configManager.cgi?action=getConfig&name=PtzAutoMovement")
+        ret = self.command(
+            "configManager.cgi?action=getConfig&name=PtzAutoMovement"
+        )
         return ret.content.decode()
 
     def ptz_presets_list(self, channel: int = 0) -> str:
@@ -40,7 +42,9 @@ class Ptz(Http):
         return ret.content.decode()
 
     def ptz_tour_routines_list(self, channel: int = 0) -> str:
-        ret = self.command(f"configManager.cgi?action=getTours&channel={channel}")
+        ret = self.command(
+            f"configManager.cgi?action=getTours&channel={channel}"
+        )
         return ret.content.decode()
 
     def ptz_control_command(
@@ -89,7 +93,9 @@ class Ptz(Http):
             channel=channel,
         )
 
-    def move_left(self, start: bool, channel: int = 0, vertical_speed: int = 1) -> str:
+    def move_left(
+        self, start: bool, channel: int = 0, vertical_speed: int = 1
+    ) -> str:
         """
         Params:
             action              - start or stop
@@ -106,7 +112,9 @@ class Ptz(Http):
             channel=channel,
         )
 
-    def move_right(self, start: bool, channel: int = 0, vertical_speed: int = 1) -> str:
+    def move_right(
+        self, start: bool, channel: int = 0, vertical_speed: int = 1
+    ) -> str:
         """
         Params:
             action              - start or stop
@@ -123,7 +131,9 @@ class Ptz(Http):
             channel=channel,
         )
 
-    def move_up(self, start: bool, channel: int = 0, vertical_speed: int = 1) -> str:
+    def move_up(
+        self, start: bool, channel: int = 0, vertical_speed: int = 1
+    ) -> str:
         """
         Params:
             action              - start or stop
@@ -140,7 +150,9 @@ class Ptz(Http):
             channel=channel,
         )
 
-    def move_down(self, start: bool, channel: int = 0, vertical_speed: int = 1) -> str:
+    def move_down(
+        self, start: bool, channel: int = 0, vertical_speed: int = 1
+    ) -> str:
         """
         The magic of move down 1x, 2x etc. is the timer between the cmd
         'start' and cmd 'stop'. My suggestion for start/stop cmd is 0.2 sec

@@ -54,7 +54,16 @@ class Network(Http):
 
         # Maximum range from mask
         # Format is mask: max_range
-        max_range = {16: 256, 24: 256, 25: 128, 27: 32, 28: 16, 29: 8, 30: 4, 31: 2}
+        max_range = {
+            16: 256,
+            24: 256,
+            25: 128,
+            27: 32,
+            28: 16,
+            29: 8,
+            30: 4,
+            31: 2,
+        }
 
         # If user didn't provide mask, use /24
         if "/" not in subnet:
@@ -93,7 +102,9 @@ class Network(Http):
         else:
             for seq1 in range(0, max_range[mask]):
                 ipaddr = "{0}.{1}".format(network, seq1)
-                thd = threading.Thread(target=self.__raw_scan, args=(ipaddr, timeout))
+                thd = threading.Thread(
+                    target=self.__raw_scan, args=(ipaddr, timeout)
+                )
                 thd.start()
 
         return self.amcrest_ips
@@ -116,7 +127,9 @@ class Network(Http):
             true  - Telnet is enabled
         """
         ret = self.command(
-            "configManager.cgi?action=setConfig&Telnet.Enable={0}".format(status)
+            "configManager.cgi?action=setConfig&Telnet.Enable={0}".format(
+                status
+            )
         )
         return ret.content.decode()
 
@@ -180,7 +193,9 @@ class Network(Http):
         upnp_opt format:
         <paramName>=<paramValue>[&<paramName>=<paramValue>...]
         """
-        ret = self.command("configManager.cgi?action=setConfig&{0}".format(upnp_opt))
+        ret = self.command(
+            "configManager.cgi?action=setConfig&{0}".format(upnp_opt)
+        )
         return ret.content.decode()
 
     @property
@@ -202,7 +217,9 @@ class Network(Http):
         ntp_opt format:
         <paramName>=<paramValue>[&<paramName>=<paramValue>...]
         """
-        ret = self.command("configManager.cgi?action=setConfig&{0}".format(ntp_opt))
+        ret = self.command(
+            "configManager.cgi?action=setConfig&{0}".format(ntp_opt)
+        )
         return ret.content.decode()
 
     @property

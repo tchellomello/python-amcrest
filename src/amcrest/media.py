@@ -76,13 +76,21 @@ class Media(Http):
                 If omitted, find files with all the stream types.
         """
 
-        c_dirs = "".join(f"&condition.Dirs[{k}]={v}" for k, v in enumerate(directories))
+        c_dirs = "".join(
+            f"&condition.Dirs[{k}]={v}" for k, v in enumerate(directories)
+        )
 
-        c_types = "".join(f"&condition.Types[{k}]={v}" for k, v in enumerate(types))
+        c_types = "".join(
+            f"&condition.Types[{k}]={v}" for k, v in enumerate(types)
+        )
 
-        c_flag = "".join(f"&condition.Flag[{k}]={v}" for k, v in enumerate(flags))
+        c_flag = "".join(
+            f"&condition.Flag[{k}]={v}" for k, v in enumerate(flags)
+        )
 
-        c_events = "".join(f"&condition.Events[{k}]={v}" for k, v in enumerate(events))
+        c_events = "".join(
+            f"&condition.Events[{k}]={v}" for k, v in enumerate(events)
+        )
 
         c_vs = f"&condition.VideoStream={stream}" if stream else ""
 
@@ -187,7 +195,9 @@ class Media(Http):
         else:
             _LOGGER.debug("%s returned error: %s", self, search)
 
-    def download_file(self, file_path: str, timeout=None, stream=False) -> bytes:
+    def download_file(
+        self, file_path: str, timeout=None, stream=False
+    ) -> bytes:
         """
         file_path: File location like returned by FilePath from find_files()
                    Example: /mnt/sd/2019-12-31/001/dav/00/00.12.00-00.20.00.mp4
@@ -196,7 +206,9 @@ class Media(Http):
                    reading content into memory
         """
         ret = self.command(
-            "RPC_Loadfile/{0}".format(file_path), timeout_cmd=timeout, stream=stream
+            "RPC_Loadfile/{0}".format(file_path),
+            timeout_cmd=timeout,
+            stream=stream,
         )
         return ret.content
 

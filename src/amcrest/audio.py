@@ -75,7 +75,10 @@ class Audio(Http):
         if httptype is None or channel is None:
             raise RuntimeError("Requires htttype and channel")
 
-        header = {"content-type": "Audio/" + encode, "content-length": "9999999"}
+        header = {
+            "content-type": "Audio/" + encode,
+            "content-length": "9999999",
+        }
 
         with open(path_file, "rb") as f:
             file_audio = {"file": f}
