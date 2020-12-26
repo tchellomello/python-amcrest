@@ -58,8 +58,8 @@ class Ptz(Http):
         channel: int = 0,
     ) -> str:
         ret = self.command(
-            f"ptz.cgi?action={action}&channel={channel}&code={code}&arg1={arg1}"
-            f"&arg2={arg2}&arg3={arg3}"
+            f"ptz.cgi?action={action}&channel={channel}&code={code}&"
+            f"arg1={arg1}&arg2={arg2}&arg3={arg3}"
         )
         return ret.content.decode()
 
@@ -363,7 +363,8 @@ class Ptz(Http):
     ) -> str:
         """three-dimensional orientation.
 
-        Move to the rectangle with screen coordinate [startX, startY], [endX, endY]
+        Move to the rectangle with screen coordinate
+        [startX, startY], [endX, endY]
 
         Params:
             channel                        - channel index, start with 1

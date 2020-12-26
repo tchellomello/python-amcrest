@@ -26,7 +26,8 @@ class Log(Http):
         start = date_to_str(start_time)
         end = date_to_str(end_time)
         ret = self.command(
-            f"Log.backup?action=All&condition.StartTime={start}&condition.EndTime={end}"
+            f"Log.backup?action=All&"
+            f"condition.StartTime={start}&condition.EndTime={end}"
         )
         return ret.content.decode()
 
@@ -34,7 +35,8 @@ class Log(Http):
         start = date_to_str(start_time)
         end = date_to_str(end_time)
         ret = self.command(
-            f"log.cgi?action=startFind&condition.StartTime={start}&condition.EndTime={end}"
+            f"log.cgi?action=startFind&"
+            f"condition.StartTime={start}&condition.EndTime={end}"
         )
 
         return ret.content.decode()

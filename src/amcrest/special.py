@@ -35,7 +35,8 @@ class Special(Http):
         $ mplayer /home/user/Desktop/myvideo
         """
         ret = self.command(
-            f"realmonitor.cgi?action=getStream&channel={channel}&subtype={stream_type}",
+            f"realmonitor.cgi?action=getStream&channel={channel}&"
+            f"subtype={stream_type}",
             stream=True,
         )
 
@@ -90,7 +91,10 @@ class Special(Http):
                     1-Extra Stream 1 (Sub Stream)
                     2-Extra Stream 2 (Sub Stream)
         """
-        cmd = f"{self._base_url}mjpg/video.cgi?channel={channel}&subtype={stream_type}"
+        cmd = (
+            f"{self._base_url}mjpg/video.cgi?"
+            f"channel={channel}&subtype={stream_type}"
+        )
         return cmd
 
     def mjpg_stream(

@@ -94,27 +94,20 @@ class Media(Http):
 
         c_vs = f"&condition.VideoStream={stream}" if stream else ""
 
+        start = date_to_str(start_time)
+        end = date_to_str(end_time)
+        extra_cond = "".join([c_dirs, c_types, c_flag, c_events, c_vs])
         ret = self.command(
-            "mediaFileFind.cgi?action=findFile&object={0}&condition.Channel"
-            "={1}&condition.StartTime={2}&condition.EndTime={3}{4}{5}{6}{7}{8}".format(
-                factory_id,
-                channel,
-                date_to_str(start_time),
-                date_to_str(end_time),
-                c_dirs,
-                c_types,
-                c_flag,
-                c_events,
-                c_vs,
-            )
+            f"mediaFileFind.cgi?action=findFile&object={factory_id}&"
+            f"condition.Channel={channel}&condition.StartTime={start}&"
+            f"condition.EndTime={end}{extra_cond}"
         )
         return ret.content.decode()
 
     def media_file_find_next(self, factory_id: str, count: int = 100) -> str:
         ret = self.command(
-            "mediaFileFind.cgi?action=findNextFile&object={0}&count={1}".format(
-                factory_id, count
-            )
+            "mediaFileFind.cgi?action=findNextFile&"
+            f"object={factory_id}&count={count}"
         )
 
         return ret.content.decode()
@@ -226,6 +219,7 @@ class Media(Http):
         start = date_to_str(start_time)
         end = date_to_str(end_time)
         ret = self.command(
-            f"loadfile.cgi?action=startLoad&channel={channel}&startTime={start}&endTime={end}&subtype={stream}"
+            f"loadfile.cgi?action=startLoad&channel={channel}&"
+            f"startTime={start}&endTime={end}&subtype={stream}"
         )
         return ret.content

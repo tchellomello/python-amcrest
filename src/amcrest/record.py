@@ -113,6 +113,7 @@ class Record(Http):
         <paramName>=<paramValue>[&<paramName>=<paramValue>...]
         """
         ret = self.command(
-            f"configManager.cgi?action=setConfig&RecordMode[{channel}].Mode={record_opt}"
+            f"configManager.cgi?action=setConfig&RecordMode[{channel}]."
+            f"Mode={record_opt}"
         )
         return ret.content.decode()

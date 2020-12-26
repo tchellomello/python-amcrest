@@ -189,7 +189,7 @@ class Http:
         timeout = timeout_cmd or self._timeout_default
         with requests.Session() as session:
             try:
-                use_keepalive = timeout[0] is None or timeout[1] is None  # type: ignore[index]
+                use_keepalive = timeout[0] is None or timeout[1] is None
             except TypeError:
                 use_keepalive = timeout is None
             if use_keepalive:

@@ -50,6 +50,7 @@ class MotionDetection(Http):
         value = "true" if opt else "false"
         ret = self.command(
             "configManager.cgi?action="
-            f"setConfig&MotionDetect[{channel}].EventHandler.RecordEnable={value}"
+            f"setConfig&MotionDetect[{channel}].EventHandler."
+            f"RecordEnable={value}"
         )
         return "ok" in ret.content.decode().lower()

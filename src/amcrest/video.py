@@ -76,7 +76,8 @@ class Video(Http):
     @property
     def video_max_remote_input_channels(self) -> str:
         ret = self.command(
-            "magicBox.cgi?action=getProductDefinition&name=MaxRemoteInputChannels"
+            "magicBox.cgi?action=getProductDefinition&name="
+            "MaxRemoteInputChannels"
         )
         return ret.content.decode()
 
@@ -134,7 +135,8 @@ class Video(Http):
 
     def set_video_in_option(self, param, value, *, channel: int) -> str:
         ret = self.command(
-            f"configManager.cgi?action=setConfig&VideoInOptions[{channel}].{param}={value}"
+            "configManager.cgi?action=setConfig&"
+            f"VideoInOptions[{channel}].{param}={value}"
         )
         return ret.content.decode()
 

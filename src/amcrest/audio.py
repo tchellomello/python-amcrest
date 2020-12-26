@@ -80,10 +80,11 @@ class Audio(Http):
             "content-length": "9999999",
         }
 
+        cmd = f"audio.cgi?action=postAudio&httptype={httptype}&channel={channel}"
         with open(path_file, "rb") as f:
             file_audio = {"file": f}
             self.command_audio(
-                f"audio.cgi?action=postAudio&httptype={httptype}&channel={channel}",
+                cmd,
                 file_content=file_audio,
                 http_header=header,
             )

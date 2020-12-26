@@ -158,10 +158,10 @@ class Event(Http):
         ):
             urllib3_logger.addFilter(NoHeaderErrorFilter())
 
-        # If timeout is not specified, then use default, but remove read timeout since
-        # there's no telling when, if ever, an event will come.
+        # If timeout is not specified, then use default, but remove read
+        # timeout since there's no telling when, if ever, an event will come.
         try:
-            timeout_cmd = self._timeout_default[0], None  # type: ignore[index]
+            timeout_cmd = self._timeout_default[0], None
         except TypeError:
             timeout_cmd = self._timeout_default, None
 
@@ -204,9 +204,8 @@ class Event(Http):
                 if Key == "data":
                     Value = {
                         DataKey.replace('"', ""): DataValue.replace('"', "")
-                        for DataKey, DataValue in _REG_PARSE_MALFORMED_JSON.findall(
-                            Value
-                        )
+                        for DataKey, DataValue in
+                        _REG_PARSE_MALFORMED_JSON.findall(Value)
                     }
                 payload[Key] = Value
             _LOGGER.debug(
