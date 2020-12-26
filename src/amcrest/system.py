@@ -102,7 +102,9 @@ class System(Http):
 
     @property
     def onvif_information(self) -> str:
-        ret = self.command("IntervideoManager.cgi?action=getVersion&Name=Onvif")
+        ret = self.command(
+            "IntervideoManager.cgi?action=getVersion&Name=Onvif"
+        )
         return ret.content.decode().strip()
 
     def config_backup(self, filename=None) -> Optional[str]:

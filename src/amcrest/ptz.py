@@ -232,7 +232,9 @@ class Ptz(Http):
             channel=channel,
         )
 
-    def set_preset(self, channel: int = 0, preset_point_number: int = 1) -> str:
+    def set_preset(
+        self, channel: int = 0, preset_point_number: int = 1
+    ) -> str:
         """
         Params:
             action              - start or stop

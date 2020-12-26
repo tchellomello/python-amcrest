@@ -75,7 +75,9 @@ class Record(Http):
     def record_mode(self, *, channel: int = 0) -> str:
         status_code = {"0": "Automatic", "1": "Manual", "2": "Stop"}
 
-        ret = self.command("configManager.cgi?action=getConfig&name=RecordMode")
+        ret = self.command(
+            "configManager.cgi?action=getConfig&name=RecordMode"
+        )
         statuses = [
             pretty(s)
             for s in ret.content.decode().split()

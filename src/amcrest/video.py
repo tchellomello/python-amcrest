@@ -25,7 +25,9 @@ class Video(Http):
 
     @property
     def video_color_config(self) -> str:
-        ret = self.command("configManager.cgi?action=getConfig&name=VideoColor")
+        ret = self.command(
+            "configManager.cgi?action=getConfig&name=VideoColor"
+        )
         return ret.content.decode()
 
     @property
@@ -34,7 +36,9 @@ class Video(Http):
         return ret.content.decode()
 
     def encode_config_capability(self, channel: int) -> str:
-        ret = self.command(f"encode.cgi?action=getConfigCaps&channel={channel}")
+        ret = self.command(
+            f"encode.cgi?action=getConfigCaps&channel={channel}"
+        )
         return ret.content.decode()
 
     @property
@@ -152,7 +156,9 @@ class Video(Http):
         return color_modes[channel]
 
     def set_day_night_color(self, value: int, channel: int) -> str:
-        return self.set_video_in_option("DayNightColor", value, channel=channel)
+        return self.set_video_in_option(
+            "DayNightColor", value, channel=channel
+        )
 
     def get_smart_ir(
         self, *, channel: Optional[int] = None

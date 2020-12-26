@@ -40,7 +40,9 @@ class Log(Http):
         return ret.content.decode()
 
     def log_find_next(self, token: str, count: int = 100) -> str:
-        ret = self.command(f"log.cgi?action=doFind&token={token}&count={count}")
+        ret = self.command(
+            f"log.cgi?action=doFind&token={token}&count={count}"
+        )
         return ret.content.decode()
 
     def log_find_stop(self, token: str) -> str:
