@@ -37,4 +37,6 @@ pycrest_PYTHON = \
 	utils.py \
 	nas.py \
 	storage.py \
+	exceptions.py \
+	media.py \
 	$(NULL)

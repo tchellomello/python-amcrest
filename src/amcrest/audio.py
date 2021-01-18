@@ -37,7 +37,7 @@ class Audio(object):
         return ret.content.decode('utf-8')
 
     def play_wav(self, httptype=None, channel=None,
-                 path_file=None):
+                 path_file=None, encoding='G.711A'):
 
         if httptype is None:
             httptype = 'singlepart'
@@ -48,7 +48,7 @@ class Audio(object):
         if path_file is None:
             raise RuntimeError('filename is required')
 
-        self.audio_send_stream(httptype, channel, path_file, 'G.711A')
+        self.audio_send_stream(httptype, channel, path_file, encoding)
 
     def audio_send_stream(self, httptype=None,
                           channel=None, path_file=None, encode=None):

@@ -12,9 +12,12 @@
 # vim:sw=4:ts=4:et
 import logging
 import re
+import socket
 import threading
 
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.connection import HTTPConnection
 
 from .exceptions import CommError, LoginError
 from .utils import clean_url, pretty
@@ -35,9 +38,40 @@ from .system import System
 from .user_management import UserManagement
 from .video import Video
 
-from .config import TIMEOUT_HTTP_PROTOCOL, MAX_RETRY_HTTP_CONNECTION
+from .config import (
+    KEEPALIVE_COUNT,
+    KEEPALIVE_IDLE,
+    KEEPALIVE_INTERVAL,
+    MAX_RETRY_HTTP_CONNECTION,
+    TIMEOUT_HTTP_PROTOCOL,
+)
 
 _LOGGER = logging.getLogger(__name__)
+
+_KEEPALIVE_OPTS = HTTPConnection.default_socket_options + [
+    (socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1),
+]
+# On some systems TCP_KEEP* are not defined in socket.
+try:
+    _KEEPALIVE_OPTS += [
+        (socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, KEEPALIVE_IDLE),
+        (socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, KEEPALIVE_INTERVAL),
+        (socket.IPPROTO_TCP, socket.TCP_KEEPCNT, KEEPALIVE_COUNT),
+    ]
+except AttributeError:
+    pass
+
+
+class SOHTTPAdapter(HTTPAdapter):
+    """HTTPAdapter with support for socket options."""
+    def __init__(self, *args, **kwargs):
+        self.socket_options = kwargs.pop("socket_options", None)
+        super(SOHTTPAdapter, self).__init__(*args, **kwargs)
+
+    def init_poolmanager(self, *args, **kwargs):
+        if self.socket_options is not None:
+            kwargs["socket_options"] = self.socket_options
+        super(SOHTTPAdapter, self).init_poolmanager(*args, **kwargs)
 
 
 # pylint: disable=too-many-ancestors
@@ -50,6 +84,8 @@ class Http(System, Network, MotionDetection, Snapshot,
                  retries_connection=None, timeout_protocol=None):
 
         self._token_lock = threading.Lock()
+        self._cmd_id_lock = threading.Lock()
+        self._cmd_id = 0
         self._host = clean_url(host)
         self._port = port
         self._user = user
@@ -67,13 +103,6 @@ class Http(System, Network, MotionDetection, Snapshot,
         self._token = None
         self._name = None
         self._serial = None
-        # Ignore comm errors in case camera happens to be off or there are
-        # temporary network issues. User can retry later and we'll get token
-        # then if camera is accessible again.
-        try:
-            self._generate_token()
-        except CommError:
-            pass
 
     def _generate_token(self):
         """Create authentation to use with requests."""
@@ -81,16 +110,13 @@ class Http(System, Network, MotionDetection, Snapshot,
         _LOGGER.debug('%s Trying Basic Authentication', self)
         self._token = requests.auth.HTTPBasicAuth(self._user, self._password)
         try:
-            resp = self._command(cmd).content.decode('utf-8')
-        except LoginError:
-            _LOGGER.debug('%s Trying Digest Authentication', self)
-            self._token = requests.auth.HTTPDigestAuth(
-                self._user, self._password)
             try:
                 resp = self._command(cmd).content.decode('utf-8')
-            except LoginError as error:
-                self._token = None
-                raise error
+            except LoginError:
+                _LOGGER.debug('%s Trying Digest Authentication', self)
+                self._token = requests.auth.HTTPDigestAuth(
+                    self._user, self._password)
+                resp = self._command(cmd).content.decode('utf-8')
         except CommError:
             self._token = None
             raise
@@ -129,7 +155,7 @@ class Http(System, Network, MotionDetection, Snapshot,
     def get_base_url(self):
         return self._base_url
 
-    def command(self, cmd, retries=None, timeout_cmd=None, stream=False):
+    def command(self, *args, **kwargs):
         """
         Args:
             cmd - command to execute via http
@@ -140,42 +166,55 @@ class Http(System, Network, MotionDetection, Snapshot,
         with self._token_lock:
             if not self._token:
                 self._generate_token()
-        return self._command(cmd, retries, timeout_cmd, stream)
+        return self._command(*args, **kwargs)
 
     def _command(self, cmd, retries=None, timeout_cmd=None, stream=False):
-        session = requests.Session()
-        session.verify = self._verify
         url = self.__base_url(cmd)
-        _LOGGER.debug("%s HTTP query %s", self, url)
+        with self._cmd_id_lock:
+            cmd_id = self._cmd_id = self._cmd_id + 1
+        _LOGGER.debug("%s HTTP query %i: %s", self, cmd_id, url)
         if retries is None:
             retries = self._retries_default
-        for loop in range(1, 2 + retries):
-            _LOGGER.debug("%s Running query attempt %s", self, loop)
+        timeout = timeout_cmd or self._timeout_default
+        with requests.Session() as session:
             try:
-                resp = session.get(
-                    url,
-                    auth=self._token,
-                    stream=stream,
-                    timeout=timeout_cmd or self._timeout_default,
+                use_keepalive = timeout[0] is None or timeout[1] is None
+            except TypeError:
+                use_keepalive = timeout is None
+            if use_keepalive:
+                session.mount(
+                    "{0}://".format(self._protocol),
+                    SOHTTPAdapter(socket_options=_KEEPALIVE_OPTS),
                 )
-                _LOGGER.debug('Completed with status_code %s, content \n%s',
-                              resp.status_code, resp.content)
-                if resp.status_code == 401:
-                    raise LoginError
-                resp.raise_for_status()
-            except requests.RequestException as error:
-                msg = re.sub(r'at 0x[0-9a-fA-F]+', 'at ADDRESS', repr(error))
-                if loop > retries:
+            for loop in range(1, 2 + retries):
+                _LOGGER.debug("%s Running query %i attempt %s", self, cmd_id, loop)
+                try:
+                    resp = session.get(
+                        url,
+                        auth=self._token,
+                        stream=stream,
+                        timeout=timeout,
+                        verify=self._verify,
+                    )
+                    if resp.status_code == 401:
+                        _LOGGER.debug(
+                            "%s Query %i: Unauthorized (401)", self, cmd_id)
+                        self._token = None
+                        raise LoginError
+                    resp.raise_for_status()
+                except requests.RequestException as error:
                     _LOGGER.debug(
-                        "%s Query failed due to error: %s", self, msg)
-                    raise CommError(error)
-                _LOGGER.warning("%s Trying again due to error: %s", self, msg)
-                continue
-            else:
-                break
+                        "%s Query %i failed due to error: %r", self, cmd_id, error)
+                    if loop > retries:
+                        raise CommError(error)
+                    msg = re.sub(r'at 0x[0-9a-fA-F]+', 'at ADDRESS', repr(error))
+                    _LOGGER.warning("%s Trying again due to error: %s", self, msg)
+                    continue
+                else:
+                    break
 
-        _LOGGER.debug(
-            "%s Query worked. Exit code: <%s>", self, resp.status_code)
+        _LOGGER.debug("%s Query %i worked. Exit code: <%s>",
+                      self, cmd_id, resp.status_code)
         return resp
 
     def command_audio(self, cmd, file_content, http_header,
