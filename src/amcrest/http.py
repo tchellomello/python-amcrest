@@ -64,6 +64,7 @@ except AttributeError:
 
 class SOHTTPAdapter(HTTPAdapter):
     """HTTPAdapter with support for socket options."""
+
     def __init__(self, *args, **kwargs):
         self.socket_options = kwargs.pop("socket_options", None)
         super(SOHTTPAdapter, self).__init__(*args, **kwargs)
@@ -75,13 +76,35 @@ class SOHTTPAdapter(HTTPAdapter):
 
 
 # pylint: disable=too-many-ancestors
-class Http(System, Network, MotionDetection, Snapshot,
-           UserManagement, Event, Audio, Record, Video,
-           Log, Ptz, Special, Storage, Nas, Media):
-
-    def __init__(self, host, port, user,
-                 password, verbose=True, protocol='http', ssl_verify=True,
-                 retries_connection=None, timeout_protocol=None):
+class Http(
+    System,
+    Network,
+    MotionDetection,
+    Snapshot,
+    UserManagement,
+    Event,
+    Audio,
+    Record,
+    Video,
+    Log,
+    Ptz,
+    Special,
+    Storage,
+    Nas,
+    Media,
+):
+    def __init__(
+        self,
+        host,
+        port,
+        user,
+        password,
+        verbose=True,
+        protocol="http",
+        ssl_verify=True,
+        retries_connection=None,
+        timeout_protocol=None,
+    ):
 
         self._token_lock = threading.Lock()
         self._cmd_id_lock = threading.Lock()
@@ -96,8 +119,10 @@ class Http(System, Network, MotionDetection, Snapshot,
         self._base_url = self.__base_url()
 
         self._retries_default = (
-            retries_connection if retries_connection is not None
-            else MAX_RETRY_HTTP_CONNECTION)
+            retries_connection
+            if retries_connection is not None
+            else MAX_RETRY_HTTP_CONNECTION
+        )
         self._timeout_default = timeout_protocol or TIMEOUT_HTTP_PROTOCOL
 
         self._token = None
@@ -106,34 +131,41 @@ class Http(System, Network, MotionDetection, Snapshot,
 
     def _generate_token(self):
         """Create authentation to use with requests."""
-        cmd = 'magicBox.cgi?action=getMachineName'
-        _LOGGER.debug('%s Trying Basic Authentication', self)
+        cmd = "magicBox.cgi?action=getMachineName"
+        _LOGGER.debug("%s Trying Basic Authentication", self)
         self._token = requests.auth.HTTPBasicAuth(self._user, self._password)
         try:
             try:
-                resp = self._command(cmd).content.decode('utf-8')
+                resp = self._command(cmd).content.decode("utf-8")
             except LoginError:
-                _LOGGER.debug('%s Trying Digest Authentication', self)
+                _LOGGER.debug("%s Trying Digest Authentication", self)
                 self._token = requests.auth.HTTPDigestAuth(
-                    self._user, self._password)
-                resp = self._command(cmd).content.decode('utf-8')
+                    self._user, self._password
+                )
+                resp = self._command(cmd).content.decode("utf-8")
         except CommError:
             self._token = None
             raise
 
         # check if user passed
         result = resp.lower()
-        if 'invalid' in result or 'error' in result:
-            _LOGGER.debug('%s Result from camera: %s', self,
-                          resp.strip().replace('\r\n', ': '))
+        if "invalid" in result or "error" in result:
+            _LOGGER.debug(
+                "%s Result from camera: %s",
+                self,
+                resp.strip().replace("\r\n", ": "),
+            )
             self._token = None
-            raise LoginError('Invalid credentials')
+            raise LoginError("Invalid credentials")
 
         self._name = pretty(resp.strip())
 
-        _LOGGER.debug('%s Retrieving serial number', self)
-        self._serial = pretty(self._command(
-            'magicBox.cgi?action=getSerialNo').content.decode('utf-8').strip())
+        _LOGGER.debug("%s Retrieving serial number", self)
+        self._serial = pretty(
+            self._command("magicBox.cgi?action=getSerialNo")
+            .content.decode("utf-8")
+            .strip()
+        )
 
     def __repr__(self):
         """Default object representation."""
@@ -142,15 +174,19 @@ class Http(System, Network, MotionDetection, Snapshot,
     def as_dict(self):
         """Callback for __dict__."""
         cdict = self.__dict__.copy()
-        redacted = '**********'
-        cdict['_token'] = redacted
-        cdict['_password'] = redacted
+        redacted = "**********"
+        cdict["_token"] = redacted
+        cdict["_password"] = redacted
         return cdict
 
     # Base methods
     def __base_url(self, param=""):
-        return '%s://%s:%s/cgi-bin/%s' % (self._protocol, self._host,
-                                          str(self._port), param)
+        return "%s://%s:%s/cgi-bin/%s" % (
+            self._protocol,
+            self._host,
+            str(self._port),
+            param,
+        )
 
     def get_base_url(self):
         return self._base_url
@@ -187,7 +223,9 @@ class Http(System, Network, MotionDetection, Snapshot,
                     SOHTTPAdapter(socket_options=_KEEPALIVE_OPTS),
                 )
             for loop in range(1, 2 + retries):
-                _LOGGER.debug("%s Running query %i attempt %s", self, cmd_id, loop)
+                _LOGGER.debug(
+                    "%s Running query %i attempt %s", self, cmd_id, loop
+                )
                 try:
                     resp = session.get(
                         url,
@@ -198,27 +236,39 @@ class Http(System, Network, MotionDetection, Snapshot,
                     )
                     if resp.status_code == 401:
                         _LOGGER.debug(
-                            "%s Query %i: Unauthorized (401)", self, cmd_id)
+                            "%s Query %i: Unauthorized (401)", self, cmd_id
+                        )
                         self._token = None
                         raise LoginError
                     resp.raise_for_status()
                 except requests.RequestException as error:
                     _LOGGER.debug(
-                        "%s Query %i failed due to error: %r", self, cmd_id, error)
+                        "%s Query %i failed due to error: %r",
+                        self,
+                        cmd_id,
+                        error,
+                    )
                     if loop > retries:
                         raise CommError(error)
-                    msg = re.sub(r'at 0x[0-9a-fA-F]+', 'at ADDRESS', repr(error))
-                    _LOGGER.warning("%s Trying again due to error: %s", self, msg)
+                    msg = re.sub(
+                        r"at 0x[0-9a-fA-F]+", "at ADDRESS", repr(error)
+                    )
+                    _LOGGER.warning(
+                        "%s Trying again due to error: %s", self, msg
+                    )
                     continue
                 else:
                     break
 
-        _LOGGER.debug("%s Query %i worked. Exit code: <%s>",
-                      self, cmd_id, resp.status_code)
+        _LOGGER.debug(
+            "%s Query %i worked. Exit code: <%s>",
+            self,
+            cmd_id,
+            resp.status_code,
+        )
         return resp
 
-    def command_audio(self, cmd, file_content, http_header,
-                      timeout=None):
+    def command_audio(self, cmd, file_content, http_header, timeout=None):
         with self._token_lock:
             if not self._token:
                 self._generate_token()
@@ -229,7 +279,7 @@ class Http(System, Network, MotionDetection, Snapshot,
                 files=file_content,
                 auth=self._token,
                 headers=http_header,
-                timeout=timeout or self._timeout_default
+                timeout=timeout or self._timeout_default,
             )
         except requests.exceptions.ReadTimeout:
             pass

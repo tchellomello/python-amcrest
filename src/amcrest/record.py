@@ -13,20 +13,15 @@
 
 
 class Record(object):
-
     @property
     def record_capability(self):
-        ret = self.command(
-            'recordManager.cgi?action=getCaps'
-        )
-        return ret.content.decode('utf-8')
+        ret = self.command("recordManager.cgi?action=getCaps")
+        return ret.content.decode("utf-8")
 
     @property
     def record_config(self):
-        ret = self.command(
-            'configManager.cgi?action=getConfig&name=Record'
-        )
-        return ret.content.decode('utf-8')
+        ret = self.command("configManager.cgi?action=getConfig&name=Record")
+        return ret.content.decode("utf-8")
 
     @record_config.setter
     def record_config(self, rec_opt):
@@ -65,31 +60,33 @@ class Record(object):
         """
 
         ret = self.command(
-            'configManager.cgi?action=setConfig&{0}'.format(rec_opt)
+            "configManager.cgi?action=setConfig&{0}".format(rec_opt)
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
     @property
     def media_global_config(self):
         ret = self.command(
-            'configManager.cgi?action=getConfig&name=MediaGlobal'
+            "configManager.cgi?action=getConfig&name=MediaGlobal"
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
     @property
     def record_mode(self):
-        status_code = {0: 'Automatic',
-                       1: 'Manual',
-                       2: 'Stop',
-                       None: 'Unknown'}
+        status_code = {0: "Automatic", 1: "Manual", 2: "Stop", None: "Unknown"}
 
         try:
             ret = self.command(
-               'configManager.cgi?action=getConfig&name=RecordMode'
+                "configManager.cgi?action=getConfig&name=RecordMode"
             )
 
-            status = int([s for s in ret.content.decode(
-                'utf-8').split() if 'Mode=' in s][0].split('=')[-1])
+            status = int(
+                [
+                    s
+                    for s in ret.content.decode("utf-8").split()
+                    if "Mode=" in s
+                ][0].split("=")[-1]
+            )
 
         # pylint: disable=bare-except
         except:
@@ -119,7 +116,7 @@ class Record(object):
         <paramName>=<paramValue>[&<paramName>=<paramValue>...]
         """
         ret = self.command(
-            'configManager.cgi?action=setConfig&RecordMode'
-            '[{0}].Mode={1}'.format(channel, record_opt)
+            "configManager.cgi?action=setConfig&RecordMode"
+            "[{0}].Mode={1}".format(channel, record_opt)
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")

@@ -24,6 +24,7 @@ _REG_PARSE_MALFORMED_JSON = re.compile(
     r'(?P<key>"[^"\\]*(?:\\.[^"\\]*)*"|[^\s"]+)\s:\s(?P<value>"[^"\\]*(?:\\.[^"\\]*)*"|[^\s"]+)'
 )
 
+
 def _event_lines(ret):
     line = ""
     for char in ret.iter_content(decode_unicode=True):
@@ -34,110 +35,95 @@ def _event_lines(ret):
 
 
 class Event(object):
-
     def event_handler_config(self, handlername):
         ret = self.command(
-            'configManager.cgi?action=getConfig&name={0}'.format(handlername)
+            "configManager.cgi?action=getConfig&name={0}".format(handlername)
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
     @property
     def alarm_config(self):
-        ret = self.command(
-            'configManager.cgi?action=getConfig&name=Alarm'
-        )
-        return ret.content.decode('utf-8')
+        ret = self.command("configManager.cgi?action=getConfig&name=Alarm")
+        return ret.content.decode("utf-8")
 
     @property
     def alarm_out_config(self):
-        ret = self.command(
-            'configManager.cgi?action=getConfig&name=AlarmOut'
-        )
-        return ret.content.decode('utf-8')
+        ret = self.command("configManager.cgi?action=getConfig&name=AlarmOut")
+        return ret.content.decode("utf-8")
 
     @property
     def alarm_input_channels(self):
-        ret = self.command(
-            'alarm.cgi?action=getInSlots'
-        )
-        return ret.content.decode('utf-8')
+        ret = self.command("alarm.cgi?action=getInSlots")
+        return ret.content.decode("utf-8")
 
     @property
     def alarm_output_channels(self):
-        ret = self.command(
-            'alarm.cgi?action=getOutSlots'
-        )
-        return ret.content.decode('utf-8')
+        ret = self.command("alarm.cgi?action=getOutSlots")
+        return ret.content.decode("utf-8")
 
     @property
     def alarm_states_input_channels(self):
-        ret = self.command(
-            'alarm.cgi?action=getInState'
-        )
-        return ret.content.decode('utf-8')
+        ret = self.command("alarm.cgi?action=getInState")
+        return ret.content.decode("utf-8")
 
     @property
     def alarm_states_output_channels(self):
-        ret = self.command(
-            'alarm.cgi?action=getOutState'
-        )
-        return ret.content.decode('utf-8')
+        ret = self.command("alarm.cgi?action=getOutState")
+        return ret.content.decode("utf-8")
 
     @property
     def video_blind_detect_config(self):
         ret = self.command(
-            'configManager.cgi?action=getConfig&name=BlindDetect'
+            "configManager.cgi?action=getConfig&name=BlindDetect"
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
     @property
     def video_loss_detect_config(self):
         ret = self.command(
-            'configManager.cgi?action=getConfig&name=LossDetect'
+            "configManager.cgi?action=getConfig&name=LossDetect"
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
     @property
     def event_login_failure(self):
         ret = self.command(
-            'configManager.cgi?action=getConfig&name=LoginFailureAlarm'
+            "configManager.cgi?action=getConfig&name=LoginFailureAlarm"
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
     @property
     def event_storage_not_exist(self):
         ret = self.command(
-            'configManager.cgi?action=getConfig&name=StorageNotExist'
+            "configManager.cgi?action=getConfig&name=StorageNotExist"
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
     @property
     def event_storage_access_failure(self):
         ret = self.command(
-            'configManager.cgi?action=getConfig&name=StorageFailure'
+            "configManager.cgi?action=getConfig&name=StorageFailure"
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
     @property
     def event_storage_low_space(self):
         ret = self.command(
-            'configManager.cgi?action=getConfig&name=StorageLowSpace'
+            "configManager.cgi?action=getConfig&name=StorageLowSpace"
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
     @property
     def event_net_abort(self):
-        ret = self.command(
-            'configManager.cgi?action=getConfig&name=NetAbort'
-        )
-        return ret.content.decode('utf-8')
+        ret = self.command("configManager.cgi?action=getConfig&name=NetAbort")
+        return ret.content.decode("utf-8")
 
     @property
     def event_ip_conflict(self):
         ret = self.command(
-            'configManager.cgi?action=getConfig&name=IPConflict'
+            "configManager.cgi?action=getConfig&name=IPConflict"
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
     def event_channels_happened(self, eventcode):
         """
@@ -155,43 +141,42 @@ class Event(object):
         SmartMotionVehicle: vehicle detection event
         """
         ret = self.command(
-            'eventManager.cgi?action=getEventIndexes&code={0}'.format(
-                eventcode)
+            "eventManager.cgi?action=getEventIndexes&code={0}".format(
+                eventcode
+            )
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
     @property
     def is_motion_detected(self):
-        event = self.event_channels_happened('VideoMotion')
-        if 'channels' not in event:
+        event = self.event_channels_happened("VideoMotion")
+        if "channels" not in event:
             return False
         return True
 
     @property
     def is_alarm_triggered(self):
-        event = self.event_channels_happened('AlarmLocal')
-        return bool('channels' in event)
+        event = self.event_channels_happened("AlarmLocal")
+        return bool("channels" in event)
 
     @property
     def is_human_detected(self):
-        event = self.event_channels_happened('SmartMotionHuman')
-        if 'channels' not in event:
+        event = self.event_channels_happened("SmartMotionHuman")
+        if "channels" not in event:
             return False
         return True
 
     @property
     def is_vehicle_detected(self):
-        event = self.event_channels_happened('SmartMotionVehicle')
-        if 'channels' not in event:
+        event = self.event_channels_happened("SmartMotionVehicle")
+        if "channels" not in event:
             return False
         return True
 
     @property
     def event_management(self):
-        ret = self.command(
-            'eventManager.cgi?action=getCaps'
-        )
-        return ret.content.decode('utf-8')
+        ret = self.command("eventManager.cgi?action=getCaps")
+        return ret.content.decode("utf-8")
 
     def event_stream(self, eventcodes, retries=None, timeout_cmd=None):
         """
@@ -211,7 +196,9 @@ class Event(object):
         SmartMotionVehicle: vehicle detection event
         """
         urllib3_logger = logging.getLogger("urllib3.connectionpool")
-        if not any(isinstance(x, NoHeaderErrorFilter) for x in urllib3_logger.filters):
+        if not any(
+            isinstance(x, NoHeaderErrorFilter) for x in urllib3_logger.filters
+        ):
             urllib3_logger.addFilter(NoHeaderErrorFilter())
 
         # If timeout is not specified, then use default, but remove read timeout since
@@ -236,7 +223,9 @@ class Event(object):
                 if line.lower().startswith("content-length:"):
                     chunk_size = int(line.split(":")[1])
                     yield next(
-                        ret.iter_content(chunk_size=chunk_size, decode_unicode=True)
+                        ret.iter_content(
+                            chunk_size=chunk_size, decode_unicode=True
+                        )
                     )
         except (RequestException, HTTPError) as error:
             _LOGGER.debug("%s Error during event streaming: %r", self, error)
@@ -249,24 +238,27 @@ class Event(object):
         for event_info in self.event_stream(eventcodes, retries, timeout_cmd):
             _LOGGER.debug("%s event info: %r", self, event_info)
             payload = dict()
-            for Key, Value \
-                    in _REG_PARSE_KEY_VALUE.findall(
-                            event_info.strip().replace('\n', '')
-                        ):
-                if Key == 'data':
+            for Key, Value in _REG_PARSE_KEY_VALUE.findall(
+                event_info.strip().replace("\n", "")
+            ):
+                if Key == "data":
                     tmpData = dict()
-                    for DataKey, DataValue \
-                            in _REG_PARSE_MALFORMED_JSON.findall(Value):
-                        tmpData[DataKey.replace('"', '')] = \
-                                    DataValue.replace('"', '')
+                    for (
+                        DataKey,
+                        DataValue,
+                    ) in _REG_PARSE_MALFORMED_JSON.findall(Value):
+                        tmpData[DataKey.replace('"', "")] = DataValue.replace(
+                            '"', ""
+                        )
                     Value = tmpData
                 payload[Key] = Value
             _LOGGER.debug(
                 "%s generate new event, code: %s , payload: %s",
-                self, payload['Code'], payload
+                self,
+                payload["Code"],
+                payload,
             )
-            yield payload['Code'], payload
-
+            yield payload["Code"], payload
 
 
 class NoHeaderErrorFilter(logging.Filter):
