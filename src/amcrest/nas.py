@@ -1,6 +1,4 @@
 """Amcrest NAS."""
-# -*- coding: utf-8 -*-
-#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 2 of the License.
@@ -12,12 +10,14 @@
 #
 # vim:sw=4:ts=4:et
 
+from .http import Http
 
-class Nas(object):
+
+class Nas(Http):
     """Amcrest methods to handle NAS."""
 
     @property
-    def nas_information(self):
+    def nas_information(self) -> str:
         """Return NAS information."""
         ret = self.command("configManager.cgi?action=getConfig&name=NAS")
-        return ret.content.decode("utf-8")
+        return ret.content.decode()

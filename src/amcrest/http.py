@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 2 of the License.
@@ -14,29 +12,11 @@ import logging
 import re
 import socket
 import threading
+from typing import Optional, Tuple, Union
 
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.connection import HTTPConnection
-
-from .exceptions import CommError, LoginError
-from .utils import clean_url, pretty
-
-from .audio import Audio
-from .event import Event
-from .log import Log
-from .media import Media
-from .motion_detection import MotionDetection
-from .nas import Nas
-from .network import Network
-from .ptz import Ptz
-from .record import Record
-from .snapshot import Snapshot
-from .special import Special
-from .storage import Storage
-from .system import System
-from .user_management import UserManagement
-from .video import Video
 
 from .config import (
     KEEPALIVE_COUNT,
@@ -45,6 +25,8 @@ from .config import (
     MAX_RETRY_HTTP_CONNECTION,
     TIMEOUT_HTTP_PROTOCOL,
 )
+from .exceptions import CommError, LoginError
+from .utils import clean_url, pretty
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -61,51 +43,36 @@ try:
 except AttributeError:
     pass
 
+TimeoutT = Union[Optional[float], Tuple[Optional[float], Optional[float]]]
+
 
 class SOHTTPAdapter(HTTPAdapter):
     """HTTPAdapter with support for socket options."""
 
     def __init__(self, *args, **kwargs):
         self.socket_options = kwargs.pop("socket_options", None)
-        super(SOHTTPAdapter, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def init_poolmanager(self, *args, **kwargs):
         if self.socket_options is not None:
             kwargs["socket_options"] = self.socket_options
-        super(SOHTTPAdapter, self).init_poolmanager(*args, **kwargs)
+        super().init_poolmanager(*args, **kwargs)
 
 
-# pylint: disable=too-many-ancestors
-class Http(
-    System,
-    Network,
-    MotionDetection,
-    Snapshot,
-    UserManagement,
-    Event,
-    Audio,
-    Record,
-    Video,
-    Log,
-    Ptz,
-    Special,
-    Storage,
-    Nas,
-    Media,
-):
+class Http:
     def __init__(
         self,
-        host,
-        port,
-        user,
-        password,
-        verbose=True,
-        protocol="http",
-        ssl_verify=True,
-        retries_connection=None,
-        timeout_protocol=None,
-    ):
-
+        host: str,
+        port: int,
+        user: str,
+        password: str,
+        *,
+        verbose: bool = True,
+        protocol: str = "http",
+        ssl_verify: bool = True,
+        retries_connection: Optional[int] = None,
+        timeout_protocol: TimeoutT = None,
+    ) -> None:
         self._token_lock = threading.Lock()
         self._cmd_id_lock = threading.Lock()
         self._cmd_id = 0
@@ -125,24 +92,24 @@ class Http(
         )
         self._timeout_default = timeout_protocol or TIMEOUT_HTTP_PROTOCOL
 
-        self._token = None
-        self._name = None
-        self._serial = None
+        self._token: Optional[requests.auth.AuthBase] = None
+        self._name: Optional[str] = None
+        self._serial: Optional[str] = None
 
-    def _generate_token(self):
+    def _generate_token(self) -> None:
         """Create authentation to use with requests."""
         cmd = "magicBox.cgi?action=getMachineName"
         _LOGGER.debug("%s Trying Basic Authentication", self)
         self._token = requests.auth.HTTPBasicAuth(self._user, self._password)
         try:
             try:
-                resp = self._command(cmd).content.decode("utf-8")
+                resp = self._command(cmd).content.decode()
             except LoginError:
                 _LOGGER.debug("%s Trying Digest Authentication", self)
                 self._token = requests.auth.HTTPDigestAuth(
                     self._user, self._password
                 )
-                resp = self._command(cmd).content.decode("utf-8")
+                resp = self._command(cmd).content.decode()
         except CommError:
             self._token = None
             raise
@@ -163,35 +130,35 @@ class Http(
         _LOGGER.debug("%s Retrieving serial number", self)
         self._serial = pretty(
             self._command("magicBox.cgi?action=getSerialNo")
-            .content.decode("utf-8")
+            .content.decode()
             .strip()
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Default object representation."""
-        return "<{0}:{1}>".format(self._name, self._serial)
+        if self._name is None:
+            return f"<Unconnected @ {self._host}>"
+        if self._serial is None:
+            return f"<{self._name}:CONNECTING>"
+        return f"<{self._name}:{self._serial}>"
 
-    def as_dict(self):
+    def as_dict(self) -> dict:
         """Callback for __dict__."""
         cdict = self.__dict__.copy()
         redacted = "**********"
-        cdict["_token"] = redacted
+        if cdict["_token"] is not None:
+            cdict["_token"] = redacted
         cdict["_password"] = redacted
         return cdict
 
     # Base methods
-    def __base_url(self, param=""):
-        return "%s://%s:%s/cgi-bin/%s" % (
-            self._protocol,
-            self._host,
-            str(self._port),
-            param,
-        )
+    def __base_url(self, param: str = "") -> str:
+        return f"{self._protocol}://{self._host}:{self._port}/cgi-bin/{param}"
 
-    def get_base_url(self):
+    def get_base_url(self) -> str:
         return self._base_url
 
-    def command(self, *args, **kwargs):
+    def command(self, *args, **kwargs) -> requests.Response:
         """
         Args:
             cmd - command to execute via http
@@ -204,7 +171,13 @@ class Http(
                 self._generate_token()
         return self._command(*args, **kwargs)
 
-    def _command(self, cmd, retries=None, timeout_cmd=None, stream=False):
+    def _command(
+        self,
+        cmd: str,
+        retries: Optional[int] = None,
+        timeout_cmd: TimeoutT = None,
+        stream: bool = False,
+    ) -> requests.Response:
         url = self.__base_url(cmd)
         with self._cmd_id_lock:
             cmd_id = self._cmd_id = self._cmd_id + 1
@@ -213,10 +186,10 @@ class Http(
             retries = self._retries_default
         timeout = timeout_cmd or self._timeout_default
         with requests.Session() as session:
-            try:
+            if isinstance(timeout, float):
+                use_keepalive = False
+            else:
                 use_keepalive = timeout[0] is None or timeout[1] is None
-            except TypeError:
-                use_keepalive = timeout is None
             if use_keepalive:
                 session.mount(
                     "{0}://".format(self._protocol),
@@ -239,7 +212,7 @@ class Http(
                             "%s Query %i: Unauthorized (401)", self, cmd_id
                         )
                         self._token = None
-                        raise LoginError
+                        raise LoginError()
                     resp.raise_for_status()
                 except requests.RequestException as error:
                     _LOGGER.debug(
@@ -249,7 +222,7 @@ class Http(
                         error,
                     )
                     if loop > retries:
-                        raise CommError(error)
+                        raise CommError(error) from error
                     msg = re.sub(
                         r"at 0x[0-9a-fA-F]+", "at ADDRESS", repr(error)
                     )
@@ -268,7 +241,13 @@ class Http(
         )
         return resp
 
-    def command_audio(self, cmd, file_content, http_header, timeout=None):
+    def command_audio(
+        self,
+        cmd,
+        file_content,
+        http_header,
+        timeout: TimeoutT = None,
+    ) -> None:
         with self._token_lock:
             if not self._token:
                 self._generate_token()

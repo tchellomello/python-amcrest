@@ -1,6 +1,4 @@
 """Amcrest system module."""
-# -*- coding: utf-8 -*-
-#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 2 of the License.
@@ -12,19 +10,24 @@
 #
 # vim:sw=4:ts=4:et
 
-from .utils import pretty
+from datetime import datetime
+from typing import Optional, Tuple
+
+from .http import Http
+from .utils import date_to_str, pretty, str_to_date
 
 
-class System(object):
+class System(Http):
     """Amcrest system class."""
 
     @property
-    def current_time(self):
+    def current_time(self) -> datetime:
         ret = self.command("global.cgi?action=getCurrentTime")
-        return ret.content.decode("utf-8")
+        date_str = pretty(ret.content.decode())
+        return str_to_date(date_str)
 
     @current_time.setter
-    def current_time(self, date):
+    def current_time(self, date_value: datetime) -> bool:
         """
         According with API:
             The time format is "Y-M-D H-m-S". It is not be effected by Locales.
@@ -36,78 +39,80 @@ class System(object):
 
         Return: True
         """
+        date_str = date_to_str(date_value)
+        ret = self.command(f"global.cgi?action=setCurrentTime&time={date_str}")
+
+        return "ok" in ret.content.decode().lower()
+
+    def __get_config(self, config_name: str) -> str:
         ret = self.command(
-            "global.cgi?action=setCurrentTime&time={0}".format(date)
+            f"configManager.cgi?action=getConfig&name={config_name}"
         )
-
-        if "ok" in ret.content.decode("utf-8").lower():
-            return True
-
-        return False
-
-    def __get_config(self, config_name):
-        ret = self.command(
-            "configManager.cgi?action=getConfig&name={0}".format(config_name)
-        )
-        return ret.content.decode("utf-8")
+        return ret.content.decode()
 
     @property
-    def general_config(self):
+    def general_config(self) -> str:
         return self.__get_config("General")
 
     @property
-    def version_http_api(self):
+    def version_http_api(self) -> str:
         ret = self.command("IntervideoManager.cgi?action=getVersion&Name=CGI")
-        return ret.content.decode("utf-8")
+        return ret.content.decode()
 
     @property
-    def software_information(self):
+    def software_information(self) -> Tuple[str, str]:
         ret = self.command("magicBox.cgi?action=getSoftwareVersion")
-        swinfo = ret.content.decode("utf-8")
+        swinfo = ret.content.decode().strip()
         if "," in swinfo:
             version, build_date = swinfo.split(",")
         else:
             version, build_date = swinfo.split()
+        _, _, version = build_date.rpartition("=")
+        _, _, build_date = build_date.rpartition(":")
         return version, build_date
 
     @property
-    def hardware_version(self):
+    def hardware_version(self) -> str:
         ret = self.command("magicBox.cgi?action=getHardwareVersion")
-        return ret.content.decode("utf-8")
+        return ret.content.decode().strip()
 
     @property
-    def device_type(self):
+    def device_type(self) -> str:
         ret = self.command("magicBox.cgi?action=getDeviceType")
-        return ret.content.decode("utf-8")
+        return pretty(ret.content.decode())
 
     @property
-    def serial_number(self):
+    def serial_number(self) -> str:
         ret = self.command("magicBox.cgi?action=getSerialNo")
-        return pretty(ret.content.decode("utf-8"))
+        return pretty(ret.content.decode())
 
     @property
-    def machine_name(self):
+    def machine_name(self) -> str:
         ret = self.command("magicBox.cgi?action=getMachineName")
-        return ret.content.decode("utf-8")
+        return pretty(ret.content.decode())
 
     @property
-    def system_information(self):
+    def system_information(self) -> str:
+        """System information
+
+        Including serial number, device type, processor, and serial.
+        """
         ret = self.command("magicBox.cgi?action=getSystemInfo")
-        return ret.content.decode("utf-8")
+        return ret.content.decode()
 
     @property
-    def vendor_information(self):
+    def vendor_information(self) -> str:
         ret = self.command("magicBox.cgi?action=getVendor")
-        return ret.content.decode("utf-8")
+        return ret.content.decode().strip()
 
     @property
-    def onvif_information(self):
+    def onvif_information(self) -> str:
         ret = self.command(
             "IntervideoManager.cgi?action=getVersion&Name=Onvif"
         )
-        return ret.content.decode("utf-8")
+        return ret.content.decode().strip()
 
-    def config_backup(self, filename=None):
+    def config_backup(self, filename=None) -> Optional[str]:
         ret = self.command("Config.backup?action=All")
 
         if not ret:
@@ -115,32 +120,32 @@ class System(object):
 
         if filename:
             with open(filename, "w+") as cfg:
-                cfg.write(ret.content.decode("utf-8"))
+                cfg.write(ret.content.decode())
             return None
 
-        return ret.content.decode("utf-8")
+        return ret.content.decode()
 
     @property
-    def device_class(self):
+    def device_class(self) -> str:
         """
         During the development, device IP2M-841B didn't
         responde for this call, adding it anyway.
         """
         ret = self.command("magicBox.cgi?action=getDeviceClass")
-        return ret.content.decode("utf-8")
+        return pretty(ret.content.decode())
 
-    def shutdown(self):
+    def shutdown(self) -> str:
         """
         From the testings, shutdown acts like "reboot now"
         """
         ret = self.command("magicBox.cgi?action=shutdown")
-        return ret.content.decode("utf-8")
+        return ret.content.decode()
 
-    def reboot(self, delay=None):
+    def reboot(self, delay: Optional[int] = None) -> str:
         cmd = "magicBox.cgi?action=reboot"
 
         if delay:
-            cmd += "&delay={0}".format(delay)
+            cmd += f"&delay={delay}"
 
         ret = self.command(cmd)
-        return ret.content.decode("utf-8")
+        return ret.content.decode()

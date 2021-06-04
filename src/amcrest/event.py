@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 2 of the License.
@@ -12,11 +10,13 @@
 # vim:sw=4:ts=4:et
 import logging
 import re
+from typing import Iterable, List, Optional, Tuple
 
-from requests import RequestException
+from requests import RequestException, Response
 from urllib3.exceptions import HTTPError
 
 from .exceptions import CommError
+from .http import Http, TimeoutT
 from .utils import pretty
 
 _LOGGER = logging.getLogger(__name__)
@@ -26,7 +26,7 @@ _REG_PARSE_MALFORMED_JSON = re.compile(
 )
 
 
-def _event_lines(ret):
+def _event_lines(ret: Response) -> Iterable[str]:
     line = []
     for char in ret.iter_content(decode_unicode=True):
         line.append(char)
@@ -35,74 +35,74 @@ def _event_lines(ret):
             line.clear()
 
 
-class Event(object):
-    def event_handler_config(self, handlername):
+class Event(Http):
+    def event_handler_config(self, handlername: str) -> str:
         ret = self.command(
-            "configManager.cgi?action=getConfig&name={0}".format(handlername)
+            f"configManager.cgi?action=getConfig&name={handlername}"
         )
-        return ret.content.decode("utf-8")
+        return ret.content.decode()
 
     @property
-    def alarm_config(self):
+    def alarm_config(self) -> str:
         return self.event_handler_config("Alarm")
 
     @property
-    def alarm_out_config(self):
+    def alarm_out_config(self) -> str:
         return self.event_handler_config("AlarmOut")
 
     @property
-    def alarm_input_channels(self):
+    def alarm_input_channels(self) -> str:
         ret = self.command("alarm.cgi?action=getInSlots")
-        return ret.content.decode("utf-8")
+        return ret.content.decode()
 
     @property
-    def alarm_output_channels(self):
+    def alarm_output_channels(self) -> str:
         ret = self.command("alarm.cgi?action=getOutSlots")
-        return ret.content.decode("utf-8")
+        return ret.content.decode()
 
     @property
-    def alarm_states_input_channels(self):
+    def alarm_states_input_channels(self) -> str:
         ret = self.command("alarm.cgi?action=getInState")
-        return ret.content.decode("utf-8")
+        return ret.content.decode()
 
     @property
-    def alarm_states_output_channels(self):
+    def alarm_states_output_channels(self) -> str:
         ret = self.command("alarm.cgi?action=getOutState")
-        return ret.content.decode("utf-8")
+        return ret.content.decode()
 
     @property
-    def video_blind_detect_config(self):
+    def video_blind_detect_config(self) -> str:
         return self.event_handler_config("BlindDetect")
 
     @property
-    def video_loss_detect_config(self):
+    def video_loss_detect_config(self) -> str:
         return self.event_handler_config("LossDetect")
 
     @property
-    def event_login_failure(self):
+    def event_login_failure(self) -> str:
         return self.event_handler_config("LoginFailureAlarm")
 
     @property
-    def event_storage_not_exist(self):
+    def event_storage_not_exist(self) -> str:
         return self.event_handler_config("StorageNotExist")
 
     @property
-    def event_storage_access_failure(self):
+    def event_storage_access_failure(self) -> str:
         return self.event_handler_config("StorageFailure")
 
     @property
-    def event_storage_low_space(self):
+    def event_storage_low_space(self) -> str:
         return self.event_handler_config("StorageLowSpace")
 
     @property
-    def event_net_abort(self):
+    def event_net_abort(self) -> str:
         return self.event_handler_config("NetAbort")
 
     @property
-    def event_ip_conflict(self):
+    def event_ip_conflict(self) -> str:
         return self.event_handler_config("IPConflict")
 
-    def event_channels_happened(self, eventcode):
+    def event_channels_happened(self, eventcode: str) -> List[int]:
         """
         Params:
 
@@ -118,9 +118,7 @@ class Event(object):
         SmartMotionVehicle: vehicle detection event
         """
         ret = self.command(
-            "eventManager.cgi?action=getEventIndexes&code={0}".format(
-                eventcode
-            )
+            f"eventManager.cgi?action=getEventIndexes&code={eventcode}"
         )
         output = ret.content.decode()
         if "Error" in output:
@@ -128,27 +126,33 @@ class Event(object):
         return [int(pretty(channel)) for channel in output.split()]
 
     @property
-    def is_motion_detected(self):
+    def is_motion_detected(self) -> List[int]:
         return self.event_channels_happened("VideoMotion")
 
     @property
-    def is_alarm_triggered(self):
+    def is_alarm_triggered(self) -> List[int]:
         return self.event_channels_happened("AlarmLocal")
 
     @property
-    def is_human_detected(self):
+    def is_human_detected(self) -> List[int]:
         return self.event_channels_happened("SmartMotionHuman")
 
     @property
-    def is_vehicle_detected(self):
+    def is_vehicle_detected(self) -> List[int]:
         return self.event_channels_happened("SmartMotionVehicle")
 
     @property
-    def event_management(self):
+    def event_management(self) -> str:
         ret = self.command("eventManager.cgi?action=getCaps")
-        return ret.content.decode("utf-8")
+        return ret.content.decode()
 
-    def event_stream(self, eventcodes, retries=None, timeout_cmd=None):
+    def event_stream(
+        self,
+        eventcodes: str,
+        *,
+        retries: Optional[int] = None,
+        timeout_cmd: TimeoutT = None,
+    ) -> Iterable[str]:
         """
         Return a stream of event info lines.
 
@@ -174,51 +178,60 @@ class Event(object):
         # If timeout is not specified, then use default, but remove read
         # timeout since there's no telling when, if ever, an event will come.
         if timeout_cmd is None:
-            try:
-                timeout_cmd = (self._timeout_default[0], None)
-            except TypeError:
-                timeout_cmd = (self._timeout_default, None)
+            if isinstance(self._timeout_default, tuple):
+                timeout_cmd = self._timeout_default[0], None
+            else:
+                timeout_cmd = self._timeout_default, None
 
         ret = self.command(
-            "eventManager.cgi?action=attach&codes=[{0}]".format(eventcodes),
+            f"eventManager.cgi?action=attach&codes=[{eventcodes}]",
             retries=retries,
             timeout_cmd=timeout_cmd,
             stream=True,
         )
         if ret.encoding is None:
-            ret.encoding = "utf-8"
+            ret.encoding = "utf-8"  # type: ignore[unreachable]
 
         try:
             for line in _event_lines(ret):
                 if line.lower().startswith("content-length:"):
                     chunk_size = int(line.split(":")[1])
-                    yield next(
-                        ret.iter_content(
-                            chunk_size=chunk_size, decode_unicode=True
+                    try:
+                        yield next(
+                            ret.iter_content(
+                                chunk_size=chunk_size, decode_unicode=True
+                            )
                         )
-                    )
+                    except StopIteration:
+                        return
         except (RequestException, HTTPError) as error:
             _LOGGER.debug("%s Error during event streaming: %r", self, error)
-            raise CommError(error)
+            raise CommError(error) from error
         finally:
             ret.close()
 
-    def event_actions(self, eventcodes, retries=None, timeout_cmd=None):
+    def event_actions(
+        self,
+        eventcodes: str,
+        retries: Optional[int] = None,
+        timeout_cmd: TimeoutT = None,
+    ) -> Iterable[Tuple[str, dict]]:
         """Return a stream of event (code, payload) tuples."""
-        for event_info in self.event_stream(eventcodes, retries, timeout_cmd):
+        for event_info in self.event_stream(
+            eventcodes, retries=retries, timeout_cmd=timeout_cmd
+        ):
             _LOGGER.debug("%s event info: %r", self, event_info)
             payload = {}
-            for Key, Value in _REG_PARSE_KEY_VALUE.findall(
+            for key, value in _REG_PARSE_KEY_VALUE.findall(
                 event_info.strip().replace("\n", "")
             ):
-                if Key == "data":
-                    Value = {
-                        DataKey.replace('"', ""): DataValue.replace('"', "")
-                        for DataKey, DataValue in _REG_PARSE_MALFORMED_JSON.findall(
-                            Value
-                        )
+                if key == "data":
+                    value = {
+                        data_key.replace('"', ""): data_value.replace('"', "")
+                        for data_key, data_value in
+                        _REG_PARSE_MALFORMED_JSON.findall(value)
                     }
-                payload[Key] = Value
+                payload[key] = value
             _LOGGER.debug(
                 "%s generate new event, code: %s , payload: %s",
                 self,
