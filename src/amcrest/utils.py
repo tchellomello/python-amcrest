@@ -77,15 +77,19 @@ def extract_audio_video_enabled(param, resp):
     ]
 
 
-def enable_audio_video_cmd(param, enable):
+def enable_audio_video_cmd(param, enable, channel):
     """Return command to enable/disable all audio/video streams."""
-    cmd = "configManager.cgi?action=setConfig"
     formats = [("Extra", 3), ("Main", 4)]
     if param == "Video":
         formats.append(("Snap", 3))
-    for fmt, num in formats:
-        for i in range(num):
-            cmd += "&Encode[0].{}Format[{}].{}Enable={}".format(
-                fmt, i, param, str(enable).lower()
-            )
-    return cmd
+
+    set_enable = str(enable).lower()
+    cmds = ["configManager.cgi?action=setConfig"]
+    cmds.extend(
+        "Encode[{}].{}Format[{}].{}Enable={}".format(
+            channel, fmt, i, param, set_enable
+        )
+        for fmt, num in formats
+        for i in range(num)
+    )
+    return "&".join(cmds)

@@ -98,14 +98,12 @@ class Audio(object):
         """
         Params:
 
-            path_file - path to output file
-            channel: - integer
             httptype - type string (singlepart or multipart)
-
                 singlepart: HTTP content is a continuos flow of audio packets
                 multipart: HTTP content type is multipart/x-mixed-replace, and
                            each audio packet ends with a boundary string
-
+            channel - integer
+            path_file - path to output file
         """
         if httptype is None and channel is None:
             raise RuntimeError("Requires htttype and channel")
@@ -131,12 +129,23 @@ class Audio(object):
 
         return ret.raw
 
+    def is_audio_enabled(self, channel):
+        """Return if any audio stream enabled on the given channel."""
+        is_enabled = utils.extract_audio_video_enabled(
+            "Audio", self.encode_media
+        )
+        return is_enabled[channel]
+
+    def set_audio_enabled(self, enable, channel):
+        """Enable/disable all audio streams on given channel."""
+        self.command(utils.enable_audio_video_cmd("Audio", enable, channel))
+
     @property
     def audio_enabled(self):
         """Return if any audio stream enabled."""
-        return utils.extract_audio_video_enabled("Audio", self.encode_media)
+        return self.is_audio_enabled(channel=0)
 
     @audio_enabled.setter
     def audio_enabled(self, enable):
         """Enable/disable all audio streams."""
-        self.command(utils.enable_audio_video_cmd("Audio", enable))
+        self.set_audio_enabled(enable, channel=0)

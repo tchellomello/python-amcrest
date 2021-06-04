@@ -12,6 +12,8 @@
 #
 # vim:sw=4:ts=4:et
 
+from .utils import pretty
+
 
 class System(object):
     """Amcrest system class."""
@@ -66,7 +68,7 @@ class System(object):
             version, build_date = swinfo.split(",")
         else:
             version, build_date = swinfo.split()
-        return (version, build_date)
+        return version, build_date
 
     @property
     def hardware_version(self):
@@ -81,7 +83,7 @@ class System(object):
     @property
     def serial_number(self):
         ret = self.command("magicBox.cgi?action=getSerialNo")
-        return ret.content.decode("utf-8").split("=")[-1]
+        return pretty(ret.content.decode("utf-8"))
 
     @property
     def machine_name(self):

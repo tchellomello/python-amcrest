@@ -10,6 +10,7 @@
 # GNU General Public License for more details.
 #
 # vim:sw=4:ts=4:et
+from amcrest.utils import pretty
 
 
 class Record(object):
@@ -71,31 +72,27 @@ class Record(object):
         )
         return ret.content.decode("utf-8")
 
-    @property
-    def record_mode(self):
-        status_code = {0: "Automatic", 1: "Manual", 2: "Stop", None: "Unknown"}
+    def get_record_mode(self, channel=0):
+        status_code = {0: "Automatic", 1: "Manual", 2: "Stop"}
 
-        try:
-            ret = self.command(
-                "configManager.cgi?action=getConfig&name=RecordMode"
-            )
+        ret = self.command(
+            "configManager.cgi?action=getConfig&name=RecordMode"
+        )
+        statuses = [
+            pretty(s)
+            for s in ret.content.decode().split()
+            if f"[{channel}].Mode=" in s
+        ]
+        if len(statuses) != 1:
+            return "Unknown"
 
-            status = int(
-                [
-                    s
-                    for s in ret.content.decode("utf-8").split()
-                    if "Mode=" in s
-                ][0].split("=")[-1]
-            )
-
-        # pylint: disable=bare-except
-        except:
-            status = None
+        status = int(statuses[0])
+        if status not in status_code:
+            return "Unknown"
 
         return status_code[status]
 
-    @record_mode.setter
-    def record_mode(self, record_opt, channel=0):
+    def set_record_mode(self, record_opt, channel=0):
         """
         Params:
 
@@ -120,3 +117,11 @@ class Record(object):
             "[{0}].Mode={1}".format(channel, record_opt)
         )
         return ret.content.decode("utf-8")
+
+    @property
+    def record_mode(self):
+        return self.get_record_mode()
+
+    @record_mode.setter
+    def record_mode(self, record_opt):
+        self.set_record_mode(record_opt)

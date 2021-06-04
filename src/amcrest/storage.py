@@ -40,12 +40,11 @@ class Storage(object):
         info = self.storage_device_info
         ret = []
         for param in params:
-            try:
-                ret.append(
-                    re.search(".{}=([0-9.]+)".format(param), info).group(1)
-                )
-            except AttributeError:
+            match = re.search(".{}=([0-9.]+)".format(param), info).group(1)
+            if match is None:
                 ret.append(None)
+            else:
+                ret.append(float(match.group(1)))
         if len(params) == 1:
             return ret[0]
         return ret

@@ -32,8 +32,11 @@ class Ptz(object):
         return ret.content.decode("utf-8")
 
     @property
-    def ptz_presets_count(self, channel=0):
-        ret = self.ptz_presets_list()
+    def ptz_presets_count(self):
+        return self.get_ptz_presets_count(channel=0)
+
+    def get_ptz_presets_count(self, channel=0):
+        ret = self.ptz_presets_list(channel=channel)
         return ret.count("Name=")
 
     def ptz_status(self, channel=0):

@@ -10,7 +10,7 @@
 # GNU General Public License for more details.
 #
 # vim:sw=4:ts=4:et
-from amcrest.utils import str2bool
+from amcrest.utils import pretty, str2bool
 
 
 class MotionDetection(object):
@@ -24,40 +24,44 @@ class MotionDetection(object):
     def motion_detection(self):
         return self.__get_config("MotionDetect")
 
-    def is_motion_detector_on(self):
+    def is_motion_detector_on(self, channel=0):
         ret = self.motion_detection
-        status = [s for s in ret.split() if ".Enable=" in s][0].split("=")[-1]
+        status = [pretty(s) for s in ret.split() if ".Enable=" in s][channel]
         return str2bool(status)  # pylint: disable=no-value-for-parameter
 
-    def is_record_on_motion_detection(self):
+    def is_record_on_motion_detection(self, channel=0):
         ret = self.motion_detection
-        status = [s for s in ret.split() if ".RecordEnable=" in s][0].split(
-            "="
-        )[-1]
+        status = [pretty(s) for s in ret.split() if ".RecordEnable=" in s][
+            channel
+        ]
         return str2bool(status)  # pylint: disable=no-value-for-parameter
+
+    def set_motion_detection(self, opt: bool, *, channel: int = 0) -> bool:
+        value = "true" if opt else "false"
+        ret = self.command(
+            "configManager.cgi?action="
+            "setConfig&MotionDetect[{0}].Enable={1}".format(channel, value)
+        )
+        return "ok" in ret.content.decode("utf-8").lower()
+
+    def set_motion_recording(self, opt, channel=0):
+        value = "true" if opt else "false"
+        ret = self.command(
+            "configManager.cgi?action="
+            "setConfig&MotionDetect[{0}].EventHandler.RecordEnable={1}".format(
+                channel, value
+            )
+        )
+        return "ok" in ret.content.decode("utf-8").lower()
 
     @motion_detection.setter
     def motion_detection(self, opt):
         if opt.lower() == "true" or opt.lower() == "false":
-            ret = self.command(
-                "configManager.cgi?action="
-                "setConfig&MotionDetect[0].Enable={0}".format(opt.lower())
-            )
-            if "ok" in ret.content.decode("utf-8").lower():
-                return True
-
+            return self.set_motion_detection(opt.lower() == "true")
         return False
 
     @motion_detection.setter
     def motion_recording(self, opt):
         if opt.lower() == "true" or opt.lower() == "false":
-            ret = self.command(
-                "configManager.cgi?action="
-                "setConfig&MotionDetect[0].EventHandler.RecordEnable={0}".format(
-                    opt.lower()
-                )
-            )
-            if "ok" in ret.content.decode("utf-8").lower():
-                return True
-
+            return self.set_motion_recording(opt.lower() == "true")
         return False

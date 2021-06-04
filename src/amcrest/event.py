@@ -17,6 +17,7 @@ from requests import RequestException
 from urllib3.exceptions import HTTPError
 
 from .exceptions import CommError
+from .utils import pretty
 
 _LOGGER = logging.getLogger(__name__)
 _REG_PARSE_KEY_VALUE = re.compile(r"(?P<key>.+?)(?:=)(?P<value>.+?)(?:;|$)")
@@ -26,12 +27,12 @@ _REG_PARSE_MALFORMED_JSON = re.compile(
 
 
 def _event_lines(ret):
-    line = ""
+    line = []
     for char in ret.iter_content(decode_unicode=True):
-        line = line + char
-        if line.endswith("\r\n"):
-            yield line.strip()
-            line = ""
+        line.append(char)
+        if line[-2:] == ["\r", "\n"]:
+            yield "".join(line).strip()
+            line.clear()
 
 
 class Event(object):
@@ -43,13 +44,11 @@ class Event(object):
 
     @property
     def alarm_config(self):
-        ret = self.command("configManager.cgi?action=getConfig&name=Alarm")
-        return ret.content.decode("utf-8")
+        return self.event_handler_config("Alarm")
 
     @property
     def alarm_out_config(self):
-        ret = self.command("configManager.cgi?action=getConfig&name=AlarmOut")
-        return ret.content.decode("utf-8")
+        return self.event_handler_config("AlarmOut")
 
     @property
     def alarm_input_channels(self):
@@ -73,57 +72,35 @@ class Event(object):
 
     @property
     def video_blind_detect_config(self):
-        ret = self.command(
-            "configManager.cgi?action=getConfig&name=BlindDetect"
-        )
-        return ret.content.decode("utf-8")
+        return self.event_handler_config("BlindDetect")
 
     @property
     def video_loss_detect_config(self):
-        ret = self.command(
-            "configManager.cgi?action=getConfig&name=LossDetect"
-        )
-        return ret.content.decode("utf-8")
+        return self.event_handler_config("LossDetect")
 
     @property
     def event_login_failure(self):
-        ret = self.command(
-            "configManager.cgi?action=getConfig&name=LoginFailureAlarm"
-        )
-        return ret.content.decode("utf-8")
+        return self.event_handler_config("LoginFailureAlarm")
 
     @property
     def event_storage_not_exist(self):
-        ret = self.command(
-            "configManager.cgi?action=getConfig&name=StorageNotExist"
-        )
-        return ret.content.decode("utf-8")
+        return self.event_handler_config("StorageNotExist")
 
     @property
     def event_storage_access_failure(self):
-        ret = self.command(
-            "configManager.cgi?action=getConfig&name=StorageFailure"
-        )
-        return ret.content.decode("utf-8")
+        return self.event_handler_config("StorageFailure")
 
     @property
     def event_storage_low_space(self):
-        ret = self.command(
-            "configManager.cgi?action=getConfig&name=StorageLowSpace"
-        )
-        return ret.content.decode("utf-8")
+        return self.event_handler_config("StorageLowSpace")
 
     @property
     def event_net_abort(self):
-        ret = self.command("configManager.cgi?action=getConfig&name=NetAbort")
-        return ret.content.decode("utf-8")
+        return self.event_handler_config("NetAbort")
 
     @property
     def event_ip_conflict(self):
-        ret = self.command(
-            "configManager.cgi?action=getConfig&name=IPConflict"
-        )
-        return ret.content.decode("utf-8")
+        return self.event_handler_config("IPConflict")
 
     def event_channels_happened(self, eventcode):
         """
@@ -145,33 +122,26 @@ class Event(object):
                 eventcode
             )
         )
-        return ret.content.decode("utf-8")
+        output = ret.content.decode()
+        if "Error" in output:
+            return []
+        return [int(pretty(channel)) for channel in output.split()]
 
     @property
     def is_motion_detected(self):
-        event = self.event_channels_happened("VideoMotion")
-        if "channels" not in event:
-            return False
-        return True
+        return self.event_channels_happened("VideoMotion")
 
     @property
     def is_alarm_triggered(self):
-        event = self.event_channels_happened("AlarmLocal")
-        return bool("channels" in event)
+        return self.event_channels_happened("AlarmLocal")
 
     @property
     def is_human_detected(self):
-        event = self.event_channels_happened("SmartMotionHuman")
-        if "channels" not in event:
-            return False
-        return True
+        return self.event_channels_happened("SmartMotionHuman")
 
     @property
     def is_vehicle_detected(self):
-        event = self.event_channels_happened("SmartMotionVehicle")
-        if "channels" not in event:
-            return False
-        return True
+        return self.event_channels_happened("SmartMotionVehicle")
 
     @property
     def event_management(self):
@@ -201,8 +171,8 @@ class Event(object):
         ):
             urllib3_logger.addFilter(NoHeaderErrorFilter())
 
-        # If timeout is not specified, then use default, but remove read timeout since
-        # there's no telling when, if ever, an event will come.
+        # If timeout is not specified, then use default, but remove read
+        # timeout since there's no telling when, if ever, an event will come.
         if timeout_cmd is None:
             try:
                 timeout_cmd = (self._timeout_default[0], None)
@@ -237,20 +207,17 @@ class Event(object):
         """Return a stream of event (code, payload) tuples."""
         for event_info in self.event_stream(eventcodes, retries, timeout_cmd):
             _LOGGER.debug("%s event info: %r", self, event_info)
-            payload = dict()
+            payload = {}
             for Key, Value in _REG_PARSE_KEY_VALUE.findall(
                 event_info.strip().replace("\n", "")
             ):
                 if Key == "data":
-                    tmpData = dict()
-                    for (
-                        DataKey,
-                        DataValue,
-                    ) in _REG_PARSE_MALFORMED_JSON.findall(Value):
-                        tmpData[DataKey.replace('"', "")] = DataValue.replace(
-                            '"', ""
+                    Value = {
+                        DataKey.replace('"', ""): DataValue.replace('"', "")
+                        for DataKey, DataValue in _REG_PARSE_MALFORMED_JSON.findall(
+                            Value
                         )
-                    Value = tmpData
+                    }
                 payload[Key] = Value
             _LOGGER.debug(
                 "%s generate new event, code: %s , payload: %s",

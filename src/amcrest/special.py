@@ -76,16 +76,16 @@ class Special(object):
         )
 
         try:
-            port = (
-                ":"
-                + [
-                    x.split("=")[1]
-                    for x in self.rtsp_config.split()
-                    if x.startswith("table.RTSP.Port=")
-                ][0]
-            )
+            port_num = [
+                x.split("=")[1]
+                for x in self.rtsp_config.split()
+                if x.startswith("table.RTSP.Port=")
+            ][0]
         except IndexError:
             port = ""
+        else:
+            port = ":{}".format(port_num)
+
         return "rtsp://{}:{}@{}{}/{}".format(
             self._user, self._password, self._host, port, cmd
         )
