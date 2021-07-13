@@ -165,3 +165,14 @@ class System(object):
 
         ret = self.command(cmd)
         return ret.content.decode('utf-8')
+
+    def onvif_login_check(self, setCheck=False):
+        if setCheck:
+            cmd = "configManager.cgi?action=setConfig"
+            cmd += "&UserGlobal.OnvifLoginCheck=true"
+        else:
+            cmd = "configManager.cgi?action=setConfig"
+            cmd += "&UserGlobal.OnvifLoginCheck=false"
+        ret = self.command(cmd)
+
+        return ret.content.decode('utf-8')
