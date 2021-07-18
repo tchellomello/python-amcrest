@@ -90,7 +90,7 @@ class Record(Http):
 
         return status_code[status]
 
-    def set_record_mode(self, record_opt: str, *, channel: int = 0) -> str:
+    def set_record_mode(self, record_opt: int, *, channel: int = 0) -> str:
         """
         Params:
 
