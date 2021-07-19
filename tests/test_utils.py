@@ -14,8 +14,8 @@ class TestUtils(TestCase):
 
     def test_precision(self):
         """Test return code from utils.precision."""
-        self.assertEqual(10.0, percent(10, 100))
-        self.assertRaises(ValueError, percent, 'a', 100)
+        self.assertEqual("10.0", percent(10, 100))
+        self.assertRaises(TypeError, percent, 'a', 100)
 
     def test_str2bool(self):
         """Test return code from utils.str2bool."""
@@ -32,7 +32,7 @@ class TestUtils(TestCase):
 
     def test_to_unit(self):
         """Test return code from utils.to_unit."""
-        self.assertEqual(1024.0, to_unit(1024, unit='B')[0])
-        self.assertEqual(8192.0, to_unit(8589934592, unit='MB')[0])
-        self.assertEqual(1024.0, to_unit(1099511627776, unit='GB')[0])
-        self.assertNotEqual(117.73, to_unit('123000300', unit='MB')[0])
+        self.assertEqual("1024.0", to_unit(1024, unit='B')[0])
+        self.assertEqual("8192.0", to_unit(8589934592, unit='MB')[0])
+        self.assertEqual("1024.0", to_unit(1099511627776, unit='GB')[0])
+        self.assertNotEqual("117.73", to_unit('123000300', unit='MB')[0])

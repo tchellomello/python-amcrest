@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 2 of the License.
@@ -11,20 +9,23 @@
 #
 # vim:sw=4:ts=4:et
 
+from amcrest.http import Http
+from amcrest.utils import pretty
 
-class Record(object):
+
+class Record(Http):
     @property
-    def record_capability(self):
+    def record_capability(self) -> str:
         ret = self.command("recordManager.cgi?action=getCaps")
-        return ret.content.decode("utf-8")
+        return ret.content.decode()
 
     @property
-    def record_config(self):
+    def record_config(self) -> str:
         ret = self.command("configManager.cgi?action=getConfig&name=Record")
-        return ret.content.decode("utf-8")
+        return ret.content.decode()
 
     @record_config.setter
-    def record_config(self, rec_opt):
+    def record_config(self, rec_opt: str) -> str:
         """
         rec_opt is the Record options listed as example below:
 
@@ -59,43 +60,37 @@ class Record(object):
         <paramName>=<paramValue>[&<paramName>=<paramValue>...]
         """
 
-        ret = self.command(
-            "configManager.cgi?action=setConfig&{0}".format(rec_opt)
-        )
-        return ret.content.decode("utf-8")
+        ret = self.command(f"configManager.cgi?action=setConfig&{rec_opt}")
+        return ret.content.decode()
 
     @property
-    def media_global_config(self):
+    def media_global_config(self) -> str:
         ret = self.command(
             "configManager.cgi?action=getConfig&name=MediaGlobal"
         )
-        return ret.content.decode("utf-8")
+        return ret.content.decode()
 
-    @property
-    def record_mode(self):
-        status_code = {0: "Automatic", 1: "Manual", 2: "Stop", None: "Unknown"}
+    def get_record_mode(self, channel: int = 0) -> str:
+        status_code = {0: "Automatic", 1: "Manual", 2: "Stop"}
 
-        try:
-            ret = self.command(
-                "configManager.cgi?action=getConfig&name=RecordMode"
-            )
+        ret = self.command(
+            "configManager.cgi?action=getConfig&name=RecordMode"
+        )
+        statuses = [
+            pretty(s)
+            for s in ret.content.decode().split()
+            if f"[{channel}].Mode=" in s
+        ]
+        if len(statuses) != 1:
+            return "Unknown"
 
-            status = int(
-                [
-                    s
-                    for s in ret.content.decode("utf-8").split()
-                    if "Mode=" in s
-                ][0].split("=")[-1]
-            )
-
-        # pylint: disable=bare-except
-        except:
-            status = None
+        status = int(statuses[0])
+        if status not in status_code:
+            return "Unknown"
 
         return status_code[status]
 
-    @record_mode.setter
-    def record_mode(self, record_opt, channel=0):
+    def set_record_mode(self, record_opt: int, *, channel: int = 0) -> str:
         """
         Params:
 
@@ -117,6 +112,14 @@ class Record(object):
         """
         ret = self.command(
             "configManager.cgi?action=setConfig&RecordMode"
-            "[{0}].Mode={1}".format(channel, record_opt)
+            f"[{channel}].Mode={record_opt}"
         )
-        return ret.content.decode("utf-8")
+        return ret.content.decode()
+
+    @property
+    def record_mode(self) -> str:
+        return self.get_record_mode()
+
+    @record_mode.setter
+    def record_mode(self, record_opt: str) -> None:
+        self.set_record_mode(record_opt)

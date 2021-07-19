@@ -172,4 +172,4 @@ ErrorID=2, Detail=Invalid Request!
         time_start = datetime.datetime(2020, 1, 2, 3, 4, 5)
         time_end = datetime.datetime(2020, 1, 2, 3, 4, 10)
         media = list(c.find_files(time_start, time_end))
-        self.assertEqual(3, len(media))
+        self.assertEqual(2, len(media))

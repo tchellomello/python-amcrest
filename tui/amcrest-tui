@@ -125,7 +125,7 @@ class AmcrestTuiViewer(object):
         try:
             self.dev.snapshot(channel=self.channel_snapshot, path_file=tmpfile)
         except Exception as e:
-            raise RuntimeError(e)
+            raise RuntimeError(e) from e
 
     # pylint: disable=unused-variable
     def run(self):

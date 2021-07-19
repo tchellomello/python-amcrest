@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 2 of the License.
@@ -11,40 +9,42 @@
 #
 # vim:sw=4:ts=4:et
 
+from .http import Http
 
-class UserManagement(object):
-    def info_user(self, username):
+
+class UserManagement(Http):
+    def info_user(self, username) -> str:
         ret = self.command(
             "userManager.cgi?action=getUserInfo&name={0}".format(username)
         )
-        return ret.content.decode("utf-8")
+        return ret.content.decode()
 
     @property
-    def info_all_users(self):
+    def info_all_users(self) -> str:
         ret = self.command("userManager.cgi?action=getUserInfoAll")
-        return ret.content.decode("utf-8")
+        return ret.content.decode()
 
     @property
-    def info_all_active_users(self):
+    def info_all_active_users(self) -> str:
         ret = self.command("userManager.cgi?action=getActiveUserInfoAll")
-        return ret.content.decode("utf-8")
+        return ret.content.decode()
 
-    def info_group(self, group):
+    def info_group(self, group) -> str:
         ret = self.command(
             "userManager.cgi?action=getGroupInfo&name={0}".format(group)
         )
-        return ret.content.decode("utf-8")
+        return ret.content.decode()
 
     @property
-    def info_all_groups(self):
+    def info_all_groups(self) -> str:
         ret = self.command("userManager.cgi?action=getGroupInfoAll")
-        return ret.content.decode("utf-8")
+        return ret.content.decode()
 
-    def delete_user(self, username):
+    def delete_user(self, username) -> str:
         ret = self.command(
             "userManager.cgi?action=deleteUser&name={0}".format(username)
         )
-        return ret.content.decode("utf-8")
+        return ret.content.decode()
 
     def add_user(
         self,
@@ -54,7 +54,7 @@ class UserManagement(object):
         sharable=True,
         reserved=False,
         memo=None,
-    ):
+    ) -> str:
         """
         Params:
             username - username for user
@@ -85,9 +85,9 @@ class UserManagement(object):
             cmd += "&user.Memo=%s" % memo
 
         ret = self.command(cmd)
-        return ret.content.decode("utf-8")
+        return ret.content.decode()
 
-    def modify_password(self, username, newpwd, oldpwd):
+    def modify_password(self, username, newpwd, oldpwd) -> str:
         """
         Params:
             username - user name
@@ -98,9 +98,9 @@ class UserManagement(object):
             "userManager.cgi?action=modifyPassword&name={0}&pwd={1}"
             "&pwdOld={2}".format(username, newpwd, oldpwd)
         )
-        return ret.content.decode("utf-8")
+        return ret.content.decode()
 
-    def modify_user(self, username, attribute, value):
+    def modify_user(self, username, attribute, value) -> str:
         """
         Params:
             username - username for user
@@ -125,4 +125,4 @@ class UserManagement(object):
             cmd += "&user.Memo=%s" % value.lower()
 
         ret = self.command(cmd)
-        return ret.content.decode("utf-8")
+        return ret.content.decode()

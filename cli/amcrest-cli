@@ -553,14 +553,14 @@ def main():
             t = threading.Timer(timer_capture, __sigtermproc, [os.getpid()])
             t.start()
 
-            print((camera.mjpg_stream(
-                channelno, typeno, path_file=args.save)))
+            print(camera.mjpg_stream(
+                channel=channelno, typeno=typeno, path_file=args.save))
 
         elif args.reboot:
-            print((camera.reboot()))
+            print(camera.reboot())
 
         elif args.shutdown:
-            print((camera.shutdown()))
+            print(camera.shutdown())
 
         elif args.audio_send_stream:
             if len(args.audio_send_stream) <= 3:
@@ -598,169 +598,168 @@ def main():
             camera.play_wav(path_file=args.play_wav)
 
         elif args.wlan_config:
-            print((camera.wlan_config))
+            print(camera.wlan_config)
 
         elif args.scan_wlan_devices:
-            print((camera.scan_wlan_devices(args.scan_wlan_devices)))
+            print(camera.scan_wlan_devices(args.scan_wlan_devices))
 
         elif args.telnet_config:
             camera.telnet_config = args.telnet_config
 
         elif args.ptz_config:
-            print((camera.ptz_config))
+            print(camera.ptz_config)
 
         elif args.ptz_auto_movement:
-            print((camera.ptz_auto_movement))
+            print(camera.ptz_auto_movement)
 
         elif args.ptz_presets_list:
-            print((camera.ptz_presets_list()))
+            print(camera.ptz_presets_list())
 
         elif args.ptz_goto_preset:
             if len(args.ptz_goto_preset) < 2:
                 print("Requires arguments: channel preset_point_number")
                 sys.exit(-1)
 
-            action = 'start'
             channel = args.ptz_goto_preset[0]
             preset_point_number = args.ptz_goto_preset[1]
-            camera.go_to_preset(action, channel, preset_point_number)
+            camera.go_to_preset(channel=channel, preset_point_number=preset_point_number)
 
         elif args.log_clear_all:
-            print((camera.log_clear_all))
+            print(camera.log_clear_all)
 
         elif args.video_standard == -1:
-            print((camera.video_standard))
+            print(camera.video_standard)
 
         elif args.video_standard:
             camera.video_standard = args.video_standard
 
         elif args.coordinates_current_window:
-            print((camera.coordinates_current_window(
-                args.coordinates_current_window)))
+            print(camera.coordinates_current_window(
+                args.coordinates_current_window))
 
         elif args.video_widget_config:
-            print((camera.video_widget_config))
+            print(camera.video_widget_config)
 
         elif args.video_input_capability:
-            print((camera.video_input_capability))
+            print(camera.video_input_capability)
 
         elif args.video_in_options:
-            print((camera.video_in_options))
+            print(camera.video_in_options)
 
         elif args.video_out_options:
-            print((camera.video_out_options))
+            print(camera.video_out_options)
 
         elif args.video_max_remote_input_channels:
-            print((camera.video_max_remote_input_channels))
+            print(camera.video_max_remote_input_channels)
 
         elif args.video_output_channels_device_supported:
-            print((camera.video_output_channels_device_supported))
+            print(camera.video_output_channels_device_supported)
 
         elif args.video_input_channels_device_supported:
-            print((camera.video_input_channels_device_supported))
+            print(camera.video_input_channels_device_supported)
 
         elif args.video_channel_title:
-            print((camera.video_channel_title))
+            print(camera.video_channel_title)
 
         elif args.encode_region_interested:
-            print((camera.encode_region_interested))
+            print(camera.encode_region_interested)
 
         elif args.encode_media:
-            print((camera.encode_media))
+            print(camera.encode_media)
 
         elif args.encode_config_capability:
-            print((camera.encode_config_capability))
+            print(camera.encode_config_capability)
 
         elif args.encode_capability:
-            print((camera.encode_capability))
+            print(camera.encode_capability)
 
         elif args.video_max_extra_stream:
-            print((camera.video_max_extra_stream))
+            print(camera.video_max_extra_stream)
 
         elif args.video_color_config:
-            print((camera.video_color_config))
+            print(camera.video_color_config)
 
         elif args.factory_create:
-            print((camera.factory_create))
+            print(camera.factory_create)
 
         elif args.record_capability:
-            print((camera.record_capability))
+            print(camera.record_capability)
 
         elif args.record_config == -1:
-            print((camera.record_config))
+            print(camera.record_config)
 
         elif args.record_config is not None:
             camera.record_config = args.record_config
 
         elif args.media_global_config:
-            print((camera.media_global_config))
+            print(camera.media_global_config)
 
         elif args.audio_input_channels_numbers:
-            print((camera.audio_input_channels_numbers))
+            print(camera.audio_input_channels_numbers)
 
         elif args.audio_output_channels_numbers:
-            print((camera.audio_output_channels_numbers))
+            print(camera.audio_output_channels_numbers)
 
         elif args.event_storage_not_exist:
-            print((camera.event_storage_not_exist))
+            print(camera.event_storage_not_exist)
 
         elif args.event_login_failure:
-            print((camera.event_login_failure))
+            print(camera.event_login_failure)
 
         elif args.event_net_abort:
-            print((camera.event_net_abort))
+            print(camera.event_net_abort)
 
         elif args.event_ip_conflict:
-            print((camera.event_ip_conflict))
+            print(camera.event_ip_conflict)
 
         elif args.event_management:
-            print((camera.event_management))
+            print(camera.event_management)
 
         elif args.event_storage_low_space:
-            print((camera.event_storage_low_space))
+            print(camera.event_storage_low_space)
 
         elif args.event_storage_access_failure:
-            print((camera.event_storage_access_failure))
+            print(camera.event_storage_access_failure)
 
         elif args.general_config:
-            print((camera.general_config))
+            print(camera.general_config)
 
         elif args.video_blind_detect_config:
-            print((camera.video_blind_detect_config))
+            print(camera.video_blind_detect_config)
 
         elif args.video_loss_detect_config:
-            print((camera.video_loss_detect_config))
+            print(camera.video_loss_detect_config)
 
         elif args.alarm_config:
-            print((camera.alarm_config))
+            print(camera.alarm_config)
 
         elif args.alarm_out_config:
-            print((camera.alarm_out))
+            print(camera.alarm_out)
 
         elif args.alarm_output_channels:
-            print((camera.alarm_output_channels))
+            print(camera.alarm_output_channels)
 
         elif args.alarm_input_channels:
-            print((camera.alarm_input_channels))
+            print(camera.alarm_input_channels)
 
         elif args.alarm_states_output_channels:
-            print((camera.alarm_states_output_channels))
+            print(camera.alarm_states_output_channels)
 
         elif args.alarm_states_input_channels:
-            print((camera.alarm_states_input_channels))
+            print(camera.alarm_states_input_channels)
 
         elif args.event_channels_happened:
-            print((camera.event_channels_happened(
-                args.event_channels_happened)))
+            print(camera.event_channels_happened(
+                args.event_channels_happened))
 
         elif args.event_handler_config:
-            print((camera.event_handler_config(args.event_handler_config)))
+            print(camera.event_handler_config(args.event_handler_config))
 
         elif args.info_group:
-            print((camera.info_user(args.info_group)))
+            print(camera.info_user(args.info_group))
 
         elif args.info_all_groups:
-            print((camera.info_all_groups))
+            print(camera.info_all_groups)
 
         elif args.add_user:
             if len(args.add_user) <= 2:
@@ -787,8 +786,8 @@ def main():
             else:
                 memo = False
 
-            print((camera.add_user(user, pwd, grp,
-                                   sharable, reserved, memo)))
+            print(camera.add_user(user, pwd, grp,
+                                   sharable, reserved, memo))
 
         elif args.modify_user:
             if len(args.modify_user) <= 2:
@@ -800,7 +799,7 @@ def main():
             attr = args.modify_user[1]
             newvalue = args.modify_user[2]
 
-            print((camera.modify_user(user, attr, newvalue)))
+            print(camera.modify_user(user, attr, newvalue))
 
         elif args.modify_password:
             if len(args.modify_password) <= 2:
@@ -812,76 +811,76 @@ def main():
             newpwd = args.modify_password[1]
             oldpwd = args.modify_password[2]
 
-            print((camera.modify_password(user, newpwd, oldpwd)))
+            print(camera.modify_password(user, newpwd, oldpwd))
 
         elif args.delete_user:
-            print((camera.delete_user(args.delete_user)))
+            print(camera.delete_user(args.delete_user))
 
         elif args.info_all_users:
-            print((camera.info_all_users))
+            print(camera.info_all_users)
 
         elif args.info_all_active_users:
-            print((camera.info_all_active_users))
+            print(camera.info_all_active_users)
 
         elif args.info_user:
-            print((camera.info_user(args.info_user)))
+            print(camera.info_user(args.info_user))
 
         elif args.device_class:
-            print((camera.device_class))
+            print(camera.device_class)
 
         elif args.onvif_information:
-            print((camera.onvif_information))
+            print(camera.onvif_information)
 
         elif args.vendor_information:
-            print((camera.vendor_information))
+            print(camera.vendor_information)
 
         elif args.system_information:
-            print((camera.system_information))
+            print(camera.system_information)
 
         elif args.machine_name:
-            print((camera.machine_name))
+            print(camera.machine_name)
 
         elif args.device_type:
-            print((camera.device_type))
+            print(camera.device_type)
 
         elif args.serial_number:
-            print((camera.serial_number))
+            print(camera.serial_number)
 
         elif args.hardware_version:
-            print((camera.hardware_version))
+            print(camera.hardware_version)
 
         elif args.version_http_api:
-            print((camera.version_http_api))
+            print(camera.version_http_api)
 
         elif args.software_information:
-            print((camera.software_information))
+            print(camera.software_information)
 
         elif args.network_config:
-            print((camera.network_config))
+            print(camera.network_config)
 
         elif args.upnp_config == -1:
-            print((camera.upnp_config))
+            print(camera.upnp_config)
 
         elif args.upnp_config is not None:
             camera.upnp_config = args.upnp_config
 
         elif args.upnp_status == -1:
-            print((camera.upnp_status))
+            print(camera.upnp_status)
 
         elif args.ntp_config == -1:
-            print((camera.ntp_config))
+            print(camera.ntp_config)
 
         elif args.ntp_config is not None:
             camera.ntp_config = args.ntp_config
 
         elif args.network_interfaces:
-            print((camera.network_interfaces))
+            print(camera.network_interfaces)
 
         elif args.current_time == -1:
-            print((camera.current_time))
+            print(camera.current_time)
 
         elif args.motion_detection == -1:
-            print((camera.motion_detection))
+            print(camera.motion_detection)
 
         elif args.motion_detection:
             camera.motion_detection = args.motion_detection
@@ -890,7 +889,7 @@ def main():
             camera.current_time = args.current_time
 
         elif args.snapshot_config:
-            print((camera.snapshot_config))
+            print(camera.snapshot_config)
 
         elif args.config_backup:
             if args.save:

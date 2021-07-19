@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 2 of the License.
@@ -12,43 +10,44 @@
 # vim:sw=4:ts=4:et
 
 import logging
+from datetime import datetime
+from typing import Iterator
+
+from .http import Http, TimeoutT
+from .utils import date_to_str
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class Media(object):
-    def factory_create(self):
+class Media(Http):
+    def factory_create(self) -> str:
         ret = self.command("mediaFileFind.cgi?action=factory.create")
-        return ret.content.decode("utf-8")
+        return ret.content.decode()
 
-    def factory_close(self, factory_id):
+    def factory_close(self, factory_id: str) -> str:
         ret = self.command(
-            "mediaFileFind.cgi?action=factory.close&object={0}".format(
-                factory_id
-            )
+            f"mediaFileFind.cgi?action=factory.close&object={factory_id}"
         )
-        return ret.content.decode("utf-8")
+        return ret.content.decode()
 
-    def factory_destroy(self, factory_id):
+    def factory_destroy(self, factory_id: str) -> str:
         ret = self.command(
-            "mediaFileFind.cgi?action=factory.destroy&object={0}".format(
-                factory_id
-            )
+            f"mediaFileFind.cgi?action=factory.destroy&object={factory_id}"
         )
-        return ret.content.decode("utf-8")
+        return ret.content.decode()
 
     def media_file_find_start(
         self,
-        factory_id,
-        start_time,
-        end_time,
-        channel=0,
+        factory_id: str,
+        start_time: datetime,
+        end_time: datetime,
+        channel: int = 0,
         directories=(),
         types=(),
         flags=(),
         events=(),
         stream=None,
-    ):
+    ) -> str:
         """
         https://s3.amazonaws.com/amcrest-files/Amcrest+HTTP+API+3.2017.pdf
 
@@ -78,63 +77,52 @@ class Media(object):
         """
 
         c_dirs = "".join(
-            "&condition.Dirs[{0}]={1}".format(k, v)
-            for k, v in enumerate(directories)
+            f"&condition.Dirs[{k}]={v}" for k, v in enumerate(directories)
         )
 
         c_types = "".join(
-            "&condition.Types[{0}]={1}".format(k, v)
-            for k, v in enumerate(types)
+            f"&condition.Types[{k}]={v}" for k, v in enumerate(types)
         )
 
         c_flag = "".join(
-            "&condition.Flag[{0}]={1}".format(k, v)
-            for k, v in enumerate(flags)
+            f"&condition.Flag[{k}]={v}" for k, v in enumerate(flags)
         )
 
         c_events = "".join(
-            "&condition.Events[{0}]={1}".format(k, v)
-            for k, v in enumerate(events)
+            f"&condition.Events[{k}]={v}" for k, v in enumerate(events)
         )
 
-        c_vs = "&condition.VideoStream={0}".format(stream) if stream else ""
+        c_vs = f"&condition.VideoStream={stream}" if stream else ""
 
+        start = date_to_str(start_time)
+        end = date_to_str(end_time)
+        extra_cond = "".join([c_dirs, c_types, c_flag, c_events, c_vs])
         ret = self.command(
-            "mediaFileFind.cgi?action=findFile&object={0}&condition.Channel"
-            "={1}&condition.StartTime={2}&condition.EndTime={3}{4}{5}{6}{7}{8}".format(
-                factory_id,
-                channel,
-                start_time,
-                end_time,
-                c_dirs,
-                c_types,
-                c_flag,
-                c_events,
-                c_vs,
-            )
+            f"mediaFileFind.cgi?action=findFile&object={factory_id}&"
+            f"condition.Channel={channel}&condition.StartTime={start}&"
+            f"condition.EndTime={end}{extra_cond}"
         )
-        return ret.content.decode("utf-8")
+        return ret.content.decode()
 
-    def media_file_find_next(self, factory_id, count=100):
+    def media_file_find_next(self, factory_id: str, count: int = 100) -> str:
         ret = self.command(
-            "mediaFileFind.cgi?action=findNextFile&object={0}&count={1}".format(
-                factory_id, count
-            )
+            "mediaFileFind.cgi?action=findNextFile&"
+            f"object={factory_id}&count={count}"
         )
 
-        return ret.content.decode("utf-8")
+        return ret.content.decode()
 
     def find_files(
         self,
-        start_time,
-        end_time,
-        channel=0,
+        start_time: datetime,
+        end_time: datetime,
+        channel: int = 0,
         directories=(),
         types=(),
         flags=(),
         events=(),
         stream=None,
-    ):
+    ) -> Iterator[str]:
         """
         https://s3.amazonaws.com/amcrest-files/Amcrest+HTTP+API+3.2017.pdf
 
@@ -176,23 +164,22 @@ class Media(object):
         )
 
         if "ok" in search.lower():
-            count = 100
-
-            while count and count > 0:
+            while True:
                 _LOGGER.debug("%s findNextFile", self)
                 content = self.media_file_find_next(factory_id)
 
                 # The first line is 'found=N'.
                 # However, it can be 'Error' if e.g. no more files found
-                tag, count = (
-                    list(content.split("\r\n", 1)[0].split("=")) + [None]
-                )[:2]
+                tag, _, str_count = content.split("\r\n", 1)[0].partition("=")
+                if tag == "found":
+                    count = int(str_count)
+                else:
+                    break
+
                 _LOGGER.debug("%s returned %s %s", self, tag, count)
 
-                if tag == "found":
-                    count = int(count)
-                else:
-                    count = None
+                if count == 0:
+                    break
 
                 yield content
 
@@ -201,7 +188,12 @@ class Media(object):
         else:
             _LOGGER.debug("%s returned error: %s", self, search)
 
-    def download_file(self, file_path, timeout=None, stream=False):
+    def download_file(
+        self,
+        file_path: str,
+        timeout: TimeoutT = None,
+        stream: bool = False,
+    ) -> bytes:
         """
         file_path: File location like returned by FilePath from find_files()
                    Example: /mnt/sd/2019-12-31/001/dav/00/00.12.00-00.20.00.mp4
@@ -216,15 +208,21 @@ class Media(object):
         )
         return ret.content
 
-    def download_time(self, start_time, end_time, channel=0, stream=0):
+    def download_time(
+        self,
+        start_time: datetime,
+        end_time: datetime,
+        channel: int = 0,
+        stream: int = 0,
+    ) -> bytes:
         """
         start_time and end_time are formatted as yyyy-mm-dd hh:mm:ss
         '%Y-%m-%d%%20%H:%M:%S'
         """
+        start = date_to_str(start_time)
+        end = date_to_str(end_time)
         ret = self.command(
-            "loadfile.cgi?action=startLoad&channel={0}&startTime={1}"
-            "&endTime={2}&subtype={3}".format(
-                channel, start_time, end_time, stream
-            )
+            f"loadfile.cgi?action=startLoad&channel={channel}&"
+            f"startTime={start}&endTime={end}&subtype={stream}"
         )
         return ret.content
