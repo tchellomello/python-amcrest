@@ -22,16 +22,17 @@ _LOGGER = logging.getLogger(__name__)
 class Snapshot(object):
     def __get_config(self, config_name):
         ret = self.command(
-            'configManager.cgi?action=getConfig&name={0}'.format(config_name)
+            "configManager.cgi?action=getConfig&name={0}".format(config_name)
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
     @property
     def snapshot_config(self):
-        return self.__get_config('Snap')
+        return self.__get_config("Snap")
 
-    def snapshot(self, channel=None, path_file=None, timeout=None,
-                 stream=True):
+    def snapshot(
+        self, channel=None, path_file=None, timeout=None, stream=True
+    ):
         """
         Args:
 
@@ -55,14 +56,16 @@ class Snapshot(object):
         ret = self.command(cmd, timeout_cmd=timeout, stream=stream)
 
         if path_file:
-            with open(path_file, 'wb') as out_file:
+            with open(path_file, "wb") as out_file:
                 if stream:
                     try:
                         shutil.copyfileobj(ret.raw, out_file)
                     except HTTPError as error:
                         _LOGGER.debug(
                             "%s Snapshot to file failed due to error: %s",
-                            self, repr(error))
+                            self,
+                            repr(error),
+                        )
                         raise CommError(error)
                 else:
                     out_file.write(ret.content)

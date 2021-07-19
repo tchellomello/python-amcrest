@@ -20,7 +20,6 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class Special(object):
-
     def realtime_stream(self, channel=1, typeno=0, path_file=None):
         """
         If the stream is redirect to a file, use mplayer tool to
@@ -30,17 +29,23 @@ class Special(object):
         $ mplayer /home/user/Desktop/myvideo
         """
         ret = self.command(
-            'realmonitor.cgi?action=getStream&channel={0}&subtype={1}'.format(
-                channel, typeno), stream=True
+            "realmonitor.cgi?action=getStream&channel={0}&subtype={1}".format(
+                channel, typeno
+            ),
+            stream=True,
         )
 
         if path_file:
             try:
-                with open(path_file, 'wb') as out_file:
+                with open(path_file, "wb") as out_file:
                     shutil.copyfileobj(ret.raw, out_file)
             except HTTPError as error:
-                _LOGGER.debug("%s Realtime stream capture to file failed due "
-                              "to error: %s", self, repr(error))
+                _LOGGER.debug(
+                    "%s Realtime stream capture to file failed due "
+                    "to error: %s",
+                    self,
+                    repr(error),
+                )
                 raise CommError(error)
 
         return ret.raw
@@ -66,16 +71,24 @@ class Special(object):
         if typeno is None:
             typeno = 0
 
-        cmd = 'cam/realmonitor?channel={0}&subtype={1}'.format(
-            channelno, typeno)
+        cmd = "cam/realmonitor?channel={0}&subtype={1}".format(
+            channelno, typeno
+        )
 
         try:
-            port = ':' + [x.split('=')[1] for x in self.rtsp_config.split()
-                          if x.startswith('table.RTSP.Port=')][0]
+            port = (
+                ":"
+                + [
+                    x.split("=")[1]
+                    for x in self.rtsp_config.split()
+                    if x.startswith("table.RTSP.Port=")
+                ][0]
+            )
         except IndexError:
-            port = ''
-        return 'rtsp://{}:{}@{}{}/{}'.format(
-            self._user, self._password, self._host, port, cmd)
+            port = ""
+        return "rtsp://{}:{}@{}{}/{}".format(
+            self._user, self._password, self._host, port, cmd
+        )
 
     # pylint: disable=pointless-string-statement
     """
@@ -123,8 +136,9 @@ class Special(object):
             typeno = 1
 
         cmd = "mjpg/video.cgi?channel={0}&subtype={1}".format(
-            channelno, typeno)
-        return '{0}{1}'.format(self._base_url, cmd)
+            channelno, typeno
+        )
+        return "{0}{1}".format(self._base_url, cmd)
 
     def mjpg_stream(self, channelno=None, typeno=None, path_file=None):
         """
@@ -144,12 +158,14 @@ class Special(object):
 
         if path_file:
             try:
-                with open(path_file, 'wb') as out_file:
+                with open(path_file, "wb") as out_file:
                     shutil.copyfileobj(ret.raw, out_file)
             except HTTPError as error:
                 _LOGGER.debug(
                     "%s MJPEG stream capture to file failed due to error: %s",
-                    self, repr(error))
+                    self,
+                    repr(error),
+                )
                 raise CommError(error)
 
         return ret.raw

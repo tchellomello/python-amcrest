@@ -17,9 +17,18 @@ from .http import Http
 class AmcrestCamera(object):
     """Amcrest camera object implementation."""
 
-    def __init__(self, host, port, user,
-                 password, verbose=True, protocol='http', ssl_verify=True,
-                 retries_connection=None, timeout_protocol=None):
+    def __init__(
+        self,
+        host,
+        port,
+        user,
+        password,
+        verbose=True,
+        protocol="http",
+        ssl_verify=True,
+        retries_connection=None,
+        timeout_protocol=None,
+    ):
         super(AmcrestCamera, self).__init__()
         self.camera = Http(
             host=host,
@@ -30,5 +39,5 @@ class AmcrestCamera(object):
             protocol=protocol,
             ssl_verify=ssl_verify,
             retries_connection=retries_connection,
-            timeout_protocol=timeout_protocol
+            timeout_protocol=timeout_protocol,
         )

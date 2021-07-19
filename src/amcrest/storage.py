@@ -14,32 +14,27 @@ import re
 
 from .utils import to_unit, percent
 
-_USED = '.UsedBytes'
-_TOTAL = '.TotalBytes'
+_USED = ".UsedBytes"
+_TOTAL = ".TotalBytes"
 
 
 def _express_as(value, unit):
     try:
         return to_unit(value, unit)
     except (TypeError, ValueError):
-        return 'unknown', unit
+        return "unknown", unit
 
 
 class Storage(object):
-
     @property
     def storage_device_info(self):
-        ret = self.command(
-            'storageDevice.cgi?action=getDeviceAllInfo'
-        )
-        return ret.content.decode('utf-8')
+        ret = self.command("storageDevice.cgi?action=getDeviceAllInfo")
+        return ret.content.decode("utf-8")
 
     @property
     def storage_device_names(self):
-        ret = self.command(
-            'storageDevice.cgi?action=factory.getCollect'
-        )
-        return ret.content.decode('utf-8')
+        ret = self.command("storageDevice.cgi?action=factory.getCollect")
+        return ret.content.decode("utf-8")
 
     def _get_storage_values(self, *params):
         info = self.storage_device_info
@@ -47,7 +42,8 @@ class Storage(object):
         for param in params:
             try:
                 ret.append(
-                    re.search('.{}=([0-9.]+)'.format(param), info).group(1))
+                    re.search(".{}=([0-9.]+)".format(param), info).group(1)
+                )
             except AttributeError:
                 ret.append(None)
         if len(params) == 1:
@@ -56,11 +52,11 @@ class Storage(object):
 
     @property
     def storage_used(self):
-        return _express_as(self._get_storage_values(_USED), 'GB')
+        return _express_as(self._get_storage_values(_USED), "GB")
 
     @property
     def storage_total(self):
-        return _express_as(self._get_storage_values(_TOTAL), 'GB')
+        return _express_as(self._get_storage_values(_TOTAL), "GB")
 
     @property
     def storage_used_percent(self):
@@ -68,7 +64,7 @@ class Storage(object):
         try:
             return percent(used, total)
         except (TypeError, ValueError, ZeroDivisionError):
-            return 'unknown'
+            return "unknown"
 
     @property
     def storage_all(self):
@@ -76,8 +72,9 @@ class Storage(object):
         try:
             used_percent = percent(used, total)
         except (TypeError, ValueError, ZeroDivisionError):
-            used_percent = 'unknown'
+            used_percent = "unknown"
         return {
-            'used_percent': used_percent,
-            'used': _express_as(used, 'GB'),
-            'total': _express_as(total, 'GB')}
+            "used_percent": used_percent,
+            "used": _express_as(used, "GB"),
+            "total": _express_as(total, "GB"),
+        }

@@ -13,26 +13,23 @@
 
 
 class Ptz(object):
-
     @property
     def ptz_config(self):
-        ret = self.command(
-            'configManager.cgi?action=getConfig&name=Ptz'
-        )
-        return ret.content.decode('utf-8')
+        ret = self.command("configManager.cgi?action=getConfig&name=Ptz")
+        return ret.content.decode("utf-8")
 
     @property
     def ptz_auto_movement(self):
         ret = self.command(
-            'configManager.cgi?action=getConfig&name=PtzAutoMovement'
+            "configManager.cgi?action=getConfig&name=PtzAutoMovement"
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
     def ptz_presets_list(self, channel=0):
         ret = self.command(
-            'ptz.cgi?action=getPresets&channel={0}'.format(channel)
+            "ptz.cgi?action=getPresets&channel={0}".format(channel)
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
     @property
     def ptz_presets_count(self, channel=0):
@@ -41,29 +38,42 @@ class Ptz(object):
 
     def ptz_status(self, channel=0):
         ret = self.command(
-            'ptz.cgi?action=getStatus&channel={0}'.format(channel)
+            "ptz.cgi?action=getStatus&channel={0}".format(channel)
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
     def ptz_tour_routines_list(self, channel=0):
         ret = self.command(
-            'configManager.cgi?action=getTours&channel={0}'.format(channel)
+            "configManager.cgi?action=getTours&channel={0}".format(channel)
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
-    def ptz_control_command(self, channel=0, action=None, code=None,
-                            arg1=None, arg2=None, arg3=None):
+    def ptz_control_command(
+        self,
+        channel=0,
+        action=None,
+        code=None,
+        arg1=None,
+        arg2=None,
+        arg3=None,
+    ):
 
-        if action is None and code is None and arg1 is None and \
-                arg2 is None and arg3 is None:
+        if (
+            action is None
+            and code is None
+            and arg1 is None
+            and arg2 is None
+            and arg3 is None
+        ):
             raise RuntimeError("code, arg1, arg2, arg3 is required!")
 
         ret = self.command(
-            'ptz.cgi?action={0}&channel={1}&code={2}&arg1={3}'
-            '&arg2={4}&arg3={5}'.format(action, channel, code,
-                                        arg1, arg2, arg3)
+            "ptz.cgi?action={0}&channel={1}&code={2}&arg1={3}"
+            "&arg2={4}&arg3={5}".format(
+                action, channel, code, arg1, arg2, arg3
+            )
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
     def zoom_in(self, action=None, channel=0):
         """
@@ -76,10 +86,10 @@ class Ptz(object):
         """
 
         ret = self.command(
-            'ptz.cgi?action={0}&channel={1}&code=ZoomTele&arg1=0'
-            '&arg2=0&arg3=0'.format(action, channel)
+            "ptz.cgi?action={0}&channel={1}&code=ZoomTele&arg1=0"
+            "&arg2=0&arg3=0".format(action, channel)
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
     def zoom_out(self, action=None, channel=0):
         """
@@ -91,10 +101,10 @@ class Ptz(object):
         'start' and cmd 'stop'. My suggestion for start/stop cmd is 0.5 sec
         """
         ret = self.command(
-            'ptz.cgi?action={0}&channel={1}&code=ZoomWide&arg1=0'
-            '&arg2=0&arg3=0'.format(action, channel)
+            "ptz.cgi?action={0}&channel={1}&code=ZoomWide&arg1=0"
+            "&arg2=0&arg3=0".format(action, channel)
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
     def move_left(self, action=None, channel=0, vertical_speed=1):
         """
@@ -107,10 +117,10 @@ class Ptz(object):
         'start' and cmd 'stop'. My suggestion for start/stop cmd is 0.5 sec
         """
         ret = self.command(
-            'ptz.cgi?action={0}&channel={1}&code=Left&arg1=0'
-            '&arg2={2}&arg3=0'.format(action, channel, vertical_speed)
+            "ptz.cgi?action={0}&channel={1}&code=Left&arg1=0"
+            "&arg2={2}&arg3=0".format(action, channel, vertical_speed)
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
     def move_right(self, action=None, channel=0, vertical_speed=1):
         """
@@ -123,10 +133,10 @@ class Ptz(object):
         'start' and cmd 'stop'. My suggestion for start/stop cmd is 0.5 sec
         """
         ret = self.command(
-            'ptz.cgi?action={0}&channel={1}&code=Right&arg1=0'
-            '&arg2={2}&arg3=0'.format(action, channel, vertical_speed)
+            "ptz.cgi?action={0}&channel={1}&code=Right&arg1=0"
+            "&arg2={2}&arg3=0".format(action, channel, vertical_speed)
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
     def move_up(self, action=None, channel=0, vertical_speed=1):
         """
@@ -139,10 +149,10 @@ class Ptz(object):
         'start' and cmd 'stop'. My suggestion for start/stop cmd is 0.2 sec
         """
         ret = self.command(
-            'ptz.cgi?action={0}&channel={1}&code=Up&arg1=0'
-            '&arg2={2}&arg3=0'.format(action, channel, vertical_speed)
+            "ptz.cgi?action={0}&channel={1}&code=Up&arg1=0"
+            "&arg2={2}&arg3=0".format(action, channel, vertical_speed)
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
     def move_down(self, action=None, channel=0, vertical_speed=1):
         """
@@ -150,10 +160,10 @@ class Ptz(object):
         'start' and cmd 'stop'. My suggestion for start/stop cmd is 0.2 sec
         """
         ret = self.command(
-            'ptz.cgi?action={0}&channel={1}&code=Down&arg1=0'
-            '&arg2={2}&arg3=0'.format(action, channel, vertical_speed)
+            "ptz.cgi?action={0}&channel={1}&code=Down&arg1=0"
+            "&arg2={2}&arg3=0".format(action, channel, vertical_speed)
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
     def focus_near(self, action=None, channel=0):
         """
@@ -162,10 +172,10 @@ class Ptz(object):
             channel             - channel number
         """
         ret = self.command(
-            'ptz.cgi?action={0}&channel={1}&code=FocusNear&arg1=0'
-            '&arg2=0&arg3=0'.format(action, channel)
+            "ptz.cgi?action={0}&channel={1}&code=FocusNear&arg1=0"
+            "&arg2=0&arg3=0".format(action, channel)
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
     def focus_far(self, action=None, channel=0):
         """
@@ -174,10 +184,10 @@ class Ptz(object):
             channel             - channel number
         """
         ret = self.command(
-            'ptz.cgi?action={0}&channel={1}&code=FocusFar&arg1=0'
-            '&arg2=0&arg3=0'.format(action, channel)
+            "ptz.cgi?action={0}&channel={1}&code=FocusFar&arg1=0"
+            "&arg2=0&arg3=0".format(action, channel)
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
     def iris_large(self, action=None, channel=0):
         """
@@ -188,10 +198,10 @@ class Ptz(object):
             channel             - channel number
         """
         ret = self.command(
-            'ptz.cgi?action={0}&channel={1}&code=IrisLarge&arg1=0'
-            '&arg2=0&arg3=0'.format(action, channel)
+            "ptz.cgi?action={0}&channel={1}&code=IrisLarge&arg1=0"
+            "&arg2=0&arg3=0".format(action, channel)
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
     def iris_small(self, action=None, channel=0):
         """
@@ -202,10 +212,10 @@ class Ptz(object):
             channel             - channel number
         """
         ret = self.command(
-            'ptz.cgi?action={0}&channel={1}&code=IrisSmall&arg1=0'
-            '&arg2=0&arg3=0'.format(action, channel)
+            "ptz.cgi?action={0}&channel={1}&code=IrisSmall&arg1=0"
+            "&arg2=0&arg3=0".format(action, channel)
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
     def go_to_preset(self, action=None, channel=0, preset_point_number=1):
         """
@@ -215,12 +225,12 @@ class Ptz(object):
             preset_point_number - preset point number
         """
         ret = self.command(
-            'ptz.cgi?action={0}&channel={1}&code=GotoPreset&arg1=0'
-            '&arg2={2}&arg3=0'.format(action, channel, preset_point_number)
+            "ptz.cgi?action={0}&channel={1}&code=GotoPreset&arg1=0"
+            "&arg2={2}&arg3=0".format(action, channel, preset_point_number)
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
-    def set_preset(self, action='start', channel=0, preset_point_number=1):
+    def set_preset(self, action="start", channel=0, preset_point_number=1):
         """
         Params:
             action              - start or stop
@@ -228,12 +238,12 @@ class Ptz(object):
             preset_point_number - preset point number
         """
         ret = self.command(
-            'ptz.cgi?action={0}&channel={1}&code=SetPreset&arg1=0'
-            '&arg2={2}&arg3=0'.format(action, channel, preset_point_number)
+            "ptz.cgi?action={0}&channel={1}&code=SetPreset&arg1=0"
+            "&arg2={2}&arg3=0".format(action, channel, preset_point_number)
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
-    def tour(self, action='start', channel=0, start=True, tour_path_number=1):
+    def tour(self, action="start", channel=0, start=True, tour_path_number=1):
         """
         Params:
             action              - start or stop
@@ -242,15 +252,16 @@ class Ptz(object):
             tour_path_number    - tour path number
         """
         ret = self.command(
-            'ptz.cgi?action={0}&channel={1}&code={2}Tour&arg1={3}'
-            '&arg2=0&arg3=0&arg4=0'.format(
-                action, channel, 'Start' if start else 'Stop',
-                tour_path_number)
+            "ptz.cgi?action={0}&channel={1}&code={2}Tour&arg1={3}"
+            "&arg2=0&arg3=0&arg4=0".format(
+                action, channel, "Start" if start else "Stop", tour_path_number
+            )
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
-    def move_left_up(self, action=None, channel=0,
-                     vertical_speed=1, horizontal_speed=1):
+    def move_left_up(
+        self, action=None, channel=0, vertical_speed=1, horizontal_speed=1
+    ):
         """
         Params:
             action           - start or stop
@@ -260,13 +271,14 @@ class Ptz(object):
         """
 
         ret = self.command(
-            'ptz.cgi?action={0}&channel={1}&code=LeftUp&arg1=0'
-            '&arg2={2}&arg3=0'.format(action, channel, vertical_speed)
+            "ptz.cgi?action={0}&channel={1}&code=LeftUp&arg1=0"
+            "&arg2={2}&arg3=0".format(action, channel, vertical_speed)
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
-    def move_left_down(self, action=None, channel=0,
-                       vertical_speed=1, horizontal_speed=1):
+    def move_left_down(
+        self, action=None, channel=0, vertical_speed=1, horizontal_speed=1
+    ):
         """
         Params:
             action           - start or stop
@@ -276,13 +288,14 @@ class Ptz(object):
         """
 
         ret = self.command(
-            'ptz.cgi?action={0}&channel={1}&code=LeftDown&arg1=0'
-            '&arg2={2}&arg3=0'.format(action, channel, vertical_speed)
+            "ptz.cgi?action={0}&channel={1}&code=LeftDown&arg1=0"
+            "&arg2={2}&arg3=0".format(action, channel, vertical_speed)
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
-    def move_right_up(self, action=None, channel=0,
-                      vertical_speed=1, horizontal_speed=1):
+    def move_right_up(
+        self, action=None, channel=0, vertical_speed=1, horizontal_speed=1
+    ):
         """
         Params:
             action           - start or stop
@@ -292,13 +305,14 @@ class Ptz(object):
         """
 
         ret = self.command(
-            'ptz.cgi?action={0}&channel={1}&code=RightUp&arg1=0'
-            '&arg2={2}&arg3=0'.format(action, channel, vertical_speed)
+            "ptz.cgi?action={0}&channel={1}&code=RightUp&arg1=0"
+            "&arg2={2}&arg3=0".format(action, channel, vertical_speed)
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
-    def move_right_down(self, action=None, channel=0,
-                        vertical_speed=1, horizontal_speed=1):
+    def move_right_down(
+        self, action=None, channel=0, vertical_speed=1, horizontal_speed=1
+    ):
         """
         Params:
             action           - start or stop
@@ -308,14 +322,19 @@ class Ptz(object):
         """
 
         ret = self.command(
-            'ptz.cgi?action={0}&channel={1}&code=RightDown&arg1=0'
-            '&arg2={2}&arg3=0'.format(action, channel, vertical_speed)
+            "ptz.cgi?action={0}&channel={1}&code=RightDown&arg1=0"
+            "&arg2={2}&arg3=0".format(action, channel, vertical_speed)
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
-    def move_directly(self,
-                      channel=1, startpoint_x=None, startpoint_y=None,
-                      endpoint_x=None, endpoint_y=None):
+    def move_directly(
+        self,
+        channel=1,
+        startpoint_x=None,
+        startpoint_y=None,
+        endpoint_x=None,
+        endpoint_y=None,
+    ):
         """
 
         Three-dimensional orientation. Move to the rectangle with screen
@@ -327,14 +346,21 @@ class Ptz(object):
             startX, startY, endX and endY - range is 0-8192
         """
 
-        if startpoint_x is None or startpoint_y is None or \
-           endpoint_x is None or endpoint_y is None:
-            raise RuntimeError("Required args, start_point_x, start_point_y"
-                               "end_point_x and end_point_y not speficied")
+        if (
+            startpoint_x is None
+            or startpoint_y is None
+            or endpoint_x is None
+            or endpoint_y is None
+        ):
+            raise RuntimeError(
+                "Required args, start_point_x, start_point_y"
+                "end_point_x and end_point_y not speficied"
+            )
 
         ret = self.command(
-            'ptzBase.cgi?action=moveDirectly&channel={0}&startPoint[0]={1}'
-            '&startPoint[1]={2}&endPoint[0]={3}&endPoint[1]={4}'.format(
-                channel, startpoint_x, startpoint_y, endpoint_x, endpoint_y)
+            "ptzBase.cgi?action=moveDirectly&channel={0}&startPoint[0]={1}"
+            "&startPoint[1]={2}&endPoint[0]={3}&endPoint[1]={4}".format(
+                channel, startpoint_x, startpoint_y, endpoint_x, endpoint_y
+            )
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")

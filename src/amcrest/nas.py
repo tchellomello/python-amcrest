@@ -19,7 +19,5 @@ class Nas(object):
     @property
     def nas_information(self):
         """Return NAS information."""
-        ret = self.command(
-            'configManager.cgi?action=getConfig&name=NAS'
-        )
-        return ret.content.decode('utf-8')
+        ret = self.command("configManager.cgi?action=getConfig&name=NAS")
+        return ret.content.decode("utf-8")

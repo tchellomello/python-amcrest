@@ -61,7 +61,7 @@ class Network(object):
             28: 16,
             29: 8,
             30: 4,
-            31: 2
+            31: 2,
         }
 
         # If user didn't provide mask, use /24
@@ -110,17 +110,13 @@ class Network(object):
 
     @property
     def wlan_config(self):
-        ret = self.command(
-            'configManager.cgi?action=getConfig&name=WLan'
-        )
-        return ret.content.decode('utf-8')
+        ret = self.command("configManager.cgi?action=getConfig&name=WLan")
+        return ret.content.decode("utf-8")
 
     @property
     def telnet_config(self):
-        ret = self.command(
-            'configManager.cgi?action=getConfig&name=Telnet'
-        )
-        return ret.content.decode('utf-8')
+        ret = self.command("configManager.cgi?action=getConfig&name=Telnet")
+        return ret.content.decode("utf-8")
 
     @telnet_config.setter
     def telnet_config(self, status):
@@ -130,38 +126,31 @@ class Network(object):
             true  - Telnet is enabled
         """
         ret = self.command(
-            'configManager.cgi?action=setConfig&Telnet.Enable={0}'.format(
-                status)
+            "configManager.cgi?action=setConfig&Telnet.Enable={0}".format(
+                status
+            )
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
     @property
     def network_config(self):
-        ret = self.command(
-            'configManager.cgi?action=getConfig&name=Network'
-        )
-        return ret.content.decode('utf-8')
+        ret = self.command("configManager.cgi?action=getConfig&name=Network")
+        return ret.content.decode("utf-8")
 
     @property
     def network_interfaces(self):
-        ret = self.command(
-            'netApp.cgi?action=getInterfaces'
-        )
-        return ret.content.decode('utf-8')
+        ret = self.command("netApp.cgi?action=getInterfaces")
+        return ret.content.decode("utf-8")
 
     @property
     def upnp_status(self):
-        ret = self.command(
-            'netApp.cgi?action=getUPnPStatus'
-        )
-        return ret.content.decode('utf-8')
+        ret = self.command("netApp.cgi?action=getUPnPStatus")
+        return ret.content.decode("utf-8")
 
     @property
     def upnp_config(self):
-        ret = self.command(
-            'configManager.cgi?action=getConfig&name=UPnP'
-        )
-        return ret.content.decode('utf-8')
+        ret = self.command("configManager.cgi?action=getConfig&name=UPnP")
+        return ret.content.decode("utf-8")
 
     @upnp_config.setter
     def upnp_config(self, upnp_opt):
@@ -204,16 +193,14 @@ class Network(object):
         <paramName>=<paramValue>[&<paramName>=<paramValue>...]
         """
         ret = self.command(
-            'configManager.cgi?action=setConfig&{0}'.format(upnp_opt)
+            "configManager.cgi?action=setConfig&{0}".format(upnp_opt)
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
     @property
     def ntp_config(self):
-        ret = self.command(
-            'configManager.cgi?action=getConfig&name=NTP'
-        )
-        return ret.content.decode('utf-8')
+        ret = self.command("configManager.cgi?action=getConfig&name=NTP")
+        return ret.content.decode("utf-8")
 
     @ntp_config.setter
     def ntp_config(self, ntp_opt):
@@ -230,14 +217,12 @@ class Network(object):
         <paramName>=<paramValue>[&<paramName>=<paramValue>...]
         """
         ret = self.command(
-            'configManager.cgi?action=setConfig&{0}'.format(ntp_opt)
+            "configManager.cgi?action=setConfig&{0}".format(ntp_opt)
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
     @property
     def rtsp_config(self):
         """Get RTSP configuration."""
-        ret = self.command(
-            'configManager.cgi?action=getConfig&name=RTSP'
-        )
-        return ret.content.decode('utf-8')
+        ret = self.command("configManager.cgi?action=getConfig&name=RTSP")
+        return ret.content.decode("utf-8")
