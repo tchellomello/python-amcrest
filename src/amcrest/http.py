@@ -49,11 +49,11 @@ TimeoutT = Union[Optional[float], Tuple[Optional[float], Optional[float]]]
 class SOHTTPAdapter(HTTPAdapter):
     """HTTPAdapter with support for socket options."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         self.socket_options = kwargs.pop("socket_options", None)
         super().__init__(*args, **kwargs)
 
-    def init_poolmanager(self, *args, **kwargs):
+    def init_poolmanager(self, *args, **kwargs) -> None:
         if self.socket_options is not None:
             kwargs["socket_options"] = self.socket_options
         super().init_poolmanager(*args, **kwargs)
@@ -243,7 +243,7 @@ class Http:
 
     def command_audio(
         self,
-        cmd,
+        cmd: str,
         file_content,
         http_header,
         timeout: TimeoutT = None,

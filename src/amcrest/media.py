@@ -11,7 +11,7 @@
 
 import logging
 from datetime import datetime
-from typing import Iterator
+from typing import Iterator, Optional, Sequence
 
 from .http import Http, TimeoutT
 from .utils import date_to_str
@@ -42,11 +42,11 @@ class Media(Http):
         start_time: datetime,
         end_time: datetime,
         channel: int = 0,
-        directories=(),
-        types=(),
-        flags=(),
-        events=(),
-        stream=None,
+        directories: Sequence[str] = (),
+        types: Sequence[str] = (),
+        flags: Sequence[str] = (),
+        events: Sequence[str] = (),
+        stream: Optional[str] = None,
     ) -> str:
         """
         https://s3.amazonaws.com/amcrest-files/Amcrest+HTTP+API+3.2017.pdf
@@ -117,11 +117,11 @@ class Media(Http):
         start_time: datetime,
         end_time: datetime,
         channel: int = 0,
-        directories=(),
-        types=(),
-        flags=(),
-        events=(),
-        stream=None,
+        directories: Sequence[str] = (),
+        types: Sequence[str] = (),
+        flags: Sequence[str] = (),
+        events: Sequence[str] = (),
+        stream: Optional[str] = None,
     ) -> Iterator[str]:
         """
         https://s3.amazonaws.com/amcrest-files/Amcrest+HTTP+API+3.2017.pdf
