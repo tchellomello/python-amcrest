@@ -155,7 +155,9 @@ class Ptz(object):
         )
         return ret.content.decode('utf-8')
 
-    def positionABS(self, action=None, horizontal_angle=0, vertical_angle=0, channel=0):
+    def positionABS(
+        self, action=None, horizontal_angle=0, vertical_angle=0, channel=0
+    ):
         """
         Params:
             action              - start or stop
@@ -166,10 +168,12 @@ class Ptz(object):
         Go to an absolute coordinate
         """
         ret = self.command(
-            'ptz.cgi?action={0}&channel={1}&code=PositionABS&arg1={2}'
-            '&arg2={3}&arg3=0'.format(action, channel, horizontal_angle, vertical_angle)
+            "ptz.cgi?action={0}&channel={1}&code=PositionABS&arg1={2}"
+            "&arg2={3}&arg3=0".format(
+                action, channel, horizontal_angle, vertical_angle
+            )
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode("utf-8")
 
     def focus_near(self, action=None, channel=0):
         """
