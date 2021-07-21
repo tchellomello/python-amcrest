@@ -121,5 +121,5 @@ class Record(Http):
         return self.get_record_mode()
 
     @record_mode.setter
-    def record_mode(self, record_opt: str) -> None:
+    def record_mode(self, record_opt: int) -> None:
         self.set_record_mode(record_opt)

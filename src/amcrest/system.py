@@ -112,7 +112,7 @@ class System(Http):
         )
         return ret.content.decode().strip()
 
-    def config_backup(self, filename=None) -> Optional[str]:
+    def config_backup(self, filename: Optional[str] = None) -> Optional[str]:
         ret = self.command("Config.backup?action=All")
 
         if not ret:

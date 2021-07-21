@@ -32,14 +32,18 @@ class Audio(Http):
         return ret.content.decode()
 
     def play_wav(
-        self, httptype=None, channel=None, path_file=None, encoding="G.711A"
+        self,
+        httptype: Optional[str] = None,
+        channel: Optional[int] = None,
+        path_file: Optional[str] = None,
+        encoding: str = "G.711A",
     ) -> None:
 
         if httptype is None:
             httptype = "singlepart"
 
         if channel is None:
-            channel = "1"
+            channel = 1
 
         if path_file is None:
             raise RuntimeError("filename is required")
@@ -47,7 +51,11 @@ class Audio(Http):
         self.audio_send_stream(httptype, channel, path_file, encoding)
 
     def audio_send_stream(
-        self, httptype=None, channel=None, path_file=None, encode=None
+        self,
+        httptype: Optional[str] = None,
+        channel: Optional[int] = None,
+        path_file: Optional[str] = None,
+        encode: Optional[str] = None,
     ) -> None:
         """
         Params:
@@ -74,6 +82,10 @@ class Audio(Http):
         """
         if httptype is None or channel is None:
             raise RuntimeError("Requires htttype and channel")
+        if encode is None:
+            raise RuntimeError("Requires encode")
+        if path_file is None:
+            raise RuntimeError("Requires path_file")
 
         header = {
             "content-type": "Audio/" + encode,

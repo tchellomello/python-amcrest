@@ -8,12 +8,13 @@
 # GNU General Public License for more details.
 #
 # vim:sw=4:ts=4:et
+from typing import Optional
 
 from .http import Http
 
 
 class UserManagement(Http):
-    def info_user(self, username) -> str:
+    def info_user(self, username: str) -> str:
         ret = self.command(
             "userManager.cgi?action=getUserInfo&name={0}".format(username)
         )
@@ -29,7 +30,7 @@ class UserManagement(Http):
         ret = self.command("userManager.cgi?action=getActiveUserInfoAll")
         return ret.content.decode()
 
-    def info_group(self, group) -> str:
+    def info_group(self, group: str) -> str:
         ret = self.command(
             "userManager.cgi?action=getGroupInfo&name={0}".format(group)
         )
@@ -40,7 +41,7 @@ class UserManagement(Http):
         ret = self.command("userManager.cgi?action=getGroupInfoAll")
         return ret.content.decode()
 
-    def delete_user(self, username) -> str:
+    def delete_user(self, username: str) -> str:
         ret = self.command(
             "userManager.cgi?action=deleteUser&name={0}".format(username)
         )
@@ -48,12 +49,12 @@ class UserManagement(Http):
 
     def add_user(
         self,
-        username,
-        password,
-        group,
-        sharable=True,
-        reserved=False,
-        memo=None,
+        username: str,
+        password: str,
+        group: str,
+        sharable: bool = True,
+        reserved: bool = False,
+        memo: Optional[str] = None,
     ) -> str:
         """
         Params:
@@ -76,8 +77,8 @@ class UserManagement(Http):
                 username,
                 password,
                 group.lower(),
-                sharable.lower(),
-                reserved.lower(),
+                str(sharable).lower(),
+                str(reserved).lower(),
             )
         )
 
@@ -87,7 +88,7 @@ class UserManagement(Http):
         ret = self.command(cmd)
         return ret.content.decode()
 
-    def modify_password(self, username, newpwd, oldpwd) -> str:
+    def modify_password(self, username: str, newpwd: str, oldpwd: str) -> str:
         """
         Params:
             username - user name
@@ -100,7 +101,7 @@ class UserManagement(Http):
         )
         return ret.content.decode()
 
-    def modify_user(self, username, attribute, value) -> str:
+    def modify_user(self, username: str, attribute: str, value: str) -> str:
         """
         Params:
             username - username for user
