@@ -1,4 +1,5 @@
-"""Amcrest NAS."""
+# -*- coding: utf-8 -*-
+#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 2 of the License.
@@ -10,14 +11,14 @@
 #
 # vim:sw=4:ts=4:et
 
-from .http import Http
+import datetime
+from amcrest import AmcrestCamera
 
+amcrest = AmcrestCamera("192.168.1.10", 80, "admin", "super_password")
+camera = amcrest.camera
 
-class Nas(Http):
-    """Amcrest methods to handle NAS."""
+end_time = datetime.datetime.now()
+start_time = end_time - datetime.timedelta(hours=1)
 
-    @property
-    def nas_information(self) -> str:
-        """Return NAS information."""
-        ret = self.command("configManager.cgi?action=getConfig&name=NAS")
-        return ret.content.decode()
+for text in camera.log_find(start_time, end_time):
+    print(text)

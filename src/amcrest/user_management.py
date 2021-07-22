@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 2 of the License.
@@ -10,51 +8,54 @@
 # GNU General Public License for more details.
 #
 # vim:sw=4:ts=4:et
+from typing import Optional
+
+from .http import Http
 
 
-class UserManagement(object):
-
-    def info_user(self, username):
+class UserManagement(Http):
+    def info_user(self, username: str) -> str:
         ret = self.command(
-            'userManager.cgi?action=getUserInfo&name={0}'.format(username)
+            "userManager.cgi?action=getUserInfo&name={0}".format(username)
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode()
 
     @property
-    def info_all_users(self):
-        ret = self.command(
-            'userManager.cgi?action=getUserInfoAll'
-        )
-        return ret.content.decode('utf-8')
+    def info_all_users(self) -> str:
+        ret = self.command("userManager.cgi?action=getUserInfoAll")
+        return ret.content.decode()
 
     @property
-    def info_all_active_users(self):
-        ret = self.command(
-            'userManager.cgi?action=getActiveUserInfoAll'
-        )
-        return ret.content.decode('utf-8')
+    def info_all_active_users(self) -> str:
+        ret = self.command("userManager.cgi?action=getActiveUserInfoAll")
+        return ret.content.decode()
 
-    def info_group(self, group):
+    def info_group(self, group: str) -> str:
         ret = self.command(
-            'userManager.cgi?action=getGroupInfo&name={0}'.format(group)
+            "userManager.cgi?action=getGroupInfo&name={0}".format(group)
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode()
 
     @property
-    def info_all_groups(self):
-        ret = self.command(
-            'userManager.cgi?action=getGroupInfoAll'
-        )
-        return ret.content.decode('utf-8')
+    def info_all_groups(self) -> str:
+        ret = self.command("userManager.cgi?action=getGroupInfoAll")
+        return ret.content.decode()
 
-    def delete_user(self, username):
+    def delete_user(self, username: str) -> str:
         ret = self.command(
-            'userManager.cgi?action=deleteUser&name={0}'.format(username)
+            "userManager.cgi?action=deleteUser&name={0}".format(username)
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode()
 
-    def add_user(self, username, password, group, sharable=True,
-                 reserved=False, memo=None):
+    def add_user(
+        self,
+        username: str,
+        password: str,
+        group: str,
+        sharable: bool = True,
+        reserved: bool = False,
+        memo: Optional[str] = None,
+    ) -> str:
         """
         Params:
             username - username for user
@@ -69,19 +70,25 @@ class UserManagement(object):
             memo - memo to user
         """
 
-        cmd = "userManager.cgi?action=addUser&user.Name={0}" \
-              "&user.Password={1}&user.Group={2}&user.Sharable={3}" \
-              "&user.Reserved={4}".format(
-                  username, password, group.lower(), sharable.lower(),
-                  reserved.lower())
+        cmd = (
+            "userManager.cgi?action=addUser&user.Name={0}"
+            "&user.Password={1}&user.Group={2}&user.Sharable={3}"
+            "&user.Reserved={4}".format(
+                username,
+                password,
+                group.lower(),
+                str(sharable).lower(),
+                str(reserved).lower(),
+            )
+        )
 
         if memo:
             cmd += "&user.Memo=%s" % memo
 
         ret = self.command(cmd)
-        return ret.content.decode('utf-8')
+        return ret.content.decode()
 
-    def modify_password(self, username, newpwd, oldpwd):
+    def modify_password(self, username: str, newpwd: str, oldpwd: str) -> str:
         """
         Params:
             username - user name
@@ -89,12 +96,12 @@ class UserManagement(object):
             oldpwd - old password
         """
         ret = self.command(
-            'userManager.cgi?action=modifyPassword&name={0}&pwd={1}'
-            '&pwdOld={2}'.format(username, newpwd, oldpwd)
+            "userManager.cgi?action=modifyPassword&name={0}&pwd={1}"
+            "&pwdOld={2}".format(username, newpwd, oldpwd)
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode()
 
-    def modify_user(self, username, attribute, value):
+    def modify_user(self, username: str, attribute: str, value: str) -> str:
         """
         Params:
             username - username for user
@@ -104,8 +111,7 @@ class UserManagement(object):
             value - the new value for attribute
         """
 
-        cmd = "userManager.cgi?action=modifyUser&name={0}".format(
-            username)
+        cmd = "userManager.cgi?action=modifyUser&name={0}".format(username)
 
         if attribute.lower() == "group":
             cmd += "&user.Group=%s" % value.lower()
@@ -120,4 +126,4 @@ class UserManagement(object):
             cmd += "&user.Memo=%s" % value.lower()
 
         ret = self.command(cmd)
-        return ret.content.decode('utf-8')
+        return ret.content.decode()

@@ -104,3 +104,6 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+# Vim temporary files
+*.swp

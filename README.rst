@@ -14,7 +14,7 @@ Python Amcrest
 .. image:: https://img.shields.io/pypi/pyversions/amcrest.svg
     :target: https://pypi.python.org/pypi/amcrest
 
-A Python 2.7/3.x module for `Amcrest Cameras <https://www.amcrest.com/>`_ using the SDK HTTP API.
+A Python 2.7/3.x module for `Amcrest Cameras <https://www.amcrest.com/>`_ using the SDK HTTP API. Amcrest and Dahua devices share similar firmwares. Dahua Cameras and NVRs also work with this module.
 
 Documentation: `http://python-amcrest.readthedocs.io/ <http://python-amcrest.readthedocs.io/>`_
 
@@ -129,6 +129,9 @@ Pseudo-terminals like xterm, ssh, screen and others WONT WORK.
 Supportability Matrix
 ---------------------
 
+Cameras
+-------
+
 +-------------------------+---------------+----------+-----------------+
 | Model                   |     Tested    | Status   | Results/Issues  |
 +=========================+===============+==========+=================+
@@ -150,10 +153,27 @@ Supportability Matrix
 +-------------------------+---------------+----------+-----------------+
 | IP3M-HX2                | Yes           |  working |                 |
 +-------------------------+---------------+----------+-----------------+
+| IP4M-1026B              | Yes           |  working |                 |
++-------------------------+---------------+----------+-----------------+
 | IP4M-1051B              | Yes           |  working |                 |
++-------------------------+---------------+----------+-----------------+
+| IP5M-1176EB             | Yes           |  working |                 |
++-------------------------+---------------+----------+-----------------+
+| IP8M-2496EB             | Yes           |  working |                 |
 +-------------------------+---------------+----------+-----------------+
 | IP8M-T2499EW-28M        | Yes           |  working |                 |
 +-------------------------+---------------+----------+-----------------+
+
+
+Network Video Recorders (NVR)
+-----------------------------
+
++-------------------------+---------------+----------+-----------------+
+| Model                   |     Tested    | Status   | Results/Issues  |
++=========================+===============+==========+=================+
+| XVR DAHUA 5104S         | Yes           |  working |                 |
++-------------------------+---------------+----------+-----------------+
+
 
 If you have different model, feel fee to contribute and report your results.
 

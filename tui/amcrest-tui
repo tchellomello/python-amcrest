@@ -14,6 +14,8 @@
 # vim:sw=4:ts=4:et
 # pylint: disable=invalid-name
 
+from __future__ import print_function
+
 import os
 import signal
 import subprocess
@@ -31,7 +33,7 @@ from argparse import ArgumentParser
 from amcrest import AmcrestCamera
 
 
-class AmcrestTuiViewer():
+class AmcrestTuiViewer(object):
     """Amcrest Text User Interface."""
 
     AMCREST_CONF = "{0}/.config/amcrest.conf".format(os.path.expanduser("~"))
@@ -123,7 +125,7 @@ class AmcrestTuiViewer():
         try:
             self.dev.snapshot(channel=self.channel_snapshot, path_file=tmpfile)
         except Exception as e:
-            raise RuntimeError(e)
+            raise RuntimeError(e) from e
 
     # pylint: disable=unused-variable
     def run(self):

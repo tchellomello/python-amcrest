@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 2 of the License.
@@ -10,15 +8,26 @@
 # GNU General Public License for more details.
 #
 # vim:sw=4:ts=4:et
+import logging
 import shutil
+from typing import Optional
+
 from urllib3.exceptions import HTTPError
 
 from .exceptions import CommError
+from .http import Http
+
+_LOGGER = logging.getLogger(__name__)
 
 
-class Special(object):
-
-    def realtime_stream(self, channel=1, typeno=0, path_file=None):
+class Special(Http):
+    def realtime_stream(
+        self,
+        *,
+        channel: int = 1,
+        typeno: int = 0,
+        path_file: Optional[str] = None,
+    ) -> bytes:
         """
         If the stream is redirect to a file, use mplayer tool to
         visualize the video record
@@ -27,28 +36,33 @@ class Special(object):
         $ mplayer /home/user/Desktop/myvideo
         """
         ret = self.command(
-            'realmonitor.cgi?action=getStream&channel={0}&subtype={1}'.format(
-                channel, typeno), stream=True
+            f"realmonitor.cgi?action=getStream&channel={channel}&"
+            f"subtype={typeno}",
+            stream=True,
         )
 
         if path_file:
             try:
-                with open(path_file, 'wb') as out_file:
+                with open(path_file, "wb") as out_file:
                     shutil.copyfileobj(ret.raw, out_file)
             except HTTPError as error:
-                _LOGGER.debug("%s Realtime stream capture to file failed due "
-                              "to error: %s", self, repr(error))
-                raise CommError(error)
+                _LOGGER.debug(
+                    "%s Realtime stream capture to file failed due "
+                    "to error: %s",
+                    self,
+                    repr(error),
+                )
+                raise CommError(error) from error
 
         return ret.raw
 
-    def rtsp_url(self, channelno=None, typeno=None):
+    def rtsp_url(self, *, channel: int = 1, typeno: int = 0) -> str:
         """
         Return RTSP streaming url
 
         Params:
-            channelno: integer, the video channel index which starts from 1,
-                       default 1 if not specified.
+            channel: integer, the video channel index which starts from 1,
+                     default 1 if not specified.
 
             typeno: the stream type, default 0 if not specified. It can be
                     the following value:
@@ -57,22 +71,20 @@ class Special(object):
                     1-Extra Stream 1 (Sub Stream)
                     2-Extra Stream 2 (Sub Stream)
         """
-        if channelno is None:
-            channelno = 1
-
-        if typeno is None:
-            typeno = 0
-
-        cmd = 'cam/realmonitor?channel={0}&subtype={1}'.format(
-            channelno, typeno)
+        cmd = f"cam/realmonitor?channel={channel}&subtype={typeno}"
 
         try:
-            port = ':' + [x.split('=')[1] for x in self.rtsp_config.split()
-                          if x.startswith('table.RTSP.Port=')][0]
+            port_num = [
+                x.split("=")[1]
+                for x in self.rtsp_config.split()  # type: ignore[attr-defined]
+                if x.startswith("table.RTSP.Port=")
+            ][0]
         except IndexError:
-            port = ''
-        return 'rtsp://{}:{}@{}{}/{}'.format(
-            self._user, self._password, self._host, port, cmd)
+            port = ""
+        else:
+            port = ":{}".format(port_num)
+
+        return f"rtsp://{self._user}:{self._password}@{self._host}{port}/{cmd}"
 
     # pylint: disable=pointless-string-statement
     """
@@ -98,13 +110,13 @@ class Special(object):
     https://amcrest.com/forum/technical-discussion-f3/lost-mjpeg-encode-for-main-stream-after-firmware-u-t1516.html
     """
 
-    def mjpeg_url(self, channelno=None, typeno=None):
+    def mjpeg_url(self, *, channel: int = 1, typeno: int = 0) -> str:
         """
         Return MJPEG streaming url
 
         Params:
-            channelno: integer, the video channel index which starts from 1,
-                       default 1 if not specified.
+            channel: integer, the video channel index which starts from 1,
+                     default 1 if not specified.
 
             typeno: the stream type, default 0 if not specified. It can be
                     the following value:
@@ -113,21 +125,22 @@ class Special(object):
                     1-Extra Stream 1 (Sub Stream)
                     2-Extra Stream 2 (Sub Stream)
         """
-        if channelno is None:
-            channelno = 0
+        return (
+            f"{self._base_url}mjpg/video.cgi?"
+            f"channel={channel}&subtype={typeno}"
+        )
 
-        if typeno is None:
-            typeno = 1
-
-        cmd = "mjpg/video.cgi?channel={0}&subtype={1}".format(
-            channelno, typeno)
-        return '{0}{1}'.format(self._base_url, cmd)
-
-    def mjpg_stream(self, channelno=None, typeno=None, path_file=None):
+    def mjpg_stream(
+        self,
+        *,
+        channel: int = 1,
+        typeno: int = 0,
+        path_file: Optional[str] = None,
+    ) -> bytes:
         """
         Params:
-            channelno: integer, the video channel index which starts from 1,
-                       default 1 if not specified.
+            channel: integer, the video channel index which starts from 1,
+                     default 1 if not specified.
 
             typeno: the stream type, default 0 if not specified. It can be
                     the following value:
@@ -136,17 +149,19 @@ class Special(object):
                     1-Extra Stream 1 (Sub Stream)
                     2-Extra Stream 2 (Sub Stream)
         """
-        cmd = self.mjpeg_url(channelno=channelno, typeno=typeno)
+        cmd = self.mjpeg_url(channel=channel, typeno=typeno)
         ret = self.command(cmd, stream=True)
 
         if path_file:
             try:
-                with open(path_file, 'wb') as out_file:
+                with open(path_file, "wb") as out_file:
                     shutil.copyfileobj(ret.raw, out_file)
             except HTTPError as error:
                 _LOGGER.debug(
                     "%s MJPEG stream capture to file failed due to error: %s",
-                    self, repr(error))
-                raise CommError(error)
+                    self,
+                    repr(error),
+                )
+                raise CommError(error) from error
 
         return ret.raw

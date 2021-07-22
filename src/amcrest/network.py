@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 2 of the License.
@@ -10,23 +8,26 @@
 # GNU General Public License for more details.
 #
 # vim:sw=4:ts=4:et
-from contextlib import closing
 import socket
 import threading
+from contextlib import closing
+from typing import List, Optional
+
+from .http import Http
 
 
-class Network(object):
+class Network(Http):
 
-    amcrest_ips = []
+    amcrest_ips: List[str] = []
     __RTSP_PORT = 554
     __PWGPSI_PORT = 3800
 
-    def __raw_scan(self, ipaddr, timeout=None):
-        # If devices not found, try increasing timeout
-        socket.setdefaulttimeout(0.2)
-
+    def __raw_scan(self, ipaddr: str, timeout: Optional[float] = None) -> None:
         if timeout:
             socket.setdefaulttimeout(timeout)
+        else:
+            # If devices not found, try increasing timeout
+            socket.setdefaulttimeout(0.2)
 
         with closing(socket.socket()) as sock:
             try:
@@ -38,7 +39,9 @@ class Network(object):
             except:
                 pass
 
-    def scan_devices(self, subnet, timeout=None):
+    def scan_devices(
+        self, subnet: str, timeout: Optional[float] = None
+    ) -> List[str]:
         """
         Scan cameras in a range of ips
 
@@ -46,7 +49,7 @@ class Network(object):
         subnet - subnet, i.e: 192.168.1.0/24
                  if mask not used, assuming mask 24
 
-        timeout_sec - timeout in sec
+        timeout - timeout in sec
 
         Returns:
         """
@@ -61,7 +64,7 @@ class Network(object):
             28: 16,
             29: 8,
             30: 4,
-            31: 2
+            31: 2,
         }
 
         # If user didn't provide mask, use /24
@@ -69,8 +72,8 @@ class Network(object):
             mask = int(24)
             network = subnet
         else:
-            network, mask = subnet.split("/")
-            mask = int(mask)
+            network, mask_str = subnet.split("/")
+            mask = int(mask_str)
 
         if mask not in max_range:
             raise RuntimeError("Cannot determine the subnet mask!")
@@ -91,16 +94,16 @@ class Network(object):
         # For clear coding, let's keep the logic in if/else (mask16)
         # instead of only one if
         if mask == 16:
-            for seq1 in range(0, max_range[mask]):
-                for seq2 in range(0, max_range[mask]):
-                    ipaddr = "{0}.{1}.{2}".format(network, seq1, seq2)
+            for seq1 in range(max_range[mask]):
+                for seq2 in range(max_range[mask]):
+                    ipaddr = f"{network}.{seq1}.{seq2}"
                     thd = threading.Thread(
                         target=self.__raw_scan, args=(ipaddr, timeout)
                     )
                     thd.start()
         else:
-            for seq1 in range(0, max_range[mask]):
-                ipaddr = "{0}.{1}".format(network, seq1)
+            for seq1 in range(max_range[mask]):
+                ipaddr = f"{network}.{seq1}"
                 thd = threading.Thread(
                     target=self.__raw_scan, args=(ipaddr, timeout)
                 )
@@ -109,62 +112,49 @@ class Network(object):
         return self.amcrest_ips
 
     @property
-    def wlan_config(self):
-        ret = self.command(
-            'configManager.cgi?action=getConfig&name=WLan'
-        )
-        return ret.content.decode('utf-8')
+    def wlan_config(self) -> str:
+        ret = self.command("configManager.cgi?action=getConfig&name=WLan")
+        return ret.content.decode()
 
     @property
-    def telnet_config(self):
-        ret = self.command(
-            'configManager.cgi?action=getConfig&name=Telnet'
-        )
-        return ret.content.decode('utf-8')
+    def telnet_config(self) -> str:
+        ret = self.command("configManager.cgi?action=getConfig&name=Telnet")
+        return ret.content.decode()
 
     @telnet_config.setter
-    def telnet_config(self, status):
+    def telnet_config(self, status: str) -> str:
         """
         status:
             false - Telnet is disabled
             true  - Telnet is enabled
         """
         ret = self.command(
-            'configManager.cgi?action=setConfig&Telnet.Enable={0}'.format(
-                status)
+            f"configManager.cgi?action=setConfig&Telnet.Enable={status}"
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode()
 
     @property
-    def network_config(self):
-        ret = self.command(
-            'configManager.cgi?action=getConfig&name=Network'
-        )
-        return ret.content.decode('utf-8')
+    def network_config(self) -> str:
+        ret = self.command("configManager.cgi?action=getConfig&name=Network")
+        return ret.content.decode()
 
     @property
-    def network_interfaces(self):
-        ret = self.command(
-            'netApp.cgi?action=getInterfaces'
-        )
-        return ret.content.decode('utf-8')
+    def network_interfaces(self) -> str:
+        ret = self.command("netApp.cgi?action=getInterfaces")
+        return ret.content.decode()
 
     @property
-    def upnp_status(self):
-        ret = self.command(
-            'netApp.cgi?action=getUPnPStatus'
-        )
-        return ret.content.decode('utf-8')
+    def upnp_status(self) -> str:
+        ret = self.command("netApp.cgi?action=getUPnPStatus")
+        return ret.content.decode()
 
     @property
-    def upnp_config(self):
-        ret = self.command(
-            'configManager.cgi?action=getConfig&name=UPnP'
-        )
-        return ret.content.decode('utf-8')
+    def upnp_config(self) -> str:
+        ret = self.command("configManager.cgi?action=getConfig&name=UPnP")
+        return ret.content.decode()
 
     @upnp_config.setter
-    def upnp_config(self, upnp_opt):
+    def upnp_config(self, upnp_opt: str) -> str:
         """
         01/21/2017
 
@@ -203,20 +193,16 @@ class Network(object):
         upnp_opt format:
         <paramName>=<paramValue>[&<paramName>=<paramValue>...]
         """
-        ret = self.command(
-            'configManager.cgi?action=setConfig&{0}'.format(upnp_opt)
-        )
-        return ret.content.decode('utf-8')
+        ret = self.command(f"configManager.cgi?action=setConfig&{upnp_opt}")
+        return ret.content.decode()
 
     @property
-    def ntp_config(self):
-        ret = self.command(
-            'configManager.cgi?action=getConfig&name=NTP'
-        )
-        return ret.content.decode('utf-8')
+    def ntp_config(self) -> str:
+        ret = self.command("configManager.cgi?action=getConfig&name=NTP")
+        return ret.content.decode()
 
     @ntp_config.setter
-    def ntp_config(self, ntp_opt):
+    def ntp_config(self, ntp_opt: str) -> str:
         """
         ntp_opt is the NTP options listed as example below:
 
@@ -229,15 +215,11 @@ class Network(object):
         ntp_opt format:
         <paramName>=<paramValue>[&<paramName>=<paramValue>...]
         """
-        ret = self.command(
-            'configManager.cgi?action=setConfig&{0}'.format(ntp_opt)
-        )
-        return ret.content.decode('utf-8')
+        ret = self.command(f"configManager.cgi?action=setConfig&{ntp_opt}")
+        return ret.content.decode()
 
     @property
-    def rtsp_config(self):
+    def rtsp_config(self) -> str:
         """Get RTSP configuration."""
-        ret = self.command(
-            'configManager.cgi?action=getConfig&name=RTSP'
-        )
-        return ret.content.decode('utf-8')
+        ret = self.command("configManager.cgi?action=getConfig&name=RTSP")
+        return ret.content.decode()
