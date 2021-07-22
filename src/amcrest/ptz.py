@@ -168,26 +168,30 @@ class Ptz(Http):
             channel=channel,
         )
 
-    def positionABS(
-        self, action=None, horizontal_angle=0, vertical_angle=0, channel=0
-    ):
+    def position_abs(
+        self,
+        start: bool,
+        *,
+        horizontal_angle: int = 0,
+        vertical_angle: int = 0,
+        channel: int = 0,
+    ) -> str:
         """
         Params:
-            action              - start or stop
-            channel             - channel number
+            start               - True to start, False to stop
             horizontal_angle    - range 0-360
-            vertical_angle    - range 0-360
+            vertical_angle      - range 0-360
+            channel             - channel number
 
         Go to an absolute coordinate
         """
-        ret = self.command(
-            "ptz.cgi?action={0}&channel={1}&code=PositionABS&arg1={2}"
-            "&arg2={3}&arg3=0".format(
-                action, channel, horizontal_angle, vertical_angle
-            )
+        return self.ptz_control_command(
+            action="start" if start else "stop",
+            code="PositionABS",
+            arg1=str(horizontal_angle),
+            arg2=str(vertical_angle),
+            channel=channel,
         )
-        return ret.content.decode("utf-8")
-
 
     def focus_near(self, start: bool, *, channel: int = 0) -> str:
         """
@@ -273,8 +277,8 @@ class Ptz(Http):
 
     def tour(
         self,
-        *,
         start: bool = True,
+        *,
         channel: int = 0,
         tour_path_number: int = 1,
     ) -> str:
