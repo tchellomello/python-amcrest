@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, version 2 of the License.
@@ -11,58 +9,60 @@
 #
 # vim:sw=4:ts=4:et
 
+from datetime import datetime
+from typing import Iterator
 
-class Log(object):
+from .http import Http
+from .utils import date_to_str
 
+
+class Log(Http):
     @property
-    def log_clear_all(self):
+    def log_clear_all(self) -> str:
+        ret = self.command("log.cgi?action=clear")
+        return ret.content.decode()
+
+    def log_show(self, start_time: datetime, end_time: datetime) -> str:
+        start = date_to_str(start_time)
+        end = date_to_str(end_time)
         ret = self.command(
-            'log.cgi?action=clear'
+            "Log.backup?action=All&"
+            f"condition.StartTime={start}&condition.EndTime={end}"
         )
-        return ret.content.decode('utf-8')
+        return ret.content.decode()
 
-    def log_show(self, start_time, end_time):
+    def log_find_start(self, start_time: datetime, end_time: datetime) -> str:
+        start = date_to_str(start_time)
+        end = date_to_str(end_time)
         ret = self.command(
-            'Log.backup?action=All&condition.StartTime='
-            '{0}&condition.EndTime={1}'.format(start_time, end_time)
+            "log.cgi?action=startFind&"
+            f"condition.StartTime={start}&condition.EndTime={end}"
         )
-        return ret.content.decode('utf-8')
 
-    def log_find_start(self, start_time, end_time):
+        return ret.content.decode()
+
+    def log_find_next(self, token: str, count: int = 100) -> str:
         ret = self.command(
-            'log.cgi?action=startFind'
-            '&condition.StartTime={0}&condition.EndTime={1}'
-            .format(
-                start_time.strftime('%Y-%m-%d %H:%M:%S'),
-                end_time.strftime('%Y-%m-%d %H:%M:%S')))
+            f"log.cgi?action=doFind&token={token}&count={count}"
+        )
+        return ret.content.decode()
 
-        return ret.content.decode('utf-8')
+    def log_find_stop(self, token: str) -> str:
+        ret = self.command(f"log.cgi?action=stopFind&token={token}")
+        return ret.content.decode()
 
-    def log_find_next(self, token, count=100):
-        ret = self.command('log.cgi?action=doFind&token={0}&count={1}'
-                           .format(token, count))
-        return ret.content.decode('utf-8')
+    def log_find(
+        self, start_time: datetime, end_time: datetime
+    ) -> Iterator[str]:
+        token = self.log_find_start(start_time, end_time).strip().split("=")[1]
 
-    def log_find_stop(self, token):
-        ret = self.command('log.cgi?action=stopFind&token={0}'
-                           .format(token))
-        return ret.content.decode('utf-8')
-
-    def log_find(self, start_time, end_time):
-        token = self.log_find_start(start_time, end_time).strip().split('=')[1]
-        to_query = True
-
-        while to_query:
+        while True:
             content = self.log_find_next(token)
-            tag, count = (
-                list(content.split('\r\n', 1)[0]
-                     .split('=')) + [None])[:2]
-
-            to_query = False
-
-            if (tag == 'found') and (int(count) > 0):
-                to_query = True
+            tag, _, count = content.split("\r\n", 1)[0].partition("=")
 
             yield content
+
+            if tag != "found" or int(count) == 0:
+                break
 
         self.log_find_stop(token)
