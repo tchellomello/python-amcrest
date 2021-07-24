@@ -156,7 +156,7 @@ class System(Http):
         Currently only the 'admin' account can use ONVIF.
         """
         cmd = 'configManager.cgi?action=setConfig'
-        cmd += "&UserGlobal.OnvifLoginCheck={0}".format(str(setCheck))
+        cmd += "&UserGlobal.OnvifLoginCheck={0}".format(str(setCheck).lower())
         ret = self.command(cmd)
 
         return ret.content.decode()
