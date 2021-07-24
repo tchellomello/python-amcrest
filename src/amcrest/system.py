@@ -150,7 +150,7 @@ class System(Http):
         ret = self.command(cmd)
         return ret.content.decode()
 
-    def onvif_login_check(self, setCheck=False):
+    def onvif_login_check(self, setCheck: bool = False) -> str:
         """
         Allows the other non-admin accounts to use ONVIF.
         Currently only the 'admin' account can use ONVIF.
