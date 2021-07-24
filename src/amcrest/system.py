@@ -149,3 +149,14 @@ class System(Http):
 
         ret = self.command(cmd)
         return ret.content.decode()
+
+    def onvif_login_check(self, setCheck=False):
+        """
+        Allows the other non-admin accounts to use ONVIF.
+        Currently only the 'admin' account can use ONVIF.
+        """
+        cmd = 'configManager.cgi?action=setConfig'
+        cmd += "&UserGlobal.OnvifLoginCheck={0}".format(str(setCheck).lower())
+        ret = self.command(cmd)
+
+        return ret.content.decode()
