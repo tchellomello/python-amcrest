@@ -67,7 +67,7 @@ class System(Http):
             version, build_date = swinfo.split(",")
         else:
             version, build_date = swinfo.split()
-        _, _, version = build_date.rpartition("=")
+        _, _, version = version.rpartition("=")
         _, _, build_date = build_date.rpartition(":")
         return version, build_date
 
