@@ -24,6 +24,7 @@ from .storage import Storage
 from .system import System
 from .user_management import UserManagement
 from .video import Video
+from .privacy_mode import PrivacyMode
 
 
 class AmcrestCamera:
