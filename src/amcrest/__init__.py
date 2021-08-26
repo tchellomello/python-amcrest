@@ -73,5 +73,6 @@ class ApiWrapper(
     Storage,
     Nas,
     Media,
+    PrivacyMode,
 ):
     pass
