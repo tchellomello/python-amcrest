@@ -183,10 +183,19 @@ class Video(Http):
         str_value = "false" if value else "true"
         return self.set_video_in_option("InfraRed", str_value, channel=channel)
 
-    def is_video_enabled(self, channel: int) -> bool:
-        """Return if any video stream enabled."""
+    def is_video_enabled(
+        self, channel: int, *, stream: str = "Main", stream_type: int = 0
+    ) -> bool:
+        """Return if given video stream enabled.
+
+        The stream should be either "Main" or "Extra".  For the main stream,
+        the stream type selects if it should read regular (0), motion detection
+        (1), alarm (2), or emergency (3) encode settings.  For the extra
+        stream, the stream type selects if it should read extra stream 1 (0) or
+        extra stream 2 (0) settings.
+        """
         is_enabled = utils.extract_audio_video_enabled(
-            "Video", self.encode_media
+            f"{stream}Format[{stream_type}].Video", self.encode_media
         )
         return is_enabled[channel]
 
@@ -220,7 +229,7 @@ class Video(Http):
 
     @property
     def video_enabled(self) -> bool:
-        """Return if any video stream enabled."""
+        """Return if main video stream enabled."""
         return self.is_video_enabled(channel=0)
 
     @video_enabled.setter
