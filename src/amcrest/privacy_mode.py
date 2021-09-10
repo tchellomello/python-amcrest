@@ -15,8 +15,7 @@ from .http import Http
 # This API is based on an undocumented API of Amcrest Cameras.
 # This API may change without notice
 class PrivacyMode(Http):
-    @property
-    def privacy_set(self, mode: bool) -> str:
+    def set_privacy(self, mode: bool) -> str:
         """
         Params:
             mode         - True to enable privacy mode, false to disable
@@ -28,7 +27,6 @@ class PrivacyMode(Http):
         )
         return ret.content.decode()
 
-    @property
     def privacy_config(self) -> str:
         ret = self.command(
             "configManager.cgi?action=getConfig&name=LeLensMask"
