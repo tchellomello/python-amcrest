@@ -9,6 +9,7 @@
 #
 # vim:sw=4:ts=4:et
 
+from amcrest.exceptions import CommError
 from amcrest.http import Http
 from amcrest.utils import pretty
 
@@ -73,9 +74,16 @@ class Record(Http):
     def get_record_mode(self, channel: int = 0) -> str:
         status_code = {0: "Automatic", 1: "Manual", 2: "Stop"}
 
-        ret = self.command(
-            "configManager.cgi?action=getConfig&name=RecordMode"
-        )
+        # Certain compatible cameras, such Dahua doorbells, will return an
+        # error code 400 when using this API.  Gracefully catch this and return
+        # "Unknown" in this case.
+        try:
+            ret = self.command(
+                "configManager.cgi?action=getConfig&name=RecordMode"
+            )
+        except CommError:
+            return "Unknown"
+
         statuses = [
             pretty(s)
             for s in ret.content.decode().split()
