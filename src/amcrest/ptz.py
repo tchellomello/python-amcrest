@@ -60,14 +60,14 @@ class Ptz(Http):
         arg2: str = "0",
         arg3: str = "0",
         channel: int = 0,
-    ) -> str:
+    ) -> bool:
         ret = self.command(
             f"ptz.cgi?action={action}&channel={channel}&code={code}&"
             f"arg1={arg1}&arg2={arg2}&arg3={arg3}"
         )
-        return ret.content.decode()
+        return ret.content.decode().strip() == "OK"
 
-    def zoom_in(self, start: bool, *, channel: int = 0) -> str:
+    def zoom_in(self, start: bool, *, channel: int = 0) -> bool:
         """
         Params:
             start               - True to start, False to stop
@@ -82,7 +82,7 @@ class Ptz(Http):
             channel=channel,
         )
 
-    def zoom_out(self, start: bool, *, channel: int = 0) -> str:
+    def zoom_out(self, start: bool, *, channel: int = 0) -> bool:
         """
         Params:
             start               - True to start, False to stop
@@ -98,13 +98,13 @@ class Ptz(Http):
         )
 
     def move_left(
-        self, start: bool, *, channel: int = 0, vertical_speed: int = 1
-    ) -> str:
+        self, start: bool, *, channel: int = 0, horizontal_speed: int = 1
+    ) -> bool:
         """
         Params:
             start               - True to start, False to stop
             channel             - channel number
-            vertical_speed      - range 1-8
+            horizontal_speed    - range 1-8
 
         The magic of move left 1x, 2x etc. is the timer between the cmd
         'start' and cmd 'stop'. My suggestion for start/stop cmd is 0.5 sec
@@ -112,18 +112,18 @@ class Ptz(Http):
         return self.ptz_control_command(
             action="start" if start else "stop",
             code="Left",
-            arg2=str(vertical_speed),
+            arg2=str(horizontal_speed),
             channel=channel,
         )
 
     def move_right(
-        self, start: bool, *, channel: int = 0, vertical_speed: int = 1
-    ) -> str:
+        self, start: bool, *, channel: int = 0, horizontal_speed: int = 1
+    ) -> bool:
         """
         Params:
             start               - True to start, False to stop
             channel             - channel number
-            vertical_speed      - range 1-8
+            horizontal_speed    - range 1-8
 
         The magic of move right 1x, 2x etc. is the timer between the cmd
         'start' and cmd 'stop'. My suggestion for start/stop cmd is 0.5 sec
@@ -131,13 +131,13 @@ class Ptz(Http):
         return self.ptz_control_command(
             action="start" if start else "stop",
             code="Right",
-            arg2=str(vertical_speed),
+            arg2=str(horizontal_speed),
             channel=channel,
         )
 
     def move_up(
         self, start: bool, *, channel: int = 0, vertical_speed: int = 1
-    ) -> str:
+    ) -> bool:
         """
         Params:
             start               - True to start, False to stop
@@ -156,7 +156,7 @@ class Ptz(Http):
 
     def move_down(
         self, start: bool, *, channel: int = 0, vertical_speed: int = 1
-    ) -> str:
+    ) -> bool:
         """
         The magic of move down 1x, 2x etc. is the timer between the cmd
         'start' and cmd 'stop'. My suggestion for start/stop cmd is 0.2 sec
@@ -175,7 +175,7 @@ class Ptz(Http):
         horizontal_angle: int = 0,
         vertical_angle: int = 0,
         channel: int = 0,
-    ) -> str:
+    ) -> bool:
         """
         Params:
             start               - True to start, False to stop
@@ -193,7 +193,7 @@ class Ptz(Http):
             channel=channel,
         )
 
-    def focus_near(self, start: bool, *, channel: int = 0) -> str:
+    def focus_near(self, start: bool, *, channel: int = 0) -> bool:
         """
         Params:
             start               - True to start, False to stop
@@ -205,7 +205,7 @@ class Ptz(Http):
             channel=channel,
         )
 
-    def focus_far(self, start: bool, *, channel: int = 0) -> str:
+    def focus_far(self, start: bool, *, channel: int = 0) -> bool:
         """
         Params:
             start               - True to start, False to stop
@@ -217,7 +217,7 @@ class Ptz(Http):
             channel=channel,
         )
 
-    def iris_large(self, start: bool, *, channel: int = 0) -> str:
+    def iris_large(self, start: bool, *, channel: int = 0) -> bool:
         """
         Aperture larger
 
@@ -231,7 +231,7 @@ class Ptz(Http):
             channel=channel,
         )
 
-    def iris_small(self, start: bool, *, channel: int = 0) -> str:
+    def iris_small(self, start: bool, *, channel: int = 0) -> bool:
         """
         Aperture smaller
 
@@ -247,7 +247,7 @@ class Ptz(Http):
 
     def go_to_preset(
         self, *, channel: int = 0, preset_point_number: int = 1
-    ) -> str:
+    ) -> bool:
         """
         Params:
             channel             - channel number
@@ -262,7 +262,7 @@ class Ptz(Http):
 
     def set_preset(
         self, *, channel: int = 0, preset_point_number: int = 1
-    ) -> str:
+    ) -> bool:
         """
         Params:
             channel             - channel number
@@ -281,7 +281,7 @@ class Ptz(Http):
         *,
         channel: int = 0,
         tour_path_number: int = 1,
-    ) -> str:
+    ) -> bool:
         """
         Params:
             start               - True (StartTour) or False (StopTour)
@@ -302,7 +302,7 @@ class Ptz(Http):
         channel: int = 0,
         vertical_speed: int = 1,
         horizontal_speed: int = 1,
-    ) -> str:
+    ) -> bool:
         """
         Params:
             start            - True to start, False to stop
@@ -325,7 +325,7 @@ class Ptz(Http):
         channel: int = 0,
         vertical_speed: int = 1,
         horizontal_speed: int = 1,
-    ) -> str:
+    ) -> bool:
         """
         Params:
             start            - True to start, False to stop
@@ -348,7 +348,7 @@ class Ptz(Http):
         channel: int = 0,
         vertical_speed: int = 1,
         horizontal_speed: int = 1,
-    ) -> str:
+    ) -> bool:
         """
         Params:
             start            - True to start, False to stop
@@ -371,7 +371,7 @@ class Ptz(Http):
         channel: int = 0,
         vertical_speed: int = 1,
         horizontal_speed: int = 1,
-    ) -> str:
+    ) -> bool:
         """
         Params:
             start            - True to start, False to stop

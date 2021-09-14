@@ -228,8 +228,9 @@ class Event(Http):
                 if key == "data":
                     value = {
                         data_key.replace('"', ""): data_value.replace('"', "")
-                        for data_key, data_value in
-                        _REG_PARSE_MALFORMED_JSON.findall(value)
+                        for data_key, data_value in _REG_PARSE_MALFORMED_JSON.findall(
+                            value
+                        )
                     }
                 payload[key] = value
             _LOGGER.debug(
