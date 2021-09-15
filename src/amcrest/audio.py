@@ -141,10 +141,22 @@ class Audio(Http):
 
         return ret.raw
 
-    def is_audio_enabled(self, *, channel: int = 0) -> bool:
-        """Return if any audio stream enabled on the given channel."""
+    def is_audio_enabled(
+        self, *, channel: int = 0, stream: str = "Main", stream_type: int = 0
+    ) -> bool:
+        """Return if the audio stream is enabled on the given channel.
+
+        The stream should be either "Main", "Extra", or "Snap".  For the main
+        stream, the stream type selects if it should read regular (0), motion
+        detection (1), alarm (2), or emergency (3) encode settings.  The snap
+        stream has the same settings for regular, motion detection, and alarm
+        stream types.  For the extra stream, the stream type selects which
+        stream should be read, and is zero indexed from 0 to 2 for streams 1 to
+        3.
+        """
         is_enabled = utils.extract_audio_video_enabled(
-            "Audio", self.encode_media  # type: ignore[attr-defined]
+            f"{stream}Format[{stream_type}].Audio",
+            self.encode_media,  # type: ignore[attr-defined]
         )
         return is_enabled[channel]
 
