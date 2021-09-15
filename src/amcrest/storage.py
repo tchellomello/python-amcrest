@@ -33,12 +33,72 @@ class Storage(Http):
         return ret.content.decode()
 
     @property
+    async def async_storage_device_info(self) -> str:
+        ret = await self.async_command(
+            "storageDevice.cgi?action=getDeviceAllInfo"
+        )
+        return ret.content.decode()
+
+    @property
     def storage_device_names(self) -> str:
         ret = self.command("storageDevice.cgi?action=factory.getCollect")
         return ret.content.decode()
 
-    def _get_storage_values(self, *params) -> List[Optional[float]]:
-        info = self.storage_device_info
+    @property
+    async def async_storage_device_names(self) -> str:
+        ret = await self.async_command(
+            "storageDevice.cgi?action=factory.getCollect"
+        )
+        return ret.content.decode()
+
+    @property
+    def storage_used(self) -> Tuple[str, str]:
+        (used,) = self._get_storage_values(self.storage_device_info, _USED)
+        return to_unit(used)
+
+    @property
+    async def async_storage_used(self) -> Tuple[str, str]:
+        (used,) = self._get_storage_values(
+            await self.async_storage_device_info, _USED
+        )
+        return to_unit(used)
+
+    @property
+    def storage_total(self) -> Tuple[str, str]:
+        (total,) = self._get_storage_values(self.storage_device_info, _TOTAL)
+        return to_unit(total)
+
+    @property
+    async def async_storage_total(self) -> Tuple[str, str]:
+        (total,) = self._get_storage_values(
+            await self.async_storage_device_info, _TOTAL
+        )
+        return to_unit(total)
+
+    @property
+    def storage_used_percent(self) -> str:
+        return self.storage_all["used_percent"]
+
+    @property
+    async def async_storage_used_percent(self) -> str:
+        storage_all = await self.async_storage_all
+        return storage_all["used_percent"]
+
+    @property
+    def storage_all(self) -> StorageT:
+        used, total = self._get_storage_values(
+            self.storage_device_info, _USED, _TOTAL
+        )
+        return self._build_storage_type(used, total)
+
+    @property
+    async def async_storage_all(self) -> StorageT:
+        used, total = self._get_storage_values(
+            await self.async_storage_device_info, _USED, _TOTAL
+        )
+        return self._build_storage_type(used, total)
+
+    def _get_storage_values(self, info: str, *params) -> List[Optional[float]]:
         ret: List[Optional[float]] = []
         for param in params:
             match = re.search(f".{param}=([0-9.]+)", info)
@@ -48,38 +108,14 @@ class Storage(Http):
                 ret.append(float(match.group(1)))
         return ret
 
-    @property
-    def storage_used(self) -> Tuple[str, str]:
-        used = self._get_storage_values(_USED)[0]
-        if used is None:
-            return "unknown", "GB"
-        return to_unit(used, "GB")
-
-    @property
-    def storage_total(self) -> Tuple[str, str]:
-        total = self._get_storage_values(_TOTAL)[0]
-        if total is None:
-            return "unknown", "GB"
-        return to_unit(total, "GB")
-
-    @property
-    def storage_used_percent(self) -> str:
-        used, total = self._get_storage_values(_USED, _TOTAL)
-        if used is None or total is None:
-            return "unknown"
-        try:
-            return percent(float(used), float(total))
-        except (TypeError, ValueError, ZeroDivisionError):
-            return "unknown"
-
-    @property
-    def storage_all(self) -> StorageT:
-        used, total = self._get_storage_values(_USED, _TOTAL)
+    def _build_storage_type(
+        self, used: Optional[float], total: Optional[float]
+    ) -> StorageT:
         if used is None or total is None:
             return {
                 "used_percent": "unknown",
-                "used": ("unknown", "GB"),
-                "total": ("unknown", "GB"),
+                "used": to_unit(used),
+                "total": to_unit(total),
             }
         try:
             used_percent = percent(float(used), float(total))
@@ -87,6 +123,6 @@ class Storage(Http):
             used_percent = "unknown"
         return {
             "used_percent": used_percent,
-            "used": to_unit(used, "GB"),
-            "total": to_unit(total, "GB"),
+            "used": to_unit(used),
+            "total": to_unit(total),
         }

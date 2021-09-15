@@ -113,13 +113,15 @@ class Network(Http):
 
     @property
     def wlan_config(self) -> str:
-        ret = self.command("configManager.cgi?action=getConfig&name=WLan")
-        return ret.content.decode()
+        return self._get_config("WLan")
+
+    @property
+    async def async_wlan_config(self) -> str:
+        return await self._async_get_config("WLan")
 
     @property
     def telnet_config(self) -> str:
-        ret = self.command("configManager.cgi?action=getConfig&name=Telnet")
-        return ret.content.decode()
+        return self._get_config("Telnet")
 
     @telnet_config.setter
     def telnet_config(self, status: str) -> str:
@@ -134,13 +136,31 @@ class Network(Http):
         return ret.content.decode()
 
     @property
-    def network_config(self) -> str:
-        ret = self.command("configManager.cgi?action=getConfig&name=Network")
+    async def async_telnet_config(self) -> str:
+        return await self._async_get_config("Telnet")
+
+    async def async_set_telnet_config(self, status: str) -> str:
+        ret = await self.async_command(
+            f"configManager.cgi?action=setConfig&Telnet.Enable={status}"
+        )
         return ret.content.decode()
+
+    @property
+    def network_config(self) -> str:
+        return self._get_config("Network")
+
+    @property
+    async def async_network_config(self) -> str:
+        return await self._async_get_config("Network")
 
     @property
     def network_interfaces(self) -> str:
         ret = self.command("netApp.cgi?action=getInterfaces")
+        return ret.content.decode()
+
+    @property
+    async def async_network_interfaces(self) -> str:
+        ret = await self.async_command("netApp.cgi?action=getInterfaces")
         return ret.content.decode()
 
     @property
@@ -149,9 +169,13 @@ class Network(Http):
         return ret.content.decode()
 
     @property
-    def upnp_config(self) -> str:
-        ret = self.command("configManager.cgi?action=getConfig&name=UPnP")
+    async def async_upnp_status(self) -> str:
+        ret = await self.async_command("netApp.cgi?action=getUPnPStatus")
         return ret.content.decode()
+
+    @property
+    def upnp_config(self) -> str:
+        return self._get_config("UPnP")
 
     @upnp_config.setter
     def upnp_config(self, upnp_opt: str) -> str:
@@ -197,9 +221,18 @@ class Network(Http):
         return ret.content.decode()
 
     @property
-    def ntp_config(self) -> str:
-        ret = self.command("configManager.cgi?action=getConfig&name=NTP")
+    async def async_upnp_config(self) -> str:
+        return await self._async_get_config("UPnP")
+
+    async def async_set_upnp_config(self, upnp_opt: str) -> str:
+        ret = await self.async_command(
+            f"configManager.cgi?action=setConfig&{upnp_opt}"
+        )
         return ret.content.decode()
+
+    @property
+    def ntp_config(self) -> str:
+        return self._get_config("NTP")
 
     @ntp_config.setter
     def ntp_config(self, ntp_opt: str) -> str:
@@ -219,7 +252,21 @@ class Network(Http):
         return ret.content.decode()
 
     @property
+    async def async_ntp_config(self) -> str:
+        return await self._async_get_config("NTP")
+
+    async def async_set_ntp_config(self, ntp_opt: str) -> str:
+        ret = await self.async_command(
+            f"configManager.cgi?action=setConfig&{ntp_opt}"
+        )
+        return ret.content.decode()
+
+    @property
     def rtsp_config(self) -> str:
         """Get RTSP configuration."""
-        ret = self.command("configManager.cgi?action=getConfig&name=RTSP")
-        return ret.content.decode()
+        return self._get_config("RTSP")
+
+    @property
+    async def async_rtsp_config(self) -> str:
+        """Get RTSP configuration."""
+        return await self._async_get_config("RTSP")

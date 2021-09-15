@@ -15,37 +15,46 @@ from .http import Http
 
 class UserManagement(Http):
     def info_user(self, username: str) -> str:
-        ret = self.command(
-            "userManager.cgi?action=getUserInfo&name={0}".format(username)
-        )
-        return ret.content.decode()
+        return self._user_manager(f"getUserInfo&name={username}")
+
+    async def async_info_user(self, username: str) -> str:
+        return await self._async_user_manager(f"getUserInfo&name={username}")
 
     @property
     def info_all_users(self) -> str:
-        ret = self.command("userManager.cgi?action=getUserInfoAll")
-        return ret.content.decode()
+        return self._user_manager("getUserInfoAll")
+
+    @property
+    async def async_info_all_users(self) -> str:
+        return await self._async_user_manager("getUserInfoAll")
 
     @property
     def info_all_active_users(self) -> str:
-        ret = self.command("userManager.cgi?action=getActiveUserInfoAll")
-        return ret.content.decode()
+        return self._user_manager("getActiveUserInfoAll")
+
+    @property
+    async def async_info_all_active_users(self) -> str:
+        return await self._async_user_manager("getActiveUserInfoAll")
 
     def info_group(self, group: str) -> str:
-        ret = self.command(
-            "userManager.cgi?action=getGroupInfo&name={0}".format(group)
-        )
-        return ret.content.decode()
+        return self._user_manager(f"getGroupInfo&name={group}")
+
+    async def async_info_group(self, group: str) -> str:
+        return await self._async_user_manager(f"getGroupInfo&name={group}")
 
     @property
     def info_all_groups(self) -> str:
-        ret = self.command("userManager.cgi?action=getGroupInfoAll")
-        return ret.content.decode()
+        return self._user_manager("getGroupInfoAll")
+
+    @property
+    async def async_info_all_groups(self) -> str:
+        return await self._async_user_manager("getGroupInfoAll")
 
     def delete_user(self, username: str) -> str:
-        ret = self.command(
-            "userManager.cgi?action=deleteUser&name={0}".format(username)
-        )
-        return ret.content.decode()
+        return self._user_manager(f"deleteUser&name={username}")
+
+    async def async_delete_user(self, username: str) -> str:
+        return await self._async_user_manager(f"deleteUser&name={username}")
 
     def add_user(
         self,
@@ -71,22 +80,41 @@ class UserManagement(Http):
         """
 
         cmd = (
-            "userManager.cgi?action=addUser&user.Name={0}"
-            "&user.Password={1}&user.Group={2}&user.Sharable={3}"
-            "&user.Reserved={4}".format(
-                username,
-                password,
-                group.lower(),
-                str(sharable).lower(),
-                str(reserved).lower(),
-            )
+            "addUser"
+            f"&user.Name={username}"
+            f"&user.Password={password}"
+            f"&user.Group={group.lower()}"
+            f"&user.Sharable={str(sharable).lower()}"
+            f"&user.Reserved={str(reserved).lower()}"
         )
 
         if memo:
-            cmd += "&user.Memo=%s" % memo
+            cmd += f"&user.Memo={memo}"
 
-        ret = self.command(cmd)
-        return ret.content.decode()
+        return self._user_manager(cmd)
+
+    async def async_add_user(
+        self,
+        username: str,
+        password: str,
+        group: str,
+        sharable: bool = True,
+        reserved: bool = False,
+        memo: Optional[str] = None,
+    ) -> str:
+        cmd = (
+            "addUser"
+            f"&user.Name={username}"
+            f"&user.Password={password}"
+            f"&user.Group={group.lower()}"
+            f"&user.Sharable={str(sharable).lower()}"
+            f"&user.Reserved={str(reserved).lower()}"
+        )
+
+        if memo:
+            cmd += f"&user.Memo={memo}"
+
+        return await self._async_user_manager(cmd)
 
     def modify_password(self, username: str, newpwd: str, oldpwd: str) -> str:
         """
@@ -95,11 +123,16 @@ class UserManagement(Http):
             newpwd - new password
             oldpwd - old password
         """
-        ret = self.command(
-            "userManager.cgi?action=modifyPassword&name={0}&pwd={1}"
-            "&pwdOld={2}".format(username, newpwd, oldpwd)
+        return self._user_manager(
+            f"modifyPassword&name={username}&pwd={newpwd}&pwdOld={oldpwd}"
         )
-        return ret.content.decode()
+
+    async def async_modify_password(
+        self, username: str, newpwd: str, oldpwd: str
+    ) -> str:
+        return await self._async_user_manager(
+            f"modifyPassword&name={username}&pwd={newpwd}&pwdOld={oldpwd}"
+        )
 
     def modify_user(self, username: str, attribute: str, value: str) -> str:
         """
@@ -111,19 +144,45 @@ class UserManagement(Http):
             value - the new value for attribute
         """
 
-        cmd = "userManager.cgi?action=modifyUser&name={0}".format(username)
+        cmd = f"modifyUser&name={username}"
 
         if attribute.lower() == "group":
-            cmd += "&user.Group=%s" % value.lower()
+            cmd += f"&user.Group={value.lower()}"
 
         elif attribute.lower() == "sharable":
-            cmd += "&user.Sharable=%s" % value.lower()
+            cmd += f"&user.Sharable={value.lower()}"
 
         elif attribute.lower() == "reserved":
-            cmd += "&user.Reserved=%s" % value.lower()
+            cmd += f"&user.Reserved={value.lower()}"
 
         elif attribute == "memo":
-            cmd += "&user.Memo=%s" % value.lower()
+            cmd += f"&user.Memo={value.lower()}"
 
-        ret = self.command(cmd)
+        return self._user_manager(cmd)
+
+    async def async_modify_user(
+        self, username: str, attribute: str, value: str
+    ) -> str:
+        cmd = f"modifyUser&name={username}"
+
+        if attribute.lower() == "group":
+            cmd += f"&user.Group={value.lower()}"
+
+        elif attribute.lower() == "sharable":
+            cmd += f"&user.Sharable={value.lower()}"
+
+        elif attribute.lower() == "reserved":
+            cmd += f"&user.Reserved={value.lower()}"
+
+        elif attribute == "memo":
+            cmd += f"&user.Memo={value.lower()}"
+
+        return await self._async_user_manager(cmd)
+
+    def _user_manager(self, action: str) -> str:
+        ret = self.command(f"userManager.cgi?action={action}")
+        return ret.content.decode()
+
+    async def _async_user_manager(self, action: str) -> str:
+        ret = await self.async_command(f"userManager.cgi?action={action}")
         return ret.content.decode()

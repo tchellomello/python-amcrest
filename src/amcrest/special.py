@@ -71,12 +71,23 @@ class Special(Http):
                     1-Extra Stream 1 (Sub Stream)
                     2-Extra Stream 2 (Sub Stream)
         """
+        return self._build_rtsp_url(self.rtsp_config, channel, typeno)  # type: ignore[attr-defined]
+
+    async def async_rtsp_url(
+        self, *, channel: int = 1, typeno: int = 0
+    ) -> str:
+        rtsp_config = await self.async_rtsp_config  # type: ignore[attr-defined]
+        return self._build_rtsp_url(rtsp_config, channel, typeno)
+
+    def _build_rtsp_url(
+        self, rtsp_config: str, channel: int, typeno: int
+    ) -> str:
         cmd = f"cam/realmonitor?channel={channel}&subtype={typeno}"
 
         try:
             port_num = [
                 x.split("=")[1]
-                for x in self.rtsp_config.split()  # type: ignore[attr-defined]
+                for x in rtsp_config.split()
                 if x.startswith("table.RTSP.Port=")
             ][0]
         except IndexError:

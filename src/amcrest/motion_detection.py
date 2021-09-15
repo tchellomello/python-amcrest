@@ -14,15 +14,9 @@ from amcrest.utils import pretty, str2bool
 
 
 class MotionDetection(Http):
-    def __get_config(self, config_name: str) -> str:
-        ret = self.command(
-            f"configManager.cgi?action=getConfig&name={config_name}"
-        )
-        return ret.content.decode()
-
     @property
     def motion_detection(self) -> str:
-        return self.__get_config("MotionDetect")
+        return self._get_config("MotionDetect")
 
     @motion_detection.setter
     def motion_detection(self, opt: bool) -> bool:
@@ -32,17 +26,35 @@ class MotionDetection(Http):
     def motion_recording(self, opt: bool) -> bool:
         return self.set_motion_recording(opt)
 
+    @property
+    async def async_motion_detection(self) -> str:
+        return await self._async_get_config("MotionDetect")
+
     def is_motion_detector_on(self, *, channel: int = 0) -> bool:
         ret = self.motion_detection
         status = [pretty(s) for s in ret.split() if ".Enable=" in s][channel]
-        return str2bool(status)  # pylint: disable=no-value-for-parameter
+        return str2bool(status)
+
+    async def async_is_motion_detector_on(self, *, channel: int = 0) -> bool:
+        ret = await self.async_motion_detection
+        status = [pretty(s) for s in ret.split() if ".Enable=" in s][channel]
+        return str2bool(status)
 
     def is_record_on_motion_detection(self, *, channel: int = 0) -> bool:
         ret = self.motion_detection
         status = [pretty(s) for s in ret.split() if ".RecordEnable=" in s][
             channel
         ]
-        return str2bool(status)  # pylint: disable=no-value-for-parameter
+        return str2bool(status)
+
+    async def async_is_record_on_motion_detection(
+        self, *, channel: int = 0
+    ) -> bool:
+        ret = await self.async_motion_detection
+        status = [pretty(s) for s in ret.split() if ".RecordEnable=" in s][
+            channel
+        ]
+        return str2bool(status)
 
     def set_motion_detection(self, opt: bool, *, channel: int = 0) -> bool:
         value = "true" if opt else "false"
@@ -52,9 +64,30 @@ class MotionDetection(Http):
         )
         return "ok" in ret.content.decode().lower()
 
+    async def async_set_motion_detection(
+        self, opt: bool, *, channel: int = 0
+    ) -> bool:
+        value = "true" if opt else "false"
+        ret = await self.async_command(
+            "configManager.cgi?action="
+            f"setConfig&MotionDetect[{channel}].Enable={value}"
+        )
+        return "ok" in ret.content.decode().lower()
+
     def set_motion_recording(self, opt: bool, *, channel: int = 0) -> bool:
         value = "true" if opt else "false"
         ret = self.command(
+            "configManager.cgi?action="
+            f"setConfig&MotionDetect[{channel}].EventHandler."
+            f"RecordEnable={value}"
+        )
+        return "ok" in ret.content.decode().lower()
+
+    async def async_set_motion_recording(
+        self, opt: bool, *, channel: int = 0
+    ) -> bool:
+        value = "true" if opt else "false"
+        ret = await self.async_command(
             "configManager.cgi?action="
             f"setConfig&MotionDetect[{channel}].EventHandler."
             f"RecordEnable={value}"

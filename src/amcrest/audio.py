@@ -27,8 +27,18 @@ class Audio(Http):
         return ret.content.decode()
 
     @property
+    async def async_audio_input_channels_numbers(self) -> str:
+        ret = await self.async_command("devAudioInput.cgi?action=getCollect")
+        return ret.content.decode()
+
+    @property
     def audio_output_channels_numbers(self) -> str:
         ret = self.command("devAudioOutput.cgi?action=getCollect")
+        return ret.content.decode()
+
+    @property
+    async def async_audio_output_channels_numbers(self) -> str:
+        ret = await self.async_command("devAudioOutput.cgi?action=getCollect")
         return ret.content.decode()
 
     def play_wav(
@@ -141,6 +151,21 @@ class Audio(Http):
 
         return ret.raw
 
+    @property
+    def audio_enabled(self) -> bool:
+        """Return if any audio stream enabled."""
+        return self.is_audio_enabled()
+
+    @audio_enabled.setter
+    def audio_enabled(self, enable: bool) -> None:
+        """Enable/disable all audio streams."""
+        self.set_audio_enabled(enable)
+
+    @property
+    async def async_audio_enabled(self) -> bool:
+        """Return if any audio stream enabled."""
+        return await self.async_is_audio_enabled()
+
     def is_audio_enabled(
         self, *, channel: int = 0, stream: str = "Main", stream_type: int = 0
     ) -> bool:
@@ -160,16 +185,24 @@ class Audio(Http):
         )
         return is_enabled[channel]
 
+    async def async_is_audio_enabled(
+        self, *, channel: int = 0, stream: str = "Main", stream_type: int = 0
+    ) -> bool:
+        """Return if any audio stream enabled on the given channel."""
+        is_enabled = utils.extract_audio_video_enabled(
+            f"{stream}Format[{stream_type}].Audio",
+            await self.async_encode_media,  # type: ignore[attr-defined]
+        )
+        return is_enabled[channel]
+
     def set_audio_enabled(self, enable: bool, *, channel: int = 0) -> None:
         """Enable/disable all audio streams on given channel."""
         self.command(utils.enable_audio_video_cmd("Audio", enable, channel))
 
-    @property
-    def audio_enabled(self) -> bool:
-        """Return if any audio stream enabled."""
-        return self.is_audio_enabled()
-
-    @audio_enabled.setter
-    def audio_enabled(self, enable: bool) -> None:
-        """Enable/disable all audio streams."""
-        self.set_audio_enabled(enable)
+    async def async_set_audio_enabled(
+        self, enable: bool, *, channel: int = 0
+    ) -> None:
+        """Enable/disable all audio streams on given channel."""
+        await self.async_command(
+            utils.enable_audio_video_cmd("Audio", enable, channel)
+        )
