@@ -159,7 +159,7 @@ class System(Http):
 
     @property
     async def async_vendor_information(self) -> str:
-        return await pretty(self._async_magic_box("getVendor"))
+        return pretty(await self._async_magic_box("getVendor"))
 
     @property
     def onvif_information(self) -> str:
