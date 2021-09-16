@@ -20,10 +20,13 @@ class Record(Http):
         ret = self.command("recordManager.cgi?action=getCaps")
         return ret.content.decode()
 
+    async def async_record_capability(self) -> str:
+        ret = await self.async_command("recordManager.cgi?action=getCaps")
+        return ret.content.decode()
+
     @property
     def record_config(self) -> str:
-        ret = self.command("configManager.cgi?action=getConfig&name=Record")
-        return ret.content.decode()
+        return self._get_config("Record")
 
     @record_config.setter
     def record_config(self, rec_opt: str) -> str:
@@ -65,29 +68,57 @@ class Record(Http):
         return ret.content.decode()
 
     @property
-    def media_global_config(self) -> str:
-        ret = self.command(
-            "configManager.cgi?action=getConfig&name=MediaGlobal"
+    async def async_record_config(self) -> str:
+        return await self._async_get_config("Record")
+
+    async def async_set_record_config(self, rec_opt: str) -> str:
+        ret = await self.async_command(
+            f"configManager.cgi?action=setConfig&{rec_opt}"
         )
         return ret.content.decode()
 
-    def get_record_mode(self, channel: int = 0) -> str:
-        status_code = {0: "Automatic", 1: "Manual", 2: "Stop"}
+    @property
+    def media_global_config(self) -> str:
+        return self._get_config("MediaGlobal")
 
+    async def async_media_global_config(self) -> str:
+        return await self._async_get_config("MediaGlobal")
+
+    @property
+    def record_mode(self) -> str:
+        return self.get_record_mode()
+
+    @record_mode.setter
+    def record_mode(self, record_opt: int) -> None:
+        self.set_record_mode(record_opt)
+
+    @property
+    async def async_record_mode(self) -> str:
+        return await self.async_get_record_mode()
+
+    def get_record_mode(self, channel: int = 0) -> str:
         # Certain compatible cameras, such Dahua doorbells, will return an
         # error code 400 when using this API.  Gracefully catch this and return
         # "Unknown" in this case.
         try:
-            ret = self.command(
-                "configManager.cgi?action=getConfig&name=RecordMode"
-            )
+            ret = self._get_config("RecordMode")
         except CommError:
             return "Unknown"
+        return self._process_record_mode(ret, channel)
+
+    async def async_get_record_mode(self, channel: int = 0) -> str:
+        # Similar behavior as above
+        try:
+            ret = await self._async_get_config("RecordMode")
+        except CommError:
+            return "Unknown"
+        return self._process_record_mode(ret, channel)
+
+    def _process_record_mode(self, record_mode: str, channel: int) -> str:
+        status_code = {0: "Automatic", 1: "Manual", 2: "Stop"}
 
         statuses = [
-            pretty(s)
-            for s in ret.content.decode().split()
-            if f"[{channel}].Mode=" in s
+            pretty(s) for s in record_mode.split() if f"[{channel}].Mode=" in s
         ]
         if len(statuses) != 1:
             return "Unknown"
@@ -124,10 +155,11 @@ class Record(Http):
         )
         return ret.content.decode()
 
-    @property
-    def record_mode(self) -> str:
-        return self.get_record_mode()
-
-    @record_mode.setter
-    def record_mode(self, record_opt: int) -> None:
-        self.set_record_mode(record_opt)
+    async def async_set_record_mode(
+        self, record_opt: int, *, channel: int = 0
+    ) -> str:
+        ret = await self.async_command(
+            "configManager.cgi?action=setConfig&RecordMode"
+            f"[{channel}].Mode={record_opt}"
+        )
+        return ret.content.decode()

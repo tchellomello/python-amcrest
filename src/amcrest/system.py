@@ -44,15 +44,38 @@ class System(Http):
 
         return "ok" in ret.content.decode().lower()
 
-    def __get_config(self, config_name: str) -> str:
-        ret = self.command(
-            f"configManager.cgi?action=getConfig&name={config_name}"
+    @property
+    async def async_current_time(self) -> datetime:
+        ret = await self.async_command("global.cgi?action=getCurrentTime")
+        date_str = pretty(ret.content.decode())
+        return str_to_date(date_str)
+
+    async def async_set_current_time(self, date_value: datetime) -> bool:
+        """
+        According with API:
+            The time format is "Y-M-D H-m-S". It is not be effected by Locales.
+            TimeFormat in SetLocalesConfig
+
+        Params:
+            date = "Y-M-D H-m-S"
+            Example: 2016-10-28 13:48:00
+
+        Return: True
+        """
+        date_str = date_to_str(date_value)
+        ret = await self.async_command(
+            f"global.cgi?action=setCurrentTime&time={date_str}"
         )
-        return ret.content.decode()
+
+        return "ok" in ret.content.decode().lower()
 
     @property
     def general_config(self) -> str:
-        return self.__get_config("General")
+        return self._get_config("General")
+
+    @property
+    async def async_general_config(self) -> str:
+        return await self._async_get_config("General")
 
     @property
     def version_http_api(self) -> str:
@@ -60,9 +83,24 @@ class System(Http):
         return ret.content.decode()
 
     @property
+    async def async_version_http_api(self) -> str:
+        ret = await self.async_command(
+            "IntervideoManager.cgi?action=getVersion&Name=CGI"
+        )
+        return ret.content.decode()
+
+    @property
     def software_information(self) -> Tuple[str, str]:
-        ret = self.command("magicBox.cgi?action=getSoftwareVersion")
-        swinfo = ret.content.decode().strip()
+        sw_info = self._magic_box("getSoftwareVersion")
+        return self._parse_sw_information(sw_info)
+
+    @property
+    async def async_software_information(self) -> Tuple[str, str]:
+        sw_info = await self._async_magic_box("getSoftwareVersion")
+        return self._parse_sw_information(sw_info)
+
+    @staticmethod
+    def _parse_sw_information(swinfo: str) -> Tuple[str, str]:
         if "," in swinfo:
             version, build_date = swinfo.split(",")
         else:
@@ -73,23 +111,35 @@ class System(Http):
 
     @property
     def hardware_version(self) -> str:
-        ret = self.command("magicBox.cgi?action=getHardwareVersion")
-        return ret.content.decode().strip()
+        return pretty(self._magic_box("getHardwareVersion"))
+
+    @property
+    async def async_hardware_version(self) -> str:
+        return pretty(await self._async_magic_box("getHardwareVersion"))
 
     @property
     def device_type(self) -> str:
-        ret = self.command("magicBox.cgi?action=getDeviceType")
-        return pretty(ret.content.decode())
+        return pretty(self._magic_box("getDeviceType"))
+
+    @property
+    async def async_device_type(self) -> str:
+        return pretty(await self._async_magic_box("getDeviceType"))
 
     @property
     def serial_number(self) -> str:
-        ret = self.command("magicBox.cgi?action=getSerialNo")
-        return pretty(ret.content.decode())
+        return pretty(self._magic_box("getSerialNo"))
+
+    @property
+    async def async_serial_number(self) -> str:
+        return pretty(await self._async_magic_box("getSerialNo"))
 
     @property
     def machine_name(self) -> str:
-        ret = self.command("magicBox.cgi?action=getMachineName")
-        return pretty(ret.content.decode())
+        return pretty(self._magic_box("getMachineName"))
+
+    @property
+    async def async_machine_name(self) -> str:
+        return pretty(await self._async_magic_box("getMachineName"))
 
     @property
     def system_information(self) -> str:
@@ -97,17 +147,30 @@ class System(Http):
 
         Including serial number, device type, processor, and serial.
         """
-        ret = self.command("magicBox.cgi?action=getSystemInfo")
-        return ret.content.decode()
+        return self._magic_box("getSystemInfo")
+
+    @property
+    async def async_system_information(self) -> str:
+        return await self._async_magic_box("getSystemInfo")
 
     @property
     def vendor_information(self) -> str:
-        ret = self.command("magicBox.cgi?action=getVendor")
-        return ret.content.decode().strip()
+        return self._magic_box("getVendor")
+
+    @property
+    async def async_vendor_information(self) -> str:
+        return await self._async_magic_box("getVendor")
 
     @property
     def onvif_information(self) -> str:
         ret = self.command(
+            "IntervideoManager.cgi?action=getVersion&Name=Onvif"
+        )
+        return ret.content.decode().strip()
+
+    @property
+    async def async_onvif_information(self) -> str:
+        ret = await self.async_command(
             "IntervideoManager.cgi?action=getVersion&Name=Onvif"
         )
         return ret.content.decode().strip()
@@ -125,30 +188,53 @@ class System(Http):
 
         return ret.content.decode()
 
+    async def async_config_backup(
+        self, filename: Optional[str] = None
+    ) -> Optional[str]:
+        ret = await self.async_command("Config.backup?action=All")
+
+        if not ret:
+            return None
+
+        if filename:
+            with open(filename, "w+") as cfg:
+                cfg.write(ret.content.decode())
+            return None
+
+        return ret.content.decode()
+
     @property
     def device_class(self) -> str:
         """
         During the development, device IP2M-841B didn't
         responde for this call, adding it anyway.
         """
-        ret = self.command("magicBox.cgi?action=getDeviceClass")
-        return pretty(ret.content.decode())
+        return pretty(self._magic_box("getDeviceClass"))
+
+    @property
+    async def async_device_class(self) -> str:
+        return pretty(await self._async_magic_box("getDeviceClass"))
 
     def shutdown(self) -> str:
         """
         From the testings, shutdown acts like "reboot now"
         """
-        ret = self.command("magicBox.cgi?action=shutdown")
-        return ret.content.decode()
+        return self._magic_box("shutdown")
+
+    async def async_shutdown(self) -> str:
+        return await self._async_magic_box("shutdown")
 
     def reboot(self, delay: Optional[int] = None) -> str:
-        cmd = "magicBox.cgi?action=reboot"
-
+        cmd = "reboot"
         if delay:
             cmd += f"&delay={delay}"
+        return self._magic_box(cmd)
 
-        ret = self.command(cmd)
-        return ret.content.decode()
+    async def async_reboot(self, delay: Optional[int] = None) -> str:
+        cmd = "reboot"
+        if delay:
+            cmd += f"&delay={delay}"
+        return await self._async_magic_box(cmd)
 
     def onvif_login_check(self, setCheck: bool = False) -> str:
         """
@@ -158,5 +244,16 @@ class System(Http):
         cmd = "configManager.cgi?action=setConfig"
         cmd += "&UserGlobal.OnvifLoginCheck={0}".format(str(setCheck).lower())
         ret = self.command(cmd)
+
+        return ret.content.decode()
+
+    async def async_onvif_login_check(self, setCheck: bool = False) -> str:
+        """
+        Allows the other non-admin accounts to use ONVIF.
+        Currently only the 'admin' account can use ONVIF.
+        """
+        cmd = "configManager.cgi?action=setConfig"
+        cmd += "&UserGlobal.OnvifLoginCheck={0}".format(str(setCheck).lower())
+        ret = await self.async_command(cmd)
 
         return ret.content.decode()

@@ -625,7 +625,7 @@ def main():
             camera.go_to_preset(channel=channel, preset_point_number=preset_point_number)
 
         elif args.log_clear_all:
-            print(camera.log_clear_all)
+            print(camera.log_clear_all())
 
         elif args.video_standard == -1:
             print(camera.video_standard)

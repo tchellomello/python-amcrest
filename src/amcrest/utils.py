@@ -56,13 +56,17 @@ def str2bool(value: Union[str, int]) -> bool:
     return bool(value)
 
 
-def to_unit(value: Union[str, int, float], unit: str = "B") -> Tuple[str, str]:
+def to_unit(
+    value: Union[None, str, int, float], unit: str = "B"
+) -> Tuple[str, str]:
     """Convert bytes to give unit."""
     byte_array = ["B", "KB", "MB", "GB", "TB"]
 
     if unit not in byte_array:
         raise ValueError(f"Unit {unit} missing from known units")
 
+    if value is None:
+        return "unknown", unit
     if isinstance(value, (int, float)):
         value_f = value
     else:

@@ -23,15 +23,13 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class Snapshot(Http):
-    def __get_config(self, config_name: str) -> str:
-        ret = self.command(
-            f"configManager.cgi?action=getConfig&name={config_name}"
-        )
-        return ret.content.decode()
-
     @property
     def snapshot_config(self) -> str:
-        return self.__get_config("Snap")
+        return self._get_config("Snap")
+
+    @property
+    async def async_snapshot_config(self) -> str:
+        return await self._async_get_config("Snap")
 
     @overload
     def snapshot(
@@ -101,3 +99,13 @@ class Snapshot(Http):
                     out_file.write(ret.content)
 
         return ret.raw if stream else ret.content
+
+    async def async_snapshot(
+        self, *, channel: Optional[int] = None, timeout: TimeoutT = None
+    ) -> bytes:
+        cmd = "snapshot.cgi"
+        if channel is not None:
+            cmd += f"?channel={channel}"
+        ret = await self.async_command(cmd, timeout_cmd=timeout)
+
+        return ret.content

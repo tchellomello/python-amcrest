@@ -27,8 +27,14 @@ class PrivacyMode(Http):
         )
         return ret.content.decode()
 
-    def privacy_config(self) -> str:
-        ret = self.command(
-            "configManager.cgi?action=getConfig&name=LeLensMask"
+    async def async_set_privacy(self, mode: bool) -> str:
+        ret = await self.async_command(
+            f"configManager.cgi?action=setConfig&LeLensMask[0].Enable={mode}"
         )
         return ret.content.decode()
+
+    def privacy_config(self) -> str:
+        return self._get_config("LeLensMask")
+
+    async def async_privacy_config(self) -> str:
+        return await self._async_get_config("LeLensMask")

@@ -8,12 +8,15 @@
 # GNU General Public License for more details.
 #
 # vim:sw=4:ts=4:et
+import asyncio
 import logging
 import re
 import socket
 import threading
-from typing import Optional, Tuple, Union
+from contextlib import asynccontextmanager
+from typing import AsyncIterator, Optional, Tuple, Union
 
+import httpx
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.connection import HTTPConnection
@@ -44,6 +47,10 @@ except AttributeError:
     pass
 
 TimeoutT = Union[Optional[float], Tuple[Optional[float], Optional[float]]]
+HttpxTimeoutT = Union[
+    Optional[float],
+    Tuple[Optional[float], Optional[float], Optional[float], Optional[float]],
+]
 
 
 class SOHTTPAdapter(HTTPAdapter):
@@ -74,6 +81,7 @@ class Http:
         timeout_protocol: TimeoutT = None,
     ) -> None:
         self._token_lock = threading.Lock()
+        self._async_token_lock = asyncio.Lock()
         self._cmd_id_lock = threading.Lock()
         self._cmd_id = 0
         self._host = clean_url(host)
@@ -93,6 +101,7 @@ class Http:
         self._timeout_default = timeout_protocol or TIMEOUT_HTTP_PROTOCOL
 
         self._token: Optional[requests.auth.AuthBase] = None
+        self._async_token: Optional[httpx.Auth] = None
         self._name: Optional[str] = None
         self._serial: Optional[str] = None
 
@@ -134,6 +143,44 @@ class Http:
             .strip()
         )
 
+    async def _async_generate_token(self) -> None:
+        """Create authentation to use with requests."""
+        cmd = "magicBox.cgi?action=getMachineName"
+        _LOGGER.debug("%s Trying async Basic Authentication", self)
+        self._async_token = httpx.BasicAuth(self._user, self._password)
+        try:
+            try:
+                resp = (await self._async_command(cmd)).content.decode()
+            except LoginError:
+                _LOGGER.debug("%s Trying async Digest Authentication", self)
+                self._async_token = httpx.DigestAuth(
+                    self._user, self._password
+                )
+                resp = (await self._async_command(cmd)).content.decode()
+        except CommError:
+            self._async_token = None
+            raise
+
+        # check if user passed
+        result = resp.lower()
+        if "invalid" in result or "error" in result:
+            _LOGGER.debug(
+                "%s Result from camera: %s",
+                self,
+                resp.strip().replace("\r\n", ": "),
+            )
+            self._async_token = None
+            raise LoginError("Invalid credentials")
+
+        self._name = pretty(resp.strip())
+
+        _LOGGER.debug("%s Retrieving serial number", self)
+        self._serial = pretty(
+            (await self._async_command("magicBox.cgi?action=getSerialNo"))
+            .content.decode()
+            .strip()
+        )
+
     def __repr__(self) -> str:
         """Default object representation."""
         if self._name is None:
@@ -170,6 +217,22 @@ class Http:
             if not self._token:
                 self._generate_token()
         return self._command(*args, **kwargs)
+
+    async def async_command(self, *args, **kwargs) -> httpx.Response:
+        async with self._async_token_lock:
+            if not self._async_token:
+                await self._async_generate_token()
+        return await self._async_command(*args, **kwargs)
+
+    @asynccontextmanager
+    async def async_stream_command(
+        self, *args, **kwargs
+    ) -> AsyncIterator[httpx.Response]:
+        async with self._async_token_lock:
+            if not self._async_token:
+                await self._async_generate_token()
+        async with self._async_stream_command(*args, **kwargs) as ret:
+            yield ret
 
     def _command(
         self,
@@ -241,6 +304,116 @@ class Http:
         )
         return resp
 
+    async def _async_command(
+        self,
+        cmd: str,
+        retries: Optional[int] = None,
+        timeout_cmd: TimeoutT = None,
+    ) -> httpx.Response:
+        url = self.__base_url(cmd)
+        cmd_id = self._cmd_id = self._cmd_id + 1
+        _LOGGER.debug("%s Async HTTP query %i: %s", self, cmd_id, url)
+        if retries is None:
+            retries = self._retries_default
+
+        timeout = timeout_cmd or self._timeout_default
+        # requests uses (connect timeout, read timeout), and httpx adds (write
+        # timeout, pool timeout), just set the extras to None
+        if isinstance(timeout, tuple):
+            httpx_timeout: HttpxTimeoutT = timeout + (None, None)
+        else:
+            httpx_timeout = timeout
+
+        async with httpx.AsyncClient(
+            auth=self._async_token, verify=self._verify, timeout=httpx_timeout
+        ) as client:
+            for loop in range(1, 2 + retries):
+                _LOGGER.debug(
+                    "%s Running query %i attempt %s", self, cmd_id, loop
+                )
+                try:
+                    resp = await client.get(url)
+                    if resp.status_code == 401:
+                        _LOGGER.debug(
+                            "%s Query %i: Unauthorized (401)", self, cmd_id
+                        )
+                        self._async_token = None
+                        raise LoginError()
+                    resp.raise_for_status()
+                except httpx.RequestError as error:
+                    _LOGGER.debug(
+                        "%s Query %i failed due to error: %r",
+                        self,
+                        cmd_id,
+                        error,
+                    )
+                    if loop > retries:
+                        raise CommError(error) from error
+                    msg = re.sub(
+                        r"at 0x[0-9a-fA-F]+", "at ADDRESS", repr(error)
+                    )
+                    _LOGGER.warning(
+                        "%s Trying again due to error: %s", self, msg
+                    )
+                    continue
+                else:
+                    break
+
+        _LOGGER.debug(
+            "%s Query %i worked. Exit code: <%s>",
+            self,
+            cmd_id,
+            resp.status_code,
+        )
+        return resp
+
+    @asynccontextmanager
+    async def _async_stream_command(
+        self,
+        cmd: str,
+        timeout_cmd: TimeoutT = None,
+    ) -> AsyncIterator[httpx.Response]:
+        url = self.__base_url(cmd)
+        cmd_id = self._cmd_id = self._cmd_id + 1
+        _LOGGER.debug("%s HTTP query %i: %s", self, cmd_id, url)
+
+        timeout = timeout_cmd or self._timeout_default
+        # requests uses (connect timeout, read timeout), and httpx adds (write
+        # timeout, pool timeout), just set the extras to None
+        if isinstance(timeout, tuple):
+            httpx_timeout: HttpxTimeoutT = timeout + (None, None)
+        else:
+            httpx_timeout = timeout
+
+        async with httpx.AsyncClient(
+            auth=self._async_token, verify=self._verify, timeout=httpx_timeout
+        ) as client:
+            async with client.stream("GET", url) as resp:
+                try:
+                    if resp.status_code == 401:
+                        _LOGGER.debug(
+                            "%s Query %i: Unauthorized (401)", self, cmd_id
+                        )
+                        self._async_token = None
+                        raise LoginError()
+                    resp.raise_for_status()
+
+                    _LOGGER.debug(
+                        "%s Query %i worked. Exit code: <%s>",
+                        self,
+                        cmd_id,
+                        resp.status_code,
+                    )
+                    yield resp
+                except httpx.RequestError as error:
+                    _LOGGER.debug(
+                        "%s Query %i failed due to error: %r",
+                        self,
+                        cmd_id,
+                        error,
+                    )
+                    raise CommError(error) from error
+
     def command_audio(
         self,
         cmd: str,
@@ -262,3 +435,25 @@ class Http:
             )
         except requests.exceptions.ReadTimeout:
             pass
+
+    # Helpers for common commands
+
+    def _get_config(self, config_name: str) -> str:
+        ret = self.command(
+            f"configManager.cgi?action=getConfig&name={config_name}"
+        )
+        return ret.content.decode()
+
+    async def _async_get_config(self, config_name: str) -> str:
+        ret = await self.async_command(
+            f"configManager.cgi?action=getConfig&name={config_name}"
+        )
+        return ret.content.decode()
+
+    def _magic_box(self, action: str) -> str:
+        ret = self.command(f"magicBox.cgi?action={action}")
+        return ret.content.decode()
+
+    async def _async_magic_box(self, action: str) -> str:
+        ret = await self.async_command(f"magicBox.cgi?action={action}")
+        return ret.content.decode()

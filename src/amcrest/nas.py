@@ -19,5 +19,9 @@ class Nas(Http):
     @property
     def nas_information(self) -> str:
         """Return NAS information."""
-        ret = self.command("configManager.cgi?action=getConfig&name=NAS")
-        return ret.content.decode()
+        return self._get_config("NAS")
+
+    @property
+    async def async_nas_information(self) -> str:
+        """Return NAS information."""
+        return await self._async_get_config("NAS")
