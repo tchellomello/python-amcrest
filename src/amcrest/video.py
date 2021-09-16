@@ -188,11 +188,13 @@ class Video(Http):
     ) -> bool:
         """Return if given video stream enabled.
 
-        The stream should be either "Main" or "Extra".  For the main stream,
-        the stream type selects if it should read regular (0), motion detection
-        (1), alarm (2), or emergency (3) encode settings.  For the extra
-        stream, the stream type selects if it should read extra stream 1 (0) or
-        extra stream 2 (0) settings.
+        The stream should be either "Main", "Extra", or "Snap".  For the main
+        stream, the stream type selects if it should read regular (0), motion
+        detection (1), alarm (2), or emergency (3) encode settings.  The snap
+        stream has the same settings for regular, motion detection, and alarm
+        stream types.  For the extra stream, the stream type selects which
+        stream should be read, and is zero indexed from 0 to 2 for streams 1 to
+        3.
         """
         is_enabled = utils.extract_audio_video_enabled(
             f"{stream}Format[{stream_type}].Video", self.encode_media
