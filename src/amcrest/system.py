@@ -155,11 +155,11 @@ class System(Http):
 
     @property
     def vendor_information(self) -> str:
-        return self._magic_box("getVendor")
+        return pretty(self._magic_box("getVendor"))
 
     @property
     async def async_vendor_information(self) -> str:
-        return await self._async_magic_box("getVendor")
+        return await pretty(self._async_magic_box("getVendor"))
 
     @property
     def onvif_information(self) -> str:
