@@ -81,7 +81,10 @@ class Http:
         timeout_protocol: TimeoutT = None,
     ) -> None:
         self._token_lock = threading.Lock()
-        self._async_token_lock = asyncio.Lock()
+        try:
+            self._async_token_lock: Optional[asyncio.Lock] = asyncio.Lock()
+        except RuntimeError:
+            self._async_token_lock = None
         self._cmd_id_lock = threading.Lock()
         self._cmd_id = 0
         self._host = clean_url(host)
@@ -219,6 +222,8 @@ class Http:
         return self._command(*args, **kwargs)
 
     async def async_command(self, *args, **kwargs) -> httpx.Response:
+        if self._async_token_lock is None:
+            raise RuntimeError("Camera not setup with async loop running")
         async with self._async_token_lock:
             if not self._async_token:
                 await self._async_generate_token()
@@ -228,6 +233,8 @@ class Http:
     async def async_stream_command(
         self, *args, **kwargs
     ) -> AsyncIterator[httpx.Response]:
+        if self._async_token_lock is None:
+            raise RuntimeError("Camera not setup with async loop running")
         async with self._async_token_lock:
             if not self._async_token:
                 await self._async_generate_token()
