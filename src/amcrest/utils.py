@@ -11,6 +11,7 @@
 
 import re
 from datetime import datetime
+from typing import List
 
 # pylint: disable=no-name-in-module
 from distutils import util
@@ -89,11 +90,18 @@ def extract_audio_video_enabled(param: str, resp: str) -> List[bool]:
     return parts
 
 
-def enable_audio_video_cmd(param: str, enable: bool, channel: int) -> str:
+def enable_audio_video_cmd(
+    param: str, enable: bool, channel: int, *, stream: str
+) -> str:
     """Return command to enable/disable all audio/video streams."""
     formats = [("Extra", 3), ("Main", 4)]
     if param == "Video":
         formats.append(("Snap", 3))
+
+    if stream is not None:
+        formats = [x for x in formats if x[0] == stream]
+        if not formats:
+            raise RuntimeError(f"Bad stream specified: {stream}")
 
     set_enable = str(enable).lower()
     cmds = ["configManager.cgi?action=setConfig"]
