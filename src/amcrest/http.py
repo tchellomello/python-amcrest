@@ -332,7 +332,10 @@ class Http:
             httpx_timeout = timeout
 
         async with httpx.AsyncClient(
-            auth=self._async_token, verify=self._verify, timeout=httpx_timeout
+            follow_redirects=True,
+            auth=self._async_token,
+            verify=self._verify,
+            timeout=httpx_timeout
         ) as client:
             for loop in range(1, 2 + retries):
                 _LOGGER.debug(
@@ -393,7 +396,10 @@ class Http:
             httpx_timeout = timeout
 
         async with httpx.AsyncClient(
-            auth=self._async_token, verify=self._verify, timeout=httpx_timeout
+            follow_redirects=True,
+            auth=self._async_token,
+            verify=self._verify,
+            timeout=httpx_timeout
         ) as client:
             async with client.stream("GET", url) as resp:
                 try:
