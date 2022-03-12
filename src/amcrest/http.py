@@ -350,7 +350,7 @@ class Http:
                         self._async_token = None
                         raise LoginError()
                     resp.raise_for_status()
-                except httpx.RequestError as error:
+                except httpx.HTTPError as error:
                     _LOGGER.debug(
                         "%s Query %i failed due to error: %r",
                         self,
