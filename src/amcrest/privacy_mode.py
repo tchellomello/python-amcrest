@@ -22,14 +22,16 @@ class PrivacyMode(Http):
 
         Turns on privacy mode on or off in the camera
         """
+        strM = str(mode).lower()
         ret = self.command(
-            f"configManager.cgi?action=setConfig&LeLensMask[0].Enable={mode}"
+            f"configManager.cgi?action=setConfig&LeLensMask[0].Enable={strM}"
         )
         return ret.content.decode()
 
     async def async_set_privacy(self, mode: bool) -> str:
+        strM = str(mode).lower()
         ret = await self.async_command(
-            f"configManager.cgi?action=setConfig&LeLensMask[0].Enable={mode}"
+            f"configManager.cgi?action=setConfig&LeLensMask[0].Enable={strM}"
         )
         return ret.content.decode()
 
