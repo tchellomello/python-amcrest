@@ -9,6 +9,10 @@ class AmcrestError(Exception):
     """General Amcrest error occurred."""
 
 
+class ReadTimeoutError(AmcrestError):
+    """A read timeout error occurred."""
+
+
 class CommError(AmcrestError):
     """A communication error occurred."""
 

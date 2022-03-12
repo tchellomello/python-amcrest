@@ -25,7 +25,7 @@ from typing import (
 from requests import RequestException
 from urllib3.exceptions import HTTPError
 
-from .exceptions import CommError
+from .exceptions import CommError, ReadTimeoutError
 from .http import Http, TimeoutT
 from .utils import pretty
 
@@ -323,31 +323,27 @@ class Event(Http):
         self, eventcodes: str, *, timeout_cmd: TimeoutT = None
     ) -> AsyncIterator[str]:
         """Return a stream of event info lines."""
-        # If timeout is not specified, then use default, but remove read
-        # timeout since there's no telling when, if ever, an event will come.
-        if timeout_cmd is None:
-            if isinstance(self._timeout_default, tuple):
-                timeout_cmd = self._timeout_default[0], None
-            else:
-                timeout_cmd = self._timeout_default, None
-
-        async with self.async_stream_command(
-            f"eventManager.cgi?action=attach&codes=[{eventcodes}]",
-            timeout_cmd=timeout_cmd,
-        ) as ret:
-            it = ret.aiter_text(chunk_size=1)
-            async for line in _async_event_lines(it):
-                if line.lower().startswith("content-length:"):
-                    chunk_size = int(line.split(":")[1])
-                    chars = []
-                    async for char in it:
-                        chars.append(char)
-                        if len(chars) == chunk_size:
-                            break
-                    else:
-                        # If we can't get the chunk, then return out
-                        return
-                    yield "".join(chars)
+        while True:
+            try:
+                async with self.async_stream_command(
+                    f"eventManager.cgi?action=attach&codes=[{eventcodes}]",
+                    timeout_cmd=timeout_cmd,
+                ) as ret:
+                    it = ret.aiter_text(chunk_size=1)
+                    async for line in _async_event_lines(it):
+                        if line.lower().startswith("content-length:"):
+                            chunk_size = int(line.split(":")[1])
+                            chars = []
+                            async for char in it:
+                                chars.append(char)
+                                if len(chars) == chunk_size:
+                                    break
+                            else:
+                                # If we can't get the chunk, then return out
+                                return
+                            yield "".join(chars)
+            except ReadTimeoutError:
+                continue
 
     def event_actions(
         self,

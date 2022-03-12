@@ -28,7 +28,7 @@ from .config import (
     MAX_RETRY_HTTP_CONNECTION,
     TIMEOUT_HTTP_PROTOCOL,
 )
-from .exceptions import CommError, LoginError
+from .exceptions import CommError, LoginError, ReadTimeoutError
 from .utils import clean_url, pretty
 
 _LOGGER = logging.getLogger(__name__)
@@ -425,7 +425,10 @@ class Http:
                         cmd_id,
                         error,
                     )
-                    raise CommError(error) from error
+                    if isinstance(error, httpx.ReadTimeout):
+                        raise ReadTimeoutError(error) from error
+                    else:
+                        raise CommError(error) from error
 
     def command_audio(
         self,
