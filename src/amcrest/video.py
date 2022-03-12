@@ -380,15 +380,23 @@ class Video(Http):
         )
         return is_enabled[channel]
 
-    def set_video_enabled(self, enable: bool, channel: int) -> None:
-        self.command(utils.enable_audio_video_cmd("Video", enable, channel))
+    def set_video_enabled(
+        self, enable: bool, channel: int, *, stream: str = "Main"
+    ) -> None:
+        self.command(
+            utils.enable_audio_video_cmd(
+                "Video", enable, channel, stream=stream
+            )
+        )
         self.set_smart_ir(enable, channel)
 
     async def async_set_video_enabled(
-        self, enable: bool, channel: int
+        self, enable: bool, channel: int, *, stream: str = "Main"
     ) -> None:
         await self.async_command(
-            utils.enable_audio_video_cmd("Video", enable, channel)
+            utils.enable_audio_video_cmd(
+                "Video", enable, channel, stream=stream
+            )
         )
         await self.async_set_smart_ir(enable, channel)
 

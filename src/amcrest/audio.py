@@ -195,14 +195,22 @@ class Audio(Http):
         )
         return is_enabled[channel]
 
-    def set_audio_enabled(self, enable: bool, *, channel: int = 0) -> None:
+    def set_audio_enabled(
+        self, enable: bool, *, channel: int = 0, stream: str = "Main"
+    ) -> None:
         """Enable/disable all audio streams on given channel."""
-        self.command(utils.enable_audio_video_cmd("Audio", enable, channel))
+        self.command(
+            utils.enable_audio_video_cmd(
+                "Audio", enable, channel, stream=stream
+            )
+        )
 
     async def async_set_audio_enabled(
-        self, enable: bool, *, channel: int = 0
+        self, enable: bool, *, channel: int = 0, stream: str = "Main"
     ) -> None:
         """Enable/disable all audio streams on given channel."""
         await self.async_command(
-            utils.enable_audio_video_cmd("Audio", enable, channel)
+            utils.enable_audio_video_cmd(
+                "Audio", enable, channel, stream=stream
+            )
         )
