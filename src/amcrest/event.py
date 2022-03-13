@@ -58,6 +58,7 @@ async def _async_event_info(ret: AsyncIterable[str], length: int) -> str:
         line.append(char)
         if len(line) == length:
             return "".join(line)
+    raise CommError()
 
 
 class Event(Http):
