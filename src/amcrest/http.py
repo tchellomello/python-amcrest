@@ -9,6 +9,7 @@
 #
 # vim:sw=4:ts=4:et
 import asyncio
+import contextlib
 from functools import lru_cache
 import logging
 import re
