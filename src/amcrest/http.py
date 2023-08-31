@@ -57,10 +57,12 @@ HttpxTimeoutT = Union[
     Tuple[Optional[float], Optional[float], Optional[float], Optional[float]],
 ]
 
+
 @lru_cache(maxsize=None)
 def create_default_ssl_context() -> ssl.SSLContext:
     """Return an SSL context that verifies the server certificate."""
     return ssl.create_default_context()
+
 
 @lru_cache(maxsize=None)
 def create_no_verify_ssl_context() -> ssl.SSLContext:
