@@ -50,7 +50,6 @@ except AttributeError:
     pass
 
 
-
 TimeoutT = Union[Optional[float], Tuple[Optional[float], Optional[float]]]
 HttpxTimeoutT = Union[
     Optional[float],
@@ -84,6 +83,7 @@ def create_no_verify_ssl_context() -> ssl.SSLContext:
     # ssl.OP_LEGACY_SERVER_CONNECT is only available in Python 3.12a4+
     sslcontext.options |= getattr(ssl, "OP_LEGACY_SERVER_CONNECT", 0x4)
     return sslcontext
+
 
 class SOHTTPAdapter(HTTPAdapter):
     """HTTPAdapter with support for socket options."""
@@ -150,9 +150,7 @@ class Http:
                 resp = self._command(cmd).content.decode()
             except LoginError:
                 _LOGGER.debug("%s Trying Digest Authentication", self)
-                self._token = requests.auth.HTTPDigestAuth(
-                    self._user, self._password
-                )
+                self._token = requests.auth.HTTPDigestAuth(self._user, self._password)
                 resp = self._command(cmd).content.decode()
         except CommError:
             self._token = None
@@ -173,9 +171,7 @@ class Http:
 
         _LOGGER.debug("%s Retrieving serial number", self)
         self._serial = pretty(
-            self._command("magicBox.cgi?action=getSerialNo")
-            .content.decode()
-            .strip()
+            self._command("magicBox.cgi?action=getSerialNo").content.decode().strip()
         )
 
     async def _async_generate_token(self) -> None:
@@ -188,9 +184,7 @@ class Http:
                 resp = (await self._async_command(cmd)).content.decode()
             except LoginError:
                 _LOGGER.debug("%s Trying async Digest Authentication", self)
-                self._async_token = httpx.DigestAuth(
-                    self._user, self._password
-                )
+                self._async_token = httpx.DigestAuth(self._user, self._password)
                 resp = (await self._async_command(cmd)).content.decode()
         except CommError:
             self._async_token = None
@@ -298,9 +292,7 @@ class Http:
                     SOHTTPAdapter(socket_options=_KEEPALIVE_OPTS),
                 )
             for loop in range(1, 2 + retries):
-                _LOGGER.debug(
-                    "%s Running query %i attempt %s", self, cmd_id, loop
-                )
+                _LOGGER.debug("%s Running query %i attempt %s", self, cmd_id, loop)
                 try:
                     resp = session.get(
                         url,
@@ -310,9 +302,7 @@ class Http:
                         verify=self._verify,
                     )
                     if resp.status_code == 401:
-                        _LOGGER.debug(
-                            "%s Query %i: Unauthorized (401)", self, cmd_id
-                        )
+                        _LOGGER.debug("%s Query %i: Unauthorized (401)", self, cmd_id)
                         self._token = None
                         raise LoginError()
                     resp.raise_for_status()
@@ -325,12 +315,8 @@ class Http:
                     )
                     if loop > retries:
                         raise CommError(error) from error
-                    msg = re.sub(
-                        r"at 0x[0-9a-fA-F]+", "at ADDRESS", repr(error)
-                    )
-                    _LOGGER.warning(
-                        "%s Trying again due to error: %s", self, msg
-                    )
+                    msg = re.sub(r"at 0x[0-9a-fA-F]+", "at ADDRESS", repr(error))
+                    _LOGGER.warning("%s Trying again due to error: %s", self, msg)
                     continue
                 else:
                     break
@@ -375,15 +361,11 @@ class Http:
             timeout=httpx_timeout,
         ) as client:
             for loop in range(1, 2 + retries):
-                _LOGGER.debug(
-                    "%s Running query %i attempt %s", self, cmd_id, loop
-                )
+                _LOGGER.debug("%s Running query %i attempt %s", self, cmd_id, loop)
                 try:
                     resp = await client.get(url)
                     if resp.status_code == 401:
-                        _LOGGER.debug(
-                            "%s Query %i: Unauthorized (401)", self, cmd_id
-                        )
+                        _LOGGER.debug("%s Query %i: Unauthorized (401)", self, cmd_id)
                         self._async_token = None
                         raise LoginError()
                     resp.raise_for_status()
@@ -396,12 +378,8 @@ class Http:
                     )
                     if loop > retries:
                         raise CommError(error) from error
-                    msg = re.sub(
-                        r"at 0x[0-9a-fA-F]+", "at ADDRESS", repr(error)
-                    )
-                    _LOGGER.warning(
-                        "%s Trying again due to error: %s", self, msg
-                    )
+                    msg = re.sub(r"at 0x[0-9a-fA-F]+", "at ADDRESS", repr(error))
+                    _LOGGER.warning("%s Trying again due to error: %s", self, msg)
                     continue
                 else:
                     break
@@ -441,9 +419,7 @@ class Http:
             try:
                 async with client.stream("GET", url) as resp:
                     if resp.status_code == 401:
-                        _LOGGER.debug(
-                            "%s Query %i: Unauthorized (401)", self, cmd_id
-                        )
+                        _LOGGER.debug("%s Query %i: Unauthorized (401)", self, cmd_id)
                         self._async_token = None
                         raise LoginError()
                     resp.raise_for_status()
@@ -492,9 +468,7 @@ class Http:
     # Helpers for common commands
 
     def _get_config(self, config_name: str) -> str:
-        ret = self.command(
-            f"configManager.cgi?action=getConfig&name={config_name}"
-        )
+        ret = self.command(f"configManager.cgi?action=getConfig&name={config_name}")
         return ret.content.decode()
 
     async def _async_get_config(self, config_name: str) -> str:
