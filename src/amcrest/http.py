@@ -12,6 +12,7 @@ import asyncio
 import logging
 import re
 import socket
+import ssl
 import threading
 from contextlib import asynccontextmanager
 from typing import AsyncIterator, Optional, Tuple, Union
@@ -45,6 +46,8 @@ try:
     ]
 except AttributeError:
     pass
+
+_DEFAULT_SSL_CONTEXT = ssl.create_default_context()
 
 TimeoutT = Union[Optional[float], Tuple[Optional[float], Optional[float]]]
 HttpxTimeoutT = Union[
@@ -336,6 +339,7 @@ class Http:
             auth=self._async_token,
             verify=self._verify,
             timeout=httpx_timeout,
+            verify=_DEFAULT_SSL_CONTEXT,
         ) as client:
             for loop in range(1, 2 + retries):
                 _LOGGER.debug(
