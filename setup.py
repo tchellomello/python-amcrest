@@ -9,7 +9,7 @@ def readme():
 
 setup(
     name="amcrest",
-    version="1.9.7",
+    version="1.9.8",
     description="Python wrapper implementation for Amcrest cameras.",
     long_description=readme(),
     author="Douglas Schilling Landgraf, Marcelo Moreira de Mello",
