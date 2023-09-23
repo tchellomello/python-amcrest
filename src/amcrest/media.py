@@ -26,13 +26,13 @@ class Media(Http):
 
     def factory_close(self, factory_id: str) -> str:
         ret = self.command(
-            f"mediaFileFind.cgi?action=factory.close&object={factory_id}"
+            f"mediaFileFind.cgi?action=close&object={factory_id}"
         )
         return ret.content.decode()
 
     def factory_destroy(self, factory_id: str) -> str:
         ret = self.command(
-            f"mediaFileFind.cgi?action=factory.destroy&object={factory_id}"
+            f"mediaFileFind.cgi?action=destroy&object={factory_id}"
         )
         return ret.content.decode()
 
