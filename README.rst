@@ -14,7 +14,7 @@ Python Amcrest
 .. image:: https://img.shields.io/pypi/pyversions/amcrest.svg
     :target: https://pypi.python.org/pypi/amcrest
 
-A Python 2.7/3.x module for `Amcrest Cameras <https://www.amcrest.com/>`_ using the SDK HTTP API. Amcrest and Dahua devices share similar firmwares. Dahua Cameras and NVRs also work with this module.
+A Python 3.x module for `Amcrest Cameras <https://www.amcrest.com/>`_ using the SDK HTTP API. Amcrest and Dahua devices share similar firmwares. Dahua Cameras and NVRs also work with this module.
 
 Documentation: `http://python-amcrest.readthedocs.io/ <http://python-amcrest.readthedocs.io/>`_
 
@@ -58,7 +58,7 @@ Usage
     'version=2.420.AC00.15.R\r\nBuildDate=2016-09-08'
 
     #Capture snapshot
-    camera.snapshot(0, "/home/user/Desktop/snapshot00.jpeg")
+    camera.snapshot(channel=0, path_file="/home/user/Desktop/snapshot00.jpeg")
     <requests.packages.urllib3.response.HTTPResponse object at 0x7f84945083c8>
 
     #Capture audio
