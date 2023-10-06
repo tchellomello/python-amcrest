@@ -10,6 +10,7 @@
 # vim:sw=4:ts=4:et
 import logging
 import shutil
+import urllib.parse
 from typing import Optional
 
 from urllib3.exceptions import HTTPError
@@ -95,7 +96,10 @@ class Special(Http):
         else:
             port = ":{}".format(port_num)
 
-        return f"rtsp://{self._user}:{self._password}@{self._host}{port}/{cmd}"
+        username = urllib.parse.quote(self._user, safe='')
+        password = urllib.parse.quote(self._password, safe='')
+
+        return f"rtsp://{username}:{password}@{self._host}{port}/{cmd}"
 
     # pylint: disable=pointless-string-statement
     """
