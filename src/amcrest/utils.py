@@ -14,7 +14,6 @@ from datetime import datetime
 from typing import List
 
 # pylint: disable=no-name-in-module
-from distutils import util
 from typing import List, Tuple, Union
 
 DATEFMT = "%Y-%m-%d %H:%M:%S"
@@ -53,7 +52,13 @@ def str2bool(value: Union[str, int]) -> bool:
          False values: n, no, false, off, 0
     """
     if isinstance(value, str):
-        return bool(util.strtobool(value))
+        value = value.lower()
+        if value in ["y", "yes", "true", "t", "on", "1"]:
+            return True
+        elif value in ["n", "no", "false", "off", "0"]:
+            return False
+        else:
+            raise ValueError
     return bool(value)
 
 
