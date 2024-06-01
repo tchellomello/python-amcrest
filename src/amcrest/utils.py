@@ -14,12 +14,21 @@ from datetime import datetime
 from typing import List
 
 # pylint: disable=no-name-in-module
-from distutils import util
+#from distutils import util
 from typing import List, Tuple, Union
 
 DATEFMT = "%Y-%m-%d %H:%M:%S"
 PRECISION = 2
 
+
+def strtobool(value: str) -> bool:
+    """Convert string to boolean."""
+    if s.lower() in ['yes', 'true', 't', 'y', '1']:
+        return True
+    elif s.lower() in ['no', 'false', 'f', 'n', '0']:
+        return False
+    else:
+        raise ValueError("Cannot convert {} to a bool".format(s))
 
 def clean_url(url: str) -> str:
     host = re.sub(r"^http[s]?://", "", url, flags=re.IGNORECASE)
