@@ -42,10 +42,7 @@ AC_PATH_PROG([PYTHON3], [python3], [no])
     AC_SUBST([PYTHON3_PREFIX], ['${prefix}'])
     AC_SUBST([PYTHON3_EXEC_PREFIX], ['${exec_prefix}'])
 
-    PYTHON3_DIR=`$PYTHON3 -c "import distutils.sysconfig; \
-        print(distutils.sysconfig.get_python_lib(0,0,prefix='$PYTHON3_PREFIX'))"`
-    PYTHON3_EXECDIR=`$PYTHON3 -c "import distutils.sysconfig; \
-        print(distutils.sysconfig.get_python_lib(1,0,prefix='$PYTHON3_EXEC_PREFIX'))"`
+
 
     AC_SUBST(PYTHON3_CFLAGS)
     AC_SUBST(PYTHON3_LIBS)
