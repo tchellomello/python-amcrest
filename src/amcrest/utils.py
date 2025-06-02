@@ -14,12 +14,10 @@ from datetime import datetime
 from typing import List
 
 # pylint: disable=no-name-in-module
-from distutils import util
 from typing import List, Tuple, Union
 
 DATEFMT = "%Y-%m-%d %H:%M:%S"
 PRECISION = 2
-
 
 def clean_url(url: str) -> str:
     host = re.sub(r"^http[s]?://", "", url, flags=re.IGNORECASE)
@@ -53,7 +51,7 @@ def str2bool(value: Union[str, int]) -> bool:
          False values: n, no, false, off, 0
     """
     if isinstance(value, str):
-        return bool(util.strtobool(value))
+        return value.lower() in ("y", "yes", "on", "1", "true", "t")
     return bool(value)
 
 
