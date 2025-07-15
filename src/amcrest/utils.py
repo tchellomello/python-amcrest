@@ -59,7 +59,7 @@ def str2bool(value: Union[str, int]) -> bool:
             return False
         else:
             raise ValueError(value)
-        
+
     return bool(value)
 
 
