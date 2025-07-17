@@ -51,7 +51,15 @@ def str2bool(value: Union[str, int]) -> bool:
          False values: n, no, false, off, 0
     """
     if isinstance(value, str):
-        return value.lower() in ("y", "yes", "on", "1", "true", "t")
+        valueCompare = value.lower()
+
+        if valueCompare in ("y", "yes", "on", "1", "true", "t"):
+            return True
+        elif valueCompare in ("n", "no", "off", "0", "false"):
+            return False
+        else:
+            raise ValueError(value)
+
     return bool(value)
 
 
